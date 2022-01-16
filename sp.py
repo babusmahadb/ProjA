@@ -24,7 +24,7 @@ ur.disable_warnings()
 def find_clstr(site: str, envir: str):
     """Get cluster info from inventory using user inputs"""
     
-    wb = xl.load_workbook(r'C:\\Users\\Administrator.DEMO\\Documents\\GitHub\\test\\amgenclstrs.xlsx')
+    wb = xl.load_workbook(r'C:\\Users\\Administrator.DEMO\\Documents\\GitHub\\ProjA\\projclstrs.xlsx')
 
 #active worksheet data
     ws = wb.active    
@@ -44,7 +44,8 @@ def find_clstr(site: str, envir: str):
 
 def list_aggregate(cluster: str, headers_inc: str) -> None:
     """Lists the Aggregate"""
-    url = "https://{}/api/storage/aggregates".format(cluster)
+    print(cluster)
+    url = "https://{}/api/cluster/aggregates".format(cluster)
     try:
         response = requests.get(url, headers=headers_inc, verify=False)
     except requests.exceptions.HTTPError as err:
@@ -54,6 +55,7 @@ def list_aggregate(cluster: str, headers_inc: str) -> None:
         print(err)
         sys.exit(1)
     tmp = dict(response.json())
+    print(tmp)
     aggr = tmp['records']
     #bs = tmp['records.block_storage']
     #print()
