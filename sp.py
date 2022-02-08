@@ -42,30 +42,11 @@ def find_clstr(site: str, envir: str):
     return output
     
 
-def list_aggregate(cluster: str, headers_inc: str) -> None:
+def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     """Lists the Aggregate"""
-    print(cluster)
-    url = "https://{}/api/cluster/aggregates".format(cluster)
-    try:
-        response = requests.get(url, headers=headers_inc, verify=False)
-    except requests.exceptions.HTTPError as err:
-        print(err)
-        sys.exit(1)
-    except requests.exceptions.RequestException as err:
-        print(err)
-        sys.exit(1)
-    tmp = dict(response.json())
-    print(tmp)
-    aggr = tmp['records']
-    #bs = tmp['records.block_storage']
-    #print()
-    #print(ns)
-    print()
-    print("List of Aggregates on ",cluster)
-    print("=====================")
-    for i in aggr:
-        aggr_uuid = i['uuid']
-        url = "https://{}/api/storage/aggregates/{}".format(cluster,aggr_uuid)
+    print(dsktype)
+    for dsk in dsktype:
+        url = "https://{}/api/storage/aggregates?name=*{}*".format(cluster,dsk)
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
         except requests.exceptions.HTTPError as err:
@@ -75,13 +56,31 @@ def list_aggregate(cluster: str, headers_inc: str) -> None:
             print(err)
             sys.exit(1)
         tmp = dict(response.json())
-        tmp2 = dict(tmp['space'])
-        tmp3 = dict(tmp2['block_storage'])
-        avail = tmp3['available']
-        space_convert=(((int(avail)/1024)/1024)/1024)
-        #aggr = tmp['records']
-        print("Aggregate %s " % i['name'] +"has available space of "+str(int(space_convert))+" GB")
-        #print("Aggregate UUID = %s " % i['uuid'])
+        aggr = tmp['records']
+        #if not aggr:
+        #    return 
+        print()
+        print("List of Aggregates on ",cluster)
+        print("=====================")
+        for i in aggr:
+            aggr_uuid = i['uuid']
+            url = "https://{}/api/storage/aggregates/{}".format(cluster,aggr_uuid)
+            try:
+                response = requests.get(url, headers=headers_inc, verify=False)
+            except requests.exceptions.HTTPError as err:
+                print(err)
+                sys.exit(1)
+            except requests.exceptions.RequestException as err:
+                print(err)
+                sys.exit(1)
+            tmp = dict(response.json())
+            tmp2 = dict(tmp['space'])
+            tmp3 = dict(tmp2['block_storage'])
+            avail = tmp3['available']
+            space_convert=(((int(avail)/1024)/1024)/1024)
+            #aggr = tmp['records']
+            print("Aggregate %s " % i['name'] +"has available space of "+str(int(space_convert))+" GB")
+            #print("Aggregate UUID = %s " % i['uuid'])
         
         
 def parse_args() -> argparse.Namespace:
@@ -90,11 +89,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="This script will list volumes in a SVM")
     parser.add_argument(
-        "-s", "--site", required=True, help="It should be valide site code like uslv,demu,usto so on.."
+        "-s", required=True, help="It should be valide site code like uslv,demu,usto so on.."
                         )
     parser.add_argument(
-        "-env", "--envir", required=True, help="It should be pfsx or sfsx"  
+        "-env", required=True, help="It should be prod or nprod"  
                         )
+    parser.add_argument(
+        "-dskt", required=False, help="It should be sas,ssd or sata"  
+                        )         
     parser.add_argument(
         "-u",
         "--api_user",
@@ -134,7 +136,27 @@ if __name__ == "__main__":
         'accept': "application/json"
     }
     
-    clstr_name = find_clstr(ARGS.site, ARGS.envir)
+    #tier = ARGS.dskt
     
-    aggr_list = list_aggregate(clstr_name[0],headers)
-    
+    if ARGS.env == 'prod':
+        if ARGS.dskt == 'sata':
+            dsktype = ['sas','ssd','sata']
+        else:
+            dsktype = ['sas','ssd']
+        ARGS.env = 'pfsx'
+        clstr_name = find_clstr(ARGS.s, ARGS.env)
+        for clstr in clstr_name:
+                aggr_list = list_aggregate(clstr,dsktype,headers)
+    elif ARGS.env == 'nprod':
+        if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
+            dsktype = ['sas','ssd','sata']
+        else:
+            dsktype = ['sata']
+        ARGS.env = 'sfsx'
+        clstr_name = find_clstr(ARGS.s, ARGS.env)
+        for clstr in clstr_name:
+                aggr_list = list_aggregate(clstr,dsktype,headers)
+    else:
+        print()
+        print("-env value invalid, it should be prod or nprod")
+        sys.exit(1)
