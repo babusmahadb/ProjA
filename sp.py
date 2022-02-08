@@ -44,14 +44,14 @@ def find_clstr(site: str, envir: str):
 def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     """Lists the Aggregate"""
     print()
-    print("List of Aggregates on ",cluster)
-    print("==========================================")
+    #print("List of Aggregates on ",cluster)
+    #print("==========================================")
     r=0
     tab = tt.Texttable()
-    header = ['Aggr name','Available space(GB)']
+    header = ['Cluster Name','VServer Name','Aggr name','Available space(GB)']
     tab.header(header)
-    tab.set_cols_width([25,25])
-    tab.set_cols_align(['c','c'])
+    tab.set_cols_width([25,25,25,25])
+    tab.set_cols_align(['c','c','c','c'])
 
     for dsk in dsktype:
         url = "https://{}/api/storage/aggregates?name=*{}*".format(cluster,dsk)
@@ -84,21 +84,41 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             avail = tmp3['available']
             space_convert=(((int(avail)/1024)/1024)/1024)
             aggr_name = i['name']
-            #row = [clus]
-            tab.add_row([aggr_name,space_convert])
-            tab.set_cols_width([25,25])
-            tab.set_cols_align(['c','c'])
+            svm_name = list_svm(cluster, headers)
+            tab.add_row([cluster,svm_name,aggr_name,space_convert])
+            tab.set_cols_width([25,25,25,25])
+            tab.set_cols_align(['c','c','c','c'])
         #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
     setdisplay = tab.draw()
     print(setdisplay)
         
 
         
-#def list_svm(cluster: str, dsktype: str, headers_inc: str) -> None:
-#    """Lists the VServers"""
+def list_svm(cluster: str, headers_inc: str):
+    """Lists the VServers"""
+    ctr = 0
+    tmp = dict(get_vservers(cluster, headers_inc))
+    vservers = tmp['records']
+    #tab = tt.Texttable()
+    #header = ['Vserver name']
+    #tab.header(header)
+    #tab.set_cols_align(['c'])
+    for i in vservers:
+        ctr = ctr + 1
+        clus = i['name']
+        row = [clus]
+        #tab.add_row(row)
+        #tab.set_cols_align(['c'])
+    return row
+    #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
+    #setdisplay = tab.draw()
+    #print(setdisplay)
 
-
-
+def get_vservers(cluster: str, headers_inc: str):
+    """ Get vServer"""
+    url = "https://{}/api/svm/svms".format(cluster)
+    response = requests.get(url, headers=headers_inc, verify=False)
+    return response.json()
     
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
@@ -167,6 +187,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
+                #svm_list = list_svm(clstr, headers)
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
             dsktype = ['sas','ssd','sata']
@@ -176,6 +197,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
+                #svm_list = list_svm(clstr, headers)
     else:
         print()
         print("-env value invalid, it should be prod or nprod")
@@ -185,5 +207,5 @@ if __name__ == "__main__":
     ip_add = socket.gethostbyname(hostname).split('.')
     subnet = '.'.join(ip_add[0:3])
     
-    
+    #disp_vservers(ARGS.cluster, headers)
     
