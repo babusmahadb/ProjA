@@ -96,6 +96,9 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
         
 def list_svm(cluster: str, headers_inc: str):
     """Lists the VServers"""
+    hostname = ARGS.host 
+    host_ip_add = socket.gethostbyname(hostname).split('.')
+    host_subnet = '.'.join(host_ip_add[0:3])  
     ctr = 0
     tmp = dict(get_vservers(cluster, headers_inc))
     vservers = tmp['records']
@@ -106,6 +109,11 @@ def list_svm(cluster: str, headers_inc: str):
     for i in vservers:
         ctr = ctr + 1
         clus = i['name']
+        svm_ip_add = socket.gethostbyname(clus).split('.')
+        svm_subnet = '.'.join(svm_ip_add[0:3])
+        if host_subnet == svm_subnet:
+            row = [clus+"*"]
+            return row
         row = [clus]
         #tab.add_row(row)
         #tab.set_cols_align(['c'])
@@ -116,8 +124,12 @@ def list_svm(cluster: str, headers_inc: str):
 
 def get_vservers(cluster: str, headers_inc: str):
     """ Get vServer"""
-    url = "https://{}/api/svm/svms".format(cluster)
-    response = requests.get(url, headers=headers_inc, verify=False)
+    services = ARGS.proto
+    
+    if services == 'nfs':
+        url = "https://{}/api/svm/svms?{}.enabled=true".format(cluster,services)
+        response = requests.get(url, headers=headers_inc, verify=False)
+    
     return response.json()
     
 def parse_args() -> argparse.Namespace:
@@ -134,6 +146,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "-host", required=True, help="Valid Servername"  
                         )
+    parser.add_argument(
+        "-proto", required=True, help="Valid protocal value of nfs,cifs,iscsi,fc"  
+                        )                        
     parser.add_argument(
         "-dskt", required=False, help="It should be sas,ssd or sata"  
                         )         
@@ -176,7 +191,7 @@ if __name__ == "__main__":
         'accept': "application/json"
     }
     
-    #tier = ARGS.dskt
+    
     
     if ARGS.env == 'prod':
         if ARGS.dskt == 'sata':
@@ -203,9 +218,9 @@ if __name__ == "__main__":
         print("-env value invalid, it should be prod or nprod")
         sys.exit(1)
         
-    hostname = ARGS.host 
-    ip_add = socket.gethostbyname(hostname).split('.')
-    subnet = '.'.join(ip_add[0:3])
+
+    
+    
     
     #disp_vservers(ARGS.cluster, headers)
     
