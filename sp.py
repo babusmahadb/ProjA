@@ -16,6 +16,7 @@ from getpass import getpass
 import logging
 import texttable as tt
 import requests
+import json
 
 import sys
 
@@ -97,39 +98,72 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
 def list_svm(cluster: str, headers_inc: str):
     """Lists the VServers"""
     hostname = ARGS.host 
+    services = ARGS.proto
     host_ip_add = socket.gethostbyname(hostname).split('.')
     host_subnet = '.'.join(host_ip_add[0:3])  
     ctr = 0
     tmp = dict(get_vservers(cluster, headers_inc))
     vservers = tmp['records']
-    #tab = tt.Texttable()
-    #header = ['Vserver name']
-    #tab.header(header)
-    #tab.set_cols_align(['c'])
+    
+    row = []
     for i in vservers:
         ctr = ctr + 1
-        clus = i['name']
-        svm_ip_add = socket.gethostbyname(clus).split('.')
-        svm_subnet = '.'.join(svm_ip_add[0:3])
-        if host_subnet == svm_subnet:
-            row = [clus+"*"]
-            return row
-        row = [clus]
-        #tab.add_row(row)
-        #tab.set_cols_align(['c'])
+        if services == 'nfs':
+            clus = i['name']
+            svm_ip_add = socket.gethostbyname(clus).split('.')
+            svm_subnet = '.'.join(svm_ip_add[0:3])
+            if host_subnet == svm_subnet:
+                row = [clus+"*"]
+                return row
+            row = [clus]
+        elif services == 'cifs':
+            rcd_dt = dict(i)
+            svm_rd = rcd_dt['svm']
+            svm_dt = dict(svm_rd)
+            clus = svm_dt['name']
+            row=[clus]
+        else:
+            row =[]
+        
     return row
-    #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
-    #setdisplay = tab.draw()
-    #print(setdisplay)
-
+    
 def get_vservers(cluster: str, headers_inc: str):
     """ Get vServer"""
     services = ARGS.proto
     
     if services == 'nfs':
         url = "https://{}/api/svm/svms?{}.enabled=true".format(cluster,services)
-        response = requests.get(url, headers=headers_inc, verify=False)
-    
+        try:
+            response = requests.get(url, headers=headers_inc, verify=False)
+            print(response.json())
+        except requests.exceptions.HTTPError as err:
+            print(err)
+            sys.exit(1)
+        except requests.exceptions.RequestException as err:
+            print(err)
+            sys.exit(1)
+    elif services == 'cifs':
+        url = "https://{}/api/protocols/{}/services?enabled=true".format(cluster,services)
+        
+        try:
+            response = requests.get(url, headers=headers_inc, verify=False)
+               
+        except requests.exceptions.HTTPError as err:
+            print(err)
+            sys.exit(1)
+        except requests.exceptions.RequestException as err:
+            print(err)
+            sys.exit(1)
+    elif services == 'iscsi':
+        url = "https://{}/api/protocols/san/{}/services?enabled=true".format(cluster,services)
+        try:
+            response = requests.get(url, headers=headers_inc, verify=False)
+        except requests.exceptions.HTTPError as err:
+            print(err)
+            sys.exit(1)
+        except requests.exceptions.RequestException as err:
+            print(err)
+            sys.exit(1)
     return response.json()
     
 def parse_args() -> argparse.Namespace:
