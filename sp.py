@@ -164,6 +164,10 @@ def get_vservers(cluster: str, headers_inc: str):
         except requests.exceptions.RequestException as err:
             print(err)
             sys.exit(1)
+    else:
+        print()
+        print(" Enter Valid protocol, should be nfs, cifs or iscsi")
+        sys.exit(1)
     return response.json()
     
 def parse_args() -> argparse.Namespace:
