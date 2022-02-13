@@ -93,12 +93,30 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     setdisplay = tab.draw()
     print(setdisplay)
         
+def sort_svm(cluster: str, headers_inc: str):
+    """Sorts VServers with app condition"""
+    apps = ARGS.app
+    app_list = ["arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0"]
+    ctr = 0
+    sort_row = []
+    tmp = dict(get_vservers(cluster, headers_inc))
+    vservers = tmp['records']
+    
+    for i in vservers:
+        ctr = ctr + 1
+        if apps in app_list:
+            sort_row = ["svm_for_"+apps]
+        else:
+            print("provide valid -app value, it must be one of ",app_list)
+            sys.exit(1)
+    return sort_row 
 
-        
+    
 def list_svm(cluster: str, headers_inc: str):
     """Lists the VServers"""
     hostname = ARGS.host 
     services = ARGS.proto
+     
     host_ip_add = socket.gethostbyname(hostname).split('.')
     host_subnet = '.'.join(host_ip_add[0:3])  
     ctr = 0
@@ -115,15 +133,22 @@ def list_svm(cluster: str, headers_inc: str):
             if host_subnet == svm_subnet:
                 row = [clus+"*"]
                 return row
+            srt = sort_svm(cluster, headers_inc)
+            clus = clus + srt
             row = [clus]
         elif services == 'cifs':
             rcd_dt = dict(i)
             svm_rd = rcd_dt['svm']
             svm_dt = dict(svm_rd)
             clus = svm_dt['name']
+            srt = sort_svm(cluster, headers_inc)
+            clus = clus + srt
             row=[clus]
         else:
-            row =[]
+            srt = sort_svm(cluster, headers_inc)
+            clus = clus + srt
+            row=[clus]
+            
         
     return row
     
@@ -184,6 +209,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "-host", required=True, help="Valid Servername"  
                         )
+    parser.add_argument(
+        "-app", required=True, help="App name or purpose of provisioning like arch,bkp,cdp,cf0,pdb,ddb,dmz so on.."  
+                        )                    
     parser.add_argument(
         "-proto", required=True, help="Valid protocal value of nfs,cifs,iscsi,fc"  
                         )                        
