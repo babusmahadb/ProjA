@@ -96,19 +96,48 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
 def sort_svm(cluster: str, headers_inc: str):
     """Sorts VServers with app condition"""
     apps = ARGS.app
-    app_list = ["arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0"]
+    services = ARGS.proto
+    app_list = ["svm","arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0"]
     ctr = 0
     sort_row = []
     tmp = dict(get_vservers(cluster, headers_inc))
     vservers = tmp['records']
     
     for i in vservers:
+        #print(i)
         ctr = ctr + 1
-        if apps in app_list:
-            sort_row = ["svm_for_"+apps]
-        else:
-            print("provide valid -app value, it must be one of ",app_list)
+        if i is False:
+            print("Vserver can't be sorted for app "+apps+", select one of different app value", app_list)
             sys.exit(1)
+        if services == 'nfs':
+            sort_name = i['name']
+            if apps in app_list:
+                if apps in sort_name:
+                    sort_row = [sort_name]
+            else:
+                print("provide valid -app value, it must be one of ",app_list)
+                sys.exit(1)
+            
+        elif services == 'cifs':
+            rcd_dt = dict(i)
+            svm_rd = rcd_dt['svm']
+            svm_dt = dict(svm_rd)
+            sort_name = svm_dt['name']
+            if apps in app_list:
+                if apps in sort_name:
+                    sort_row = [sort_name]
+            else:
+                print("provide valid -app value, it must be one of ",app_list)
+                sys.exit(1)
+        else:
+            if apps in app_list:
+                if apps in sort_name:
+                    sort_row = [sort_name]
+            else:
+                print("provide valid -app value, it must be one of ",app_list)
+                sys.exit(1)
+            #sort_name = i['name']
+        
     return sort_row 
 
     
@@ -122,31 +151,35 @@ def list_svm(cluster: str, headers_inc: str):
     ctr = 0
     tmp = dict(get_vservers(cluster, headers_inc))
     vservers = tmp['records']
-    
+    #srt = clus = []
     row = []
     for i in vservers:
         ctr = ctr + 1
         if services == 'nfs':
             clus = i['name']
+            clus = list(clus)
             svm_ip_add = socket.gethostbyname(clus).split('.')
             svm_subnet = '.'.join(svm_ip_add[0:3])
             if host_subnet == svm_subnet:
                 row = [clus+"*"]
                 return row
             srt = sort_svm(cluster, headers_inc)
-            clus = clus + srt
-            row = [clus]
+            clus = list(set(clus) | set(srt))
+            row = clus
         elif services == 'cifs':
             rcd_dt = dict(i)
             svm_rd = rcd_dt['svm']
             svm_dt = dict(svm_rd)
-            clus = svm_dt['name']
+            clus = [svm_dt['name']]
+            #clus = list(clus)
             srt = sort_svm(cluster, headers_inc)
-            clus = clus + srt
-            row=[clus]
+            #print(srt)
+            #print(clus)
+            clus = list(set(clus) | set(srt))
+            row=clus
         else:
             srt = sort_svm(cluster, headers_inc)
-            clus = clus + srt
+            clus = list(set(clus) | set(srt))
             row=[clus]
             
         
