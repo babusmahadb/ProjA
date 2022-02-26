@@ -130,6 +130,11 @@ def sort_svm(cluster: str, headers_inc: str):
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
         else:
+            
+            tmp=dict(i)
+            tmp1 = tmp['svm']
+            tmp3 = dict(tmp1)
+            sort_name = tmp3['name']
             if apps in app_list:
                 if apps in sort_name:
                     sort_row = [sort_name]
@@ -157,7 +162,7 @@ def list_svm(cluster: str, headers_inc: str):
         ctr = ctr + 1
         if services == 'nfs':
             clus = i['name']
-            clus = list(clus)
+            #clus = list(clus)
             svm_ip_add = socket.gethostbyname(clus).split('.')
             svm_subnet = '.'.join(svm_ip_add[0:3])
             if host_subnet == svm_subnet:
@@ -178,8 +183,12 @@ def list_svm(cluster: str, headers_inc: str):
             clus = list(set(clus) | set(srt))
             row=clus
         else:
+            tmp=dict(i)
+            tmp1 = tmp['svm']
+            tmp3 = dict(tmp1)
+            clus = tmp3['name']
             srt = sort_svm(cluster, headers_inc)
-            clus = list(set(clus) | set(srt))
+            #clus = list(set(clus) | set(srt))
             row=[clus]
             
         
@@ -301,7 +310,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
-                #svm_list = list_svm(clstr, headers)
+                svm_list = list_svm(clstr, headers)
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
             dsktype = ['sas','ssd','sata']
@@ -311,7 +320,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
-                #svm_list = list_svm(clstr, headers)
+                svm_list = list_svm(clstr, headers)
     else:
         print()
         print("-env value invalid, it should be prod or nprod")
