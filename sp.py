@@ -22,24 +22,32 @@ import sys
 
 ur.disable_warnings()
 
-def find_clstr(site: str, envir: str):
+def find_clstr(site: str, envir: str, domain: str):
     """Get cluster info from inventory using user inputs"""
     
     wb = xl.load_workbook(r'C:\\Users\\Administrator.DEMO\\Documents\\GitHub\\ProjA\\projclstrs.xlsx')
 
 #active worksheet data
     ws = wb.active    
+    
 
     output = []
     for i in range(1, ws.max_row + 1):
         for j in range(1, ws.max_column + 1):
             if site in ws.cell(i,j).value:
-                #print("found")
                 val = ws.cell(i,j).value   
                 if envir in val:
-                   op = ''.join(val)
-                   output.append(op)
-
+                    val = ws.cell(i,j).value
+                    if domain == 'amz':
+                       amz = ['bkp','cdoc','cf0','devi','erp0','nps','vm0']
+                       for dom in amz:
+                            if dom in val:
+                                op = ''.join(val)
+                                output.append(op)    
+                    elif domain in val:
+                        op = ''.join(val)
+                        output.append(op)
+    print(output)
     return output
     
 def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
@@ -326,7 +334,7 @@ if __name__ == "__main__":
         else:
             dsktype = ['sas','ssd']
         ARGS.env = 'pfsx'
-        clstr_name = find_clstr(ARGS.s, ARGS.env)
+        clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
                 #svm_list = list_svm(clstr, headers)
@@ -336,7 +344,7 @@ if __name__ == "__main__":
         else:
             dsktype = ['sata']
         ARGS.env = 'sfsx'
-        clstr_name = find_clstr(ARGS.s, ARGS.env)
+        clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
                 #svm_list = list_svm(clstr, headers)
