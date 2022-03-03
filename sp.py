@@ -39,6 +39,7 @@ def find_clstr(site: str, envir: str, domain: str):
                 if envir in val:
                     val = ws.cell(i,j).value
                     if domain == 'amz':
+                       # list of amz tags
                        amz = ['bkp','cdoc','cf0','devi','erp0','nps','vm0']
                        for dom in amz:
                             if dom in val:
