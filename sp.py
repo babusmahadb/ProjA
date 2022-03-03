@@ -55,7 +55,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     tab.set_cols_align(['c','c','c','c'])
 
     for dsk in dsktype:
-        url = "https://{}/api/storage/aggregates?name=*{}*".format(cluster,dsk)
+        url = "https://{}/api/storage/aggregates?name=*_{}*".format(cluster,dsk)
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
         except requests.exceptions.HTTPError as err:
@@ -86,6 +86,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             space_convert=(((int(avail)/1024)/1024)/1024)
             aggr_name = i['name']
             svm_name = list_svm(cluster, headers)
+            #print("svm_name is ", svm_name)
             tab.add_row([cluster,svm_name,aggr_name,space_convert])
             tab.set_cols_width([25,25,25,25])
             tab.set_cols_align(['c','c','c','c'])
@@ -150,26 +151,37 @@ def list_svm(cluster: str, headers_inc: str):
     """Lists the VServers"""
     hostname = ARGS.host 
     services = ARGS.proto
-     
-    host_ip_add = socket.gethostbyname(hostname).split('.')
-    host_subnet = '.'.join(host_ip_add[0:3])  
+    
+    try:
+        host_ip_add = socket.gethostbyname(hostname).split('.')
+        host_subnet = '.'.join(host_ip_add[0:3])
+    except socket.gaierror as err:
+        print("host ip address is not resolved from DNS")
+        sys.exit(1)
+        
+                
     ctr = 0
     tmp = dict(get_vservers(cluster, headers_inc))
+    #print(" tmp of list_svm ", tmp, ctr)
     vservers = tmp['records']
-    #srt = clus = []
+    srt = clus = []
     row = []
     for i in vservers:
         ctr = ctr + 1
         if services == 'nfs':
             clus = i['name']
-            #clus = list(clus)
-            svm_ip_add = socket.gethostbyname(clus).split('.')
-            svm_subnet = '.'.join(svm_ip_add[0:3])
+            try:
+                svm_ip_add = socket.gethostbyname(clus).split('.')
+                svm_subnet = '.'.join(svm_ip_add[0:3])
+            except socket.gaierror as err:
+                svm_subnet = "0.0.0"
+            
             if host_subnet == svm_subnet:
                 row = [clus+"*"]
                 return row
             srt = sort_svm(cluster, headers_inc)
-            clus = list(set(clus) | set(srt))
+            #print("srt output",srt)
+            #clus = list(set(clus) | set(srt))
             row = clus
         elif services == 'cifs':
             rcd_dt = dict(i)
@@ -202,7 +214,7 @@ def get_vservers(cluster: str, headers_inc: str):
         url = "https://{}/api/svm/svms?{}.enabled=true".format(cluster,services)
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
-            print(response.json())
+            #print(response.json())
         except requests.exceptions.HTTPError as err:
             print(err)
             sys.exit(1)
@@ -235,7 +247,11 @@ def get_vservers(cluster: str, headers_inc: str):
         print()
         print(" Enter Valid protocol, should be nfs, cifs or iscsi")
         sys.exit(1)
-    return response.json()
+        
+        
+    out_response = response.json() 
+    
+    return out_response
     
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
@@ -256,7 +272,10 @@ def parse_args() -> argparse.Namespace:
                         )                    
     parser.add_argument(
         "-proto", required=True, help="Valid protocal value of nfs,cifs,iscsi,fc"  
-                        )                        
+                        )    
+    parser.add_argument(
+        "-domain", required=True, help="Valid domain value of amz or dmz"  
+                        )
     parser.add_argument(
         "-dskt", required=False, help="It should be sas,ssd or sata"  
                         )         
@@ -310,7 +329,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
-                svm_list = list_svm(clstr, headers)
+                #svm_list = list_svm(clstr, headers)
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
             dsktype = ['sas','ssd','sata']
@@ -320,7 +339,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
-                svm_list = list_svm(clstr, headers)
+                #svm_list = list_svm(clstr, headers)
     else:
         print()
         print("-env value invalid, it should be prod or nprod")
