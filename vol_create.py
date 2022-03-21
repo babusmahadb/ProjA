@@ -114,74 +114,74 @@ def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, v
     dataobj = {}
     tmp1 = {"name": svm_name}
     dataobj['svm'] = tmp1
-    print()
-    #show_aggregate(cluster, headers_inc)
-    print()
+    #print()
+    ##show_aggregate(cluster, headers_inc)
+    #print()
     #aggrname = input(
     #    "Enter the name of the Aggregate on which the volume needs to be created:- ")
     tmp2 = [{"name": aggr_name}]
     dataobj['aggregates'] = tmp2
-    print()
+    #print()
     #volname = input("Enter the name of the Volume:- ")
     dataobj['name'] = volume_name
-    print()
+    #print()
     #vol_size = input("Enter the size of the Volume in MB:- ")
     tmp3 = get_size(volume_size)
     dataobj['size'] = tmp3
-    print()
+    #print()
     voltype = input("Enter the Volume Type[rw/dp]:- ")
     dataobj['type'] = voltype
     print()
     styletype = input("Enter the Volume Style Type[flexvol]:- ")
     dataobj['style'] = styletype
     print()
-    autosize = input("Would you like to enable Autosize (y/n): ")
-    if autosize == 'y':
-        print("Enter the following Details")
-        grow_threshold = input("grow_threshold?:- ")
-        maximum = input("maximum?:- ")
-        minimum = input("minimum?:- ")
-        mode = input("mode?:- ")
-        shrink_threshold = input("shrink_threshold?:- ")
-        autosizejson = {
-            "grow_threshold": grow_threshold,
-            "maximum": maximum,
-            "minimum": minimum,
-            "mode": mode,
-            "shrink_threshold": shrink_threshold}
-        dataobj['autosize'] = autosizejson
-    print()
-    efficiency = input("Would you like to enable Efficiency (y/n): ")
-    if efficiency == 'y':
-        print("Enter the following Details")
-        compaction = input("compaction?:- ")
-        compression = input("compression?:- ")
-        cross_volume_dedupe = input("cross_volume_dedupe?:- ")
-        dedupe = input("dedupe?:- ")
-        policy_name_e = input("Efficiency Policy Name?:- ")
-        efficiencyjson = {
-            "compaction": compaction,
-            "compression": compression,
-            "cross_volume_dedupe": cross_volume_dedupe,
-            "dedupe": dedupe,
-            "policy": {
-                "name": policy_name_e}}
-        dataobj['efficiency'] = efficiencyjson
-    print()
-    encryption = input("Would you like to enable Encryption (y/n): ")
-    if encryption == 'y':
-        print("Enter the following Details")
-        enabled_encry = input("Enable Encryption ?:- ")
-        encryptionjson = {"enabled": bool(enabled_encry), "status": {}}
-        dataobj['encryption'] = encryptionjson
-    print()
-    files = input("Would you like to enable Max File Count (y/n): ")
-    if files == 'y':
-        print("Enter the following Details")
-        maximum_files = input("Max File Count?:- ")
-        filesjson = {"maximum": maximum_files}
-        dataobj['files'] = filesjson
-    print()
+    #autosize = input("Would you like to enable Autosize (y/n): ")
+    #if autosize == 'y':
+    #    print("Enter the following Details")
+    #    grow_threshold = input("grow_threshold?:- ")
+    #    maximum = input("maximum?:- ")
+    #    minimum = input("minimum?:- ")
+    #    mode = input("mode?:- ")
+    #    shrink_threshold = input("shrink_threshold?:- ")
+    #    autosizejson = {
+    #        "grow_threshold": grow_threshold,
+    #        "maximum": maximum,
+    #        "minimum": minimum,
+    #        "mode": mode,
+    #        "shrink_threshold": shrink_threshold}
+    #    dataobj['autosize'] = autosizejson
+    #print()
+    #efficiency = input("Would you like to enable Efficiency (y/n): ")
+    #if efficiency == 'y':
+    #    print("Enter the following Details")
+    #    compaction = input("compaction?:- ")
+    #    compression = input("compression?:- ")
+    #    cross_volume_dedupe = input("cross_volume_dedupe?:- ")
+    #    dedupe = input("dedupe?:- ")
+    #    policy_name_e = input("Efficiency Policy Name?:- ")
+    #    efficiencyjson = {
+    #        "compaction": compaction,
+    #        "compression": compression,
+    #        "cross_volume_dedupe": cross_volume_dedupe,
+    #        "dedupe": dedupe,
+    #        "policy": {
+    #            "name": policy_name_e}}
+    #    dataobj['efficiency'] = efficiencyjson
+    #print()
+    #encryption = input("Would you like to enable Encryption (y/n): ")
+    #if encryption == 'y':
+    #    print("Enter the following Details")
+    #    enabled_encry = input("Enable Encryption ?:- ")
+    #    encryptionjson = {"enabled": bool(enabled_encry), "status": {}}
+    #    dataobj['encryption'] = encryptionjson
+    #print()
+    #files = input("Would you like to enable Max File Count (y/n): ")
+    #if files == 'y':
+    #    print("Enter the following Details")
+    #    maximum_files = input("Max File Count?:- ")
+    #    filesjson = {"maximum": maximum_files}
+    #    dataobj['files'] = filesjson
+    #print()
     nas = input("Would you like to enable NAS parameters (y/n): ")
     if nas == 'y':
         print("Enter the following Details")
