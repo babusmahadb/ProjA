@@ -88,10 +88,8 @@ def check_job_status(cluster: str, job_status: str, headers_inc: str):
     
 def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, volume_size, headers_inc: str):
     """Module to create a volume"""
-    #v_size = get_size(volume_size)
-    #print("Vol Size is :{}".format(v_size))
-    #
-    #url = "https://{}/api/storage/volumes".format(cluster)
+    
+    url = "https://{}/api/storage/volumes".format(cluster)
     #payload = {
     #    "aggregates.name": [aggr_name],
     #    "svm.name": svm_name,
@@ -185,7 +183,9 @@ def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, v
     nas = input("Would you like to enable NAS parameters (y/n): ")
     if nas == 'y':
         print("Enter the following Details")
-        export_policy_name = input("export_policy_name?:- ")
+        export_policy_name = input("Enter new policy name for share:- ")
+        export_policy_rule = input("Enter clientmatch name for share[0.0.0.0/0]:- ")
+        create_export_policy(cluster,export_policy_name,export_policy_rule,svm_name,headers_inc)
         path = input("path?:- ")
         security_style = input("security_style?:- ")
         unix_permissions = input("unix_permissions?:- ")
@@ -256,6 +256,42 @@ def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, v
     check_job_status(cluster, job_status, headers_inc )
 
 
+def create_export_policy(
+        cluster: str,
+        export_policy_name: str,
+        export_policy_rule: str,
+        svm_name: str,
+        headers_inc: str):
+    """Create Export Policy"""
+    url = "https://{}/api/protocols/nfs/export-policies".format(cluster)
+    #svm_uuid = get_key_svms(cluster, svm_name, headers_inc)
+    payload = {
+        "name": export_policy_name,
+        "rules": [
+            {
+                "clients": [
+                    {
+                        "match": export_policy_rule
+                    }
+                ],
+                "protocols": [
+                    "any"
+                ],
+                "ro_rule": [
+                    "any"
+                ],
+                "rw_rule": [
+                    "any"
+                ]}],
+        "svm.uuid": svm_uuid
+    }
+    response = requests.post(
+        url,
+        headers=headers_inc,
+        json=payload,
+        verify=False)
+        
+        
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
 

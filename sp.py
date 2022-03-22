@@ -107,7 +107,7 @@ def sort_svm(cluster: str, headers_inc: str):
     """Sorts VServers with app condition"""
     apps = ARGS.app
     services = ARGS.proto
-    app_list = ["svm","arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0"]
+    app_list = ["svm","arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0","cdoc","cf1","devi","sdb"]
     ctr = 0
     sort_row = []
     tmp = dict(get_vservers(cluster, headers_inc))
