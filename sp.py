@@ -165,8 +165,7 @@ def list_svm(cluster: str, headers_inc: str):
         host_ip_add = socket.gethostbyname(hostname).split('.')
         host_subnet = '.'.join(host_ip_add[0:3])
     except socket.gaierror as err:
-        print("host ip address is not resolved from DNS")
-        sys.exit(1)
+        host_subnet = "127.0.0"
         
                 
     ctr = 0

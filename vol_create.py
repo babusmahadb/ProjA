@@ -127,8 +127,8 @@ def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, v
     tmp3 = get_size(volume_size)
     dataobj['size'] = tmp3
     #print()
-    voltype = input("Enter the Volume Type[rw/dp]:- ")
-    dataobj['type'] = voltype
+    #voltype = input("Enter the Volume Type[rw/dp]:- ")
+    dataobj['type'] = "rw"
     print()
     styletype = input("Enter the Volume Style Type[flexvol]:- ")
     dataobj['style'] = styletype
