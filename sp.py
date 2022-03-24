@@ -64,7 +64,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     tab.set_cols_align(['c','c','c','c'])
 
     for dsk in dsktype:
-        url = "https://{}/api/storage/aggregates?name=*_{}*".format(cluster,dsk)
+        url = "https://{}/api/storage/aggregates?name=*{}*".format(cluster,dsk)
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
         except requests.exceptions.HTTPError as err:
