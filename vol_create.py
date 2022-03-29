@@ -29,8 +29,7 @@ def get_size(volume_size):
 
 def check_job_status(job_status: str, headers_inc: str):
     """ Check job status"""
-    #a = job_status['state']
-    #type(job_status)
+    print()
     #
     #print("inside fun", job_status) 
     if job_status['state'] == "failure":
@@ -64,11 +63,7 @@ def crt_vol(unix_perm, SecStyle: str, headers_inc: str):
         "name": vol_name,
         "size": volume_size,
         "comment": task_id,
-        #"nas": {
-        #    "export_policy": {
-        #        "name": exp_name
-        #    }
-        #    
+         
         "nas": {
             "export_policy": {
                 "name": exp_name
@@ -76,7 +71,7 @@ def crt_vol(unix_perm, SecStyle: str, headers_inc: str):
             
             "path": path,
             "security_style": SecStyle,
-            "unix_permissions": unix_perm
+            
             },   
         "snapshot_policy": {
             "name": "default"
@@ -92,9 +87,9 @@ def crt_vol(unix_perm, SecStyle: str, headers_inc: str):
 
     response = requests.post(vol_url,headers=headers_inc,json=vol_data,verify=False)
     time.sleep(20)
-    vol_url = response.json()
+    vol_res = response.json()
     try:
-        job_status = "https://{}/{}".format(clus_name,vol_url['job']['_links']['self']['href'])
+        job_status = "https://{}/{}".format(clus_name,vol_res['job']['_links']['self']['href'])
         job_response = requests.get(job_status, headers=headers_inc, verify=False)
         job_status = job_response.json()
         check_job_status(job_status, headers_inc)
@@ -104,27 +99,7 @@ def crt_vol(unix_perm, SecStyle: str, headers_inc: str):
     except requests.exceptions.RequestException as err:
         print(err)
         sys.exit(1)
-    url_text = response.json()
-    if 'error' in url_text:
-        print(url_text)
-        sys.exit(1)
-    job_status = "https://{}{}".format(clus_name,url_text['job']['_links']['self']['href'])
-    try:
-        job_response = requests.get(
-            job_status, headers=headers_inc, verify=False)
-    except requests.exceptions.HTTPError as err:
-        print(err)
-        sys.exit(1)
-    except requests.exceptions.RequestException as err:
-        print(err)
-        sys.exit(1)
-    url_text = job_response.json()
-    if 'error' in url_text:
-        print(url_text)
-        sys.exit(1)
-    job_status = job_response.json()
-    print("job_status", job_status)
-    check_job_status(job_status, headers_inc )
+    
         
       
         
@@ -177,8 +152,6 @@ def crt_exp(exp_name: str, headers_inc: str):
     
     if shrproto == "nfs":
         
-        protocol = "nfs3"
-        #ro = rw = su = "sys"
         anon = "65534"
         print()
         clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
@@ -188,8 +161,7 @@ def crt_exp(exp_name: str, headers_inc: str):
             "name": exp_name,
             "rules": [
                 {
-                #"allow_device_creation": "true",
-                #"allow_suid": "true",
+                
                 "anonymous_user": anon,
                 
                 "clients": [
@@ -208,8 +180,7 @@ def crt_exp(exp_name: str, headers_inc: str):
                 "name": svmname,
                 "uuid": svm_uuid
             }}
-            
-        #print(" exp_data json", exp_data) 
+        
         
         exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
         try:
@@ -217,19 +188,81 @@ def crt_exp(exp_name: str, headers_inc: str):
             exp_res = response.json()
             
         except requests.exceptions.HTTPError as err:
-            print("inside except") 
+             
             print(err)
             sys.exit(1)
         
         
     elif shrproto == "cifs":
+        
+        anon = "65534"
         print()
+        #clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
+        #for loop or while to add more clients to list
+        
+        exp_data = {
+            "name": exp_name,
+            "rules": [
+                {
+                
+                "anonymous_user": anon,
+                
+                "clients": [
+                    {
+                    "match": "0.0.0.0/0"
+                    }
+                ],
+                
+                "protocols": ["cifs"],
+                "ro_rule": ["any"],
+                "rw_rule": ["any"],
+                "superuser": ["any"]
+                }
+            ],
+            "svm": {
+                "name": svmname,
+                "uuid": svm_uuid
+            }}
+                
+        exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
+        try:
+            response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
+            exp_res = response.json()
+            
+        except requests.exceptions.HTTPError as err:
+             
+            print(err)
+            sys.exit(1)
+        print("Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
     
     elif shrproto == "multi":
         print()
     else:
         print()
+ 
+def get_svm():
+    """ Get SVM nane and UUID """
     
+    svm_url = "https://{}/api/svm/svms?name={}&fields=uuid,language".format(clus_name,svmname)
+    
+    try:
+        response = requests.get(svm_url, headers=headers, verify=False)
+        svm_res = response.json()
+        svm_dt = dict(svm_res)
+        svm_rd = svm_dt['records']
+        
+        for i in svm_rd:
+            svm = dict(i)
+            
+        svm_uuid = svm['uuid']
+        svm_lang = svm['language']
+        
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        sys.exit(1)
+        
+    return svm_uuid,svm_lang    
+ 
     
 if __name__ == "__main__":
     
@@ -259,7 +292,7 @@ if __name__ == "__main__":
     svault = ARGS.sv
     
     print()
-    #task_id = input("Enter a valid and approved Task number:")
+    task_id = input("Enter a valid and approved Task number:")
     
     svm_tag = svmname[-4:]
     #svm_tag = svmname.split("-")
@@ -271,34 +304,24 @@ if __name__ == "__main__":
     #Space Reserved for Snapshot Copies
     SRSC = 10
     
-    svm_url = "https://{}/api/svm/svms?name={}&fields=uuid,language".format(clus_name,svmname)
-    try:
-        response = requests.get(svm_url, headers=headers, verify=False)
-        svm_res = response.json()
-        svm_dt = dict(svm_res)
-        svm_rd = svm_dt['records']
-        
-        for i in svm_rd:
-            svm = dict(i)
-            
-        svm_uuid = svm['uuid']
-        svm_lang = svm['language']
-        
-    except requests.exceptions.HTTPError as err:
-        print(err)
-        sys.exit(1)
+
     
     if ARGS.proto == "nfs":
         
         exp_name = vol_name+"_ip"
+        svmd = get_svm()
+        svm_uuid = svmd[0]
+        svm_lang = svmd[1]
         crt_exp(exp_name, headers)
         
         SecStyle = "unix"
         unix_perm = "0755"
         crt_vol(unix_perm, SecStyle, headers)
          #Language: en_US.UTF-8  #if volume is dp, make sure language is same of source svm value.
+    
     elif ARGS.proto == "cifs":
         #Export Policy: cifs-default or default
+        cifs_exp_name = chk = []
         cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs".format(clus_name)
         try:
             response = requests.get(cifs_exp_url, headers=headers, verify=False)
@@ -308,40 +331,74 @@ if __name__ == "__main__":
             cifs_exp_rd = cifs_exp_dt['records']
             #print(cifs_exp_rd)
             #
-            exp_name = chk = []
             for i in cifs_exp_rd:
                 cifs_exp = dict(i)
                 name = cifs_exp['name']
-                exp_name.append(name) 
+                cifs_exp_name.append(name) 
             #svm_lang = svm['language']
-            print(exp_name)
+            #print(exp_name)
         except requests.exceptions.HTTPError as err:
             print(err)
             sys.exit(1)
-        if exp_name == chk:
+            
+        print(cifs_exp_name)    
+        if cifs_exp_name is False:
             print("No export policy created for cifs protocol with name tag of 'default'")
             crt = input("Would you like to create default export policy with cifs protocol rule?(y/n):")
             if crt == 'y':
                 exp_name = "default"
-                
-                
-        #crt_exp(exp_name, headers)
+                crt_exp(exp_name, headers)
+            elif crt == "n":
+                print("You need to create export policy and rule manaul, then re-run this script")
+            else:
+                print("Invalid Input, re-run script")
+                sys.exit(1)
         
-        #SecStyle = "ntfs"
-        #unix_perm = "0000"
-        #crt_vol(unix_perm, SecStyle, headers)
+        exp_name = input("Select one of the export policy:"+str(cifs_exp_name)+" .")
+        
+        if exp_name in cifs_exp_name:
+        
+            SecStyle = "ntfs"
+            unix_perm = "0000"
+            svmd = get_svm()
+            svm_uuid = svmd[0]
+            svm_lang = svmd[1]
+            crt_vol(unix_perm, SecStyle, headers)
+            
+        else:
+            
+            print("Invalid Export policy Input, re-run script")
+            sys.exit(1)
+        
         print()
-        #crt_vol()
-        #Junction Path: path
-        #Extended Volume Style: flexvol
-        #Security Style: ntfs
-        #UNIX Permissions: ------------
-        #Security Style: ntfs
-        #Comment: task_id
-        #Space Reserved for Snapshot Copies: 10%
+        share_name = input("Enter cifs share name for "+vol_name+": ")
+        print()
+        share_comment = input("Enter share comment mentioning share owner details: ")
+        
+        cifs_share_data = {
+  
+            "comment": share_comment,
+            "name": share_name,
+            "path": path,
+            "svm": {
+                "name": svmname,
+                "uuid": svm_uuid
+            }            }
+            
+        cifs_share_url = "https://{}/api/protocols/cifs/shares/".format(clus_name)
+        
         #Language: en_US.UTF-8  #if volume is dp, make sure language is same of source svm value.
         
-        #cifs share create -share-name "EyeC Reports" -path /v_cf03_cifs_OIS0004 -comment "GK:bvandore & sfietta"
+        try:
+            response = requests.post(cifs_share_url,headers=headers,json=cifs_share_data,verify=False)
+            cifs_share_res = response.json()
+            
+        except requests.exceptions.HTTPError as err:
+            print(err)
+            sys.exit(1)
+        print()
+        print("CIFS share '"+share_name+"' create with path "+path+".")      
+            
     elif ARGS.proto == "multi":
         print()
         #crt_exp()
