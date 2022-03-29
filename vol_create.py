@@ -1,22 +1,11 @@
 #! /usr/bin/env python3
 
 """
-ONTAP REST API Sample Scripts
-
-This script was developed by NetApp to help demonstrate NetApp
-technologies.  This script is not officially supported as a
-standard NetApp product.
+ONTAP REST API Scripts
 
 Purpose: Script to create Volume using ONTAP REST API.
 
-usage:python3 create_volume.py [-h] -c CLUSTER -v VOLUME_NAME -vs SVM_NAME -a
-                        AGGR_NAME -sz VOLUME_SIZE [-u API_USER] [-p API_PASS]
-
-Copyright (c) 2020 NetApp, Inc. All Rights Reserved.
-Licensed under the BSD 3-Clause “New” or Revised” License (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-https://opensource.org/licenses/BSD-3-Clause
+usage:python3 vol_create.py -c cluster1 -vs svm1_cluster1 -aggr -volname -volsize* -fgrp* [grpname] -proto* [nfs/cifs/multi] -sm* [y/n] -sv* [y/n] [-u API_USER] [-p API_PASS]
 
 """
 
@@ -27,31 +16,9 @@ from getpass import getpass
 import requests
 import sys
 import urllib3 as ur
+import time
 ur.disable_warnings()
 
-
-def get_svms(cluster: str, headers_inc: str):
-    """ Get SVMs"""
-    url = "https://{}/api/svm/svms".format(cluster)
-    response = requests.get(url, headers=headers_inc, verify=False)
-    return response.json()
-
-
-def get_key_svms(cluster: str, svm_name: str, headers_inc: str):
-    """Get SVM Key"""
-    tmp = dict(get_svms(cluster, headers_inc))
-    svms = tmp['records']
-    for i in svms:
-        if i['name'] == svm_name:
-            return i['uuid']
-        return None
-
-
-def get_vols(cluster: str, headers_inc: str):
-    """ Get Volumes"""
-    url = "https://{}/api/storage/volumes/".format(cluster)
-    response = requests.get(url, headers=headers_inc, verify=False)
-    return response.json()
 
 
 def get_size(volume_size):
@@ -60,172 +27,77 @@ def get_size(volume_size):
     return tmp
 
 
-def check_job_status(cluster: str, job_status: str, headers_inc: str):
+def check_job_status(job_status: str, headers_inc: str):
     """ Check job status"""
     #a = job_status['state']
-    type(job_status)
-    
-    print("inside fun", job_status) 
-    if job_status['state'] == "failure":
-        print(
-            "Volume creation failed due to :{}".format(
-                job_status['message']))
-    elif job_status['state'] == "success":
-        print("Volume created successfully")
-    else:
-        job_status_url = "https://{}/api/cluster/jobs/{}".format(
-            cluster, job_status['uuid'])
-        job_response = requests.get(
-            job_status_url, headers=headers_inc, verify=False)
-        job_status = job_response.json()
-        check_job_status(cluster, job_status, headers_inc)
-
-#def show_aggregate(cluster: str):
-
-
-    
-    
-    
-def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, volume_size, headers_inc: str):
-    """Module to create a volume"""
-    
-    url = "https://{}/api/storage/volumes".format(cluster)
-    #payload = {
-    #    "aggregates.name": [aggr_name],
-    #    "svm.name": svm_name,
-    #    "name": volume_name,
-    #    "size": v_size
-    #}
+    #type(job_status)
     #
-    #response = requests.post(
-    #    url,
-    #    headers=headers_inc,
-    #    json=payload,
-    #    verify=False)
-    #url_text = response.json()
-    #job_status = "https://{}/{}".format(cluster,
-    #                                    url_text['job']['_links']['self']['href'])
-    #job_response = requests.get(job_status, headers=headers_inc, verify=False)
-    #job_status = job_response.json()
-    #check_job_status(cluster, job_status, headers_inc)
+    #print("inside fun", job_status) 
+    if job_status['state'] == "failure":
+        print("Volume creation failed due to :{}".format(job_status['message']))
+    elif job_status['state'] == "success":
+        print("Volume "+vol_name+" of "+vol_size+" MB created successfully. Junction path is "+path+" .")
+    else:
+        job_status_url = "https://{}/api/cluster/jobs/{}".format(clus_name, job_status['uuid'])
+        job_response = requests.get(job_status_url, headers=headers_inc, verify=False)
+        job_status = job_response.json()
+        check_job_status( job_status, headers_inc)
 
-    dataobj = {}
-    tmp1 = {"name": svm_name}
-    dataobj['svm'] = tmp1
-    #print()
-    ##show_aggregate(cluster, headers_inc)
-    #print()
-    #aggrname = input(
-    #    "Enter the name of the Aggregate on which the volume needs to be created:- ")
-    tmp2 = [{"name": aggr_name}]
-    dataobj['aggregates'] = tmp2
-    #print()
-    #volname = input("Enter the name of the Volume:- ")
-    dataobj['name'] = volume_name
-    #print()
-    #vol_size = input("Enter the size of the Volume in MB:- ")
-    tmp3 = get_size(volume_size)
-    dataobj['size'] = tmp3
-    #print()
-    #voltype = input("Enter the Volume Type[rw/dp]:- ")
-    dataobj['type'] = "rw"
-    print()
-    styletype = input("Enter the Volume Style Type[flexvol]:- ")
-    dataobj['style'] = styletype
-    print()
-    #autosize = input("Would you like to enable Autosize (y/n): ")
-    #if autosize == 'y':
-    #    print("Enter the following Details")
-    #    grow_threshold = input("grow_threshold?:- ")
-    #    maximum = input("maximum?:- ")
-    #    minimum = input("minimum?:- ")
-    #    mode = input("mode?:- ")
-    #    shrink_threshold = input("shrink_threshold?:- ")
-    #    autosizejson = {
-    #        "grow_threshold": grow_threshold,
-    #        "maximum": maximum,
-    #        "minimum": minimum,
-    #        "mode": mode,
-    #        "shrink_threshold": shrink_threshold}
-    #    dataobj['autosize'] = autosizejson
-    #print()
-    #efficiency = input("Would you like to enable Efficiency (y/n): ")
-    #if efficiency == 'y':
-    #    print("Enter the following Details")
-    #    compaction = input("compaction?:- ")
-    #    compression = input("compression?:- ")
-    #    cross_volume_dedupe = input("cross_volume_dedupe?:- ")
-    #    dedupe = input("dedupe?:- ")
-    #    policy_name_e = input("Efficiency Policy Name?:- ")
-    #    efficiencyjson = {
-    #        "compaction": compaction,
-    #        "compression": compression,
-    #        "cross_volume_dedupe": cross_volume_dedupe,
-    #        "dedupe": dedupe,
-    #        "policy": {
-    #            "name": policy_name_e}}
-    #    dataobj['efficiency'] = efficiencyjson
-    #print()
-    #encryption = input("Would you like to enable Encryption (y/n): ")
-    #if encryption == 'y':
-    #    print("Enter the following Details")
-    #    enabled_encry = input("Enable Encryption ?:- ")
-    #    encryptionjson = {"enabled": bool(enabled_encry), "status": {}}
-    #    dataobj['encryption'] = encryptionjson
-    #print()
-    #files = input("Would you like to enable Max File Count (y/n): ")
-    #if files == 'y':
-    #    print("Enter the following Details")
-    #    maximum_files = input("Max File Count?:- ")
-    #    filesjson = {"maximum": maximum_files}
-    #    dataobj['files'] = filesjson
-    #print()
-    nas = input("Would you like to enable NAS parameters (y/n): ")
-    if nas == 'y':
-        print("Enter the following Details")
-        export_policy_name = input("Enter new policy name for share:- ")
-        export_policy_rule = input("Enter clientmatch name for share[0.0.0.0/0]:- ")
-        create_export_policy(cluster,export_policy_name,export_policy_rule,svm_name,headers_inc)
-        path = input("path?:- ")
-        security_style = input("security_style?:- ")
-        unix_permissions = input("unix_permissions?:- ")
-        nasjson = {
+   
+def crt_vol(unix_perm, SecStyle: str, headers_inc: str):
+    """Module to create a volume"""
+    #clus_name = ARGS.cluster
+    #svmname = ARGS.svm_name
+    #aggrname = ARGS.aggr
+    #shrproto = ARGS.proto
+    #funcgrp = ARGS.fgrp
+    #vol_size = ARGS.volsize
+    #smirror = ARGS.sm
+    #svault = ARGS.sv
+    
+    volume_size = get_size(vol_size)
+        
+    vol_url = "https://{}/api/storage/volumes/?return_timeout=30".format(clus_name)
+    vol_data = {
+        "aggregates.name": [aggrname],
+        "svm.name": svmname,
+        "name": vol_name,
+        "size": volume_size,
+        "comment": task_id,
+        #"nas": {
+        #    "export_policy": {
+        #        "name": exp_name
+        #    }
+        #    
+        "nas": {
             "export_policy": {
-                "name": export_policy_name},
+                "name": exp_name
+            },
+            
             "path": path,
-            "security_style": security_style,
-            "unix_permissions": unix_permissions}
-        dataobj['efficiency'] = nasjson
-    print()
-    qos = input("Would you like to enable QoS (y/n): ")
-    if qos == 'y':
-        print("Enter the following Details")
-        max_throughput_iops = input("max_throughput_iops?:- ")
-        max_throughput_mbps = input("max_throughput_mbps?:- ")
-        min_throughput_iops = input("min_throughput_iops?:- ")
-        qosname = input("qosname?:- ")
-        qosjson = {
-            "policy": {
-                "max_throughput_iops": max_throughput_iops,
-                "max_throughput_mbps": max_throughput_mbps,
-                "min_throughput_iops": min_throughput_iops,
-                "name": qosname}}
-        dataobj['qos'] = qosjson
-    print()
-    quota = input("Would you like to enable Quota (y/n): ")
-    if quota == 'y':
-        print("Enter the following Details")
-        enable_quota = input("enable_quota?:- ")
-        quotajson = {"enabled": bool(enable_quota)}
-        dataobj['quota'] = quotajson
-    print(dataobj)
-    url = "https://{}/api/storage/volumes/?return_timeout=30".format(cluster)
+            "security_style": SecStyle,
+            "unix_permissions": unix_perm
+            },   
+        "snapshot_policy": {
+            "name": "default"
+            },
+            
+        "space": {
+            "snapshot": {
+                "reserve_percent": 10
+            }
+           }
+        }
+    
+
+    response = requests.post(vol_url,headers=headers_inc,json=vol_data,verify=False)
+    time.sleep(20)
+    vol_url = response.json()
     try:
-        response = requests.post(
-            url,
-            headers=headers_inc,
-            json=dataobj,
-            verify=False)
+        job_status = "https://{}/{}".format(clus_name,vol_url['job']['_links']['self']['href'])
+        job_response = requests.get(job_status, headers=headers_inc, verify=False)
+        job_status = job_response.json()
+        check_job_status(job_status, headers_inc)
     except requests.exceptions.HTTPError as err:
         print(err)
         sys.exit(1)
@@ -236,8 +108,7 @@ def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, v
     if 'error' in url_text:
         print(url_text)
         sys.exit(1)
-    job_status = "https://{}{}".format(cluster,
-                                       url_text['job']['_links']['self']['href'])
+    job_status = "https://{}{}".format(clus_name,url_text['job']['_links']['self']['href'])
     try:
         job_response = requests.get(
             job_status, headers=headers_inc, verify=False)
@@ -253,44 +124,9 @@ def make_volume(cluster: str, volume_name: str, svm_name: str, aggr_name: str, v
         sys.exit(1)
     job_status = job_response.json()
     print("job_status", job_status)
-    check_job_status(cluster, job_status, headers_inc )
-
-
-def create_export_policy(
-        cluster: str,
-        export_policy_name: str,
-        export_policy_rule: str,
-        svm_name: str,
-        headers_inc: str):
-    """Create Export Policy"""
-    url = "https://{}/api/protocols/nfs/export-policies".format(cluster)
-    #svm_uuid = get_key_svms(cluster, svm_name, headers_inc)
-    payload = {
-        "name": export_policy_name,
-        "rules": [
-            {
-                "clients": [
-                    {
-                        "match": export_policy_rule
-                    }
-                ],
-                "protocols": [
-                    "any"
-                ],
-                "ro_rule": [
-                    "any"
-                ],
-                "rw_rule": [
-                    "any"
-                ]}],
-        "svm.uuid": svm_uuid
-    }
-    response = requests.post(
-        url,
-        headers=headers_inc,
-        json=payload,
-        verify=False)
+    check_job_status(job_status, headers_inc )
         
+      
         
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
@@ -302,18 +138,24 @@ def parse_args() -> argparse.Namespace:
         "-c", "--cluster", required=True, help="API server IP:port details"
     )
     parser.add_argument(
-        "-v",
-        "--volume_name",
-        required=True,
-        help="Name of the volume that needs to be created.")
+        "-fgrp", required=True, help="Name of the functinal group in caps.")
     parser.add_argument(
         "-vs", "--svm_name", required=True, help="svm name"
     )
     parser.add_argument(
-        "-a", "--aggr_name", required=True, help="Aggregate Name"
+        "-aggr",  required=True, help="Aggregate Name"
     )
     parser.add_argument(
-        "-sz", "--volume_size", required=True, help="Volume Size"
+        "-volsize",  required=True, help="Volume Size"
+    )
+    parser.add_argument(
+        "-proto", required=True, help="valid protocal nfs, cifs or multi"
+    )
+    parser.add_argument(
+        "-sm", required=True, help="Is this Volume need Snapmirror? (y/n)"
+    )
+    parser.add_argument(
+        "-sv", required=True, help="Is this Volume need SnapVault? (y/n)"
     )
     parser.add_argument(
         "-u",
@@ -330,6 +172,65 @@ def parse_args() -> argparse.Namespace:
     return parsed_args
 
 
+def crt_exp(exp_name: str, headers_inc: str):
+    """ Create export policy name and rule """
+    
+    if shrproto == "nfs":
+        
+        protocol = "nfs3"
+        #ro = rw = su = "sys"
+        anon = "65534"
+        print()
+        clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
+        #for loop or while to add more clients to list
+        
+        exp_data = {
+            "name": exp_name,
+            "rules": [
+                {
+                #"allow_device_creation": "true",
+                #"allow_suid": "true",
+                "anonymous_user": anon,
+                
+                "clients": [
+                    {
+                    "match": clientlist
+                    }
+                ],
+                
+                "protocols": ["nfs3"],
+                "ro_rule": ["sys"],
+                "rw_rule": ["sys"],
+                "superuser": ["sys"]
+                }
+            ],
+            "svm": {
+                "name": svmname,
+                "uuid": svm_uuid
+            }}
+            
+        #print(" exp_data json", exp_data) 
+        
+        exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
+        try:
+            response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
+            exp_res = response.json()
+            
+        except requests.exceptions.HTTPError as err:
+            print("inside except") 
+            print(err)
+            sys.exit(1)
+        
+        
+    elif shrproto == "cifs":
+        print()
+    
+    elif shrproto == "multi":
+        print()
+    else:
+        print()
+    
+    
 if __name__ == "__main__":
     
     
@@ -347,11 +248,118 @@ if __name__ == "__main__":
         'content-type': "application/json",
         'accept': "application/json"
     }
-
-    make_volume(
-        ARGS.cluster,
-        ARGS.volume_name,
-        ARGS.svm_name,
-        ARGS.aggr_name,
-        ARGS.volume_size,
-        headers)
+    
+    clus_name = ARGS.cluster
+    svmname = ARGS.svm_name
+    aggrname = ARGS.aggr
+    shrproto = ARGS.proto
+    funcgrp = ARGS.fgrp
+    vol_size = ARGS.volsize
+    smirror = ARGS.sm
+    svault = ARGS.sv
+    
+    print()
+    #task_id = input("Enter a valid and approved Task number:")
+    
+    svm_tag = svmname[-4:]
+    #svm_tag = svmname.split("-")
+    #svm_tag = svm_tag[2]
+    
+    vol_name = "v_"+svm_tag+"_"+shrproto+"_"+funcgrp.upper()
+    path = "/"+vol_name
+    Ext_Vol_Style = "flexvol"
+    #Space Reserved for Snapshot Copies
+    SRSC = 10
+    
+    svm_url = "https://{}/api/svm/svms?name={}&fields=uuid,language".format(clus_name,svmname)
+    try:
+        response = requests.get(svm_url, headers=headers, verify=False)
+        svm_res = response.json()
+        svm_dt = dict(svm_res)
+        svm_rd = svm_dt['records']
+        
+        for i in svm_rd:
+            svm = dict(i)
+            
+        svm_uuid = svm['uuid']
+        svm_lang = svm['language']
+        
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        sys.exit(1)
+    
+    if ARGS.proto == "nfs":
+        
+        exp_name = vol_name+"_ip"
+        crt_exp(exp_name, headers)
+        
+        SecStyle = "unix"
+        unix_perm = "0755"
+        crt_vol(unix_perm, SecStyle, headers)
+         #Language: en_US.UTF-8  #if volume is dp, make sure language is same of source svm value.
+    elif ARGS.proto == "cifs":
+        #Export Policy: cifs-default or default
+        cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs".format(clus_name)
+        try:
+            response = requests.get(cifs_exp_url, headers=headers, verify=False)
+            cifs_exp_res = response.json()
+            #print(cifs_exp_res)
+            cifs_exp_dt = dict(cifs_exp_res)
+            cifs_exp_rd = cifs_exp_dt['records']
+            #print(cifs_exp_rd)
+            #
+            exp_name = chk = []
+            for i in cifs_exp_rd:
+                cifs_exp = dict(i)
+                name = cifs_exp['name']
+                exp_name.append(name) 
+            #svm_lang = svm['language']
+            print(exp_name)
+        except requests.exceptions.HTTPError as err:
+            print(err)
+            sys.exit(1)
+        if exp_name == chk:
+            print("No export policy created for cifs protocol with name tag of 'default'")
+            crt = input("Would you like to create default export policy with cifs protocol rule?(y/n):")
+            if crt == 'y':
+                exp_name = "default"
+                
+                
+        #crt_exp(exp_name, headers)
+        
+        #SecStyle = "ntfs"
+        #unix_perm = "0000"
+        #crt_vol(unix_perm, SecStyle, headers)
+        print()
+        #crt_vol()
+        #Junction Path: path
+        #Extended Volume Style: flexvol
+        #Security Style: ntfs
+        #UNIX Permissions: ------------
+        #Security Style: ntfs
+        #Comment: task_id
+        #Space Reserved for Snapshot Copies: 10%
+        #Language: en_US.UTF-8  #if volume is dp, make sure language is same of source svm value.
+        
+        #cifs share create -share-name "EyeC Reports" -path /v_cf03_cifs_OIS0004 -comment "GK:bvandore & sfietta"
+    elif ARGS.proto == "multi":
+        print()
+        #crt_exp()
+        #crt_exp_rul()
+        #cifs     0.0.0.0/0, ro-any,rw-any,su-any
+        #nfs3     ip,ro-sys,rw-sys,su-sys 
+        #crt_vol()
+        #Volume Size: volsize
+        #Junction Path: path
+        #Extended Volume Style: flexvol
+        #UNIX Permissions: ---rwxr-xr-x
+        #Security Style: unix
+        #Comment: task_id
+        #Space Reserved for Snapshot Copies: 10%
+        #Language: en_US.UTF-8  #if volume is dp, make sure language is same of source svm value.
+    else:
+        print("Invalid protocal, should be nfs, cifs or multi")
+        sys.exit()
+        
+  
+    #make_volume(ARGS.cluster,ARGS.volume_name,ARGS.svm_name,ARGS.aggr_name,ARGS.volume_size,headers)
