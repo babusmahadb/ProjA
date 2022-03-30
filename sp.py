@@ -60,13 +60,18 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     tab = tt.Texttable()
     header = ['Cluster Name','VServer Name','Aggr name','Available space(GB)']
     tab.header(header)
-    tab.set_cols_width([25,25,25,25])
+    tab.set_cols_width([25,25,35,25])
     tab.set_cols_align(['c','c','c','c'])
 
     for dsk in dsktype:
         url = "https://{}/api/storage/aggregates?name=*{}*".format(cluster,dsk)
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
+            tmp = dict(response.json())
+            if "error" in tmp:
+                print("Invalid Username/Password")
+                print(tmp)
+                sys.exit(1)
         except requests.exceptions.HTTPError as err:
             print(err)
             sys.exit(1)
@@ -97,7 +102,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             svm_name = list_svm(cluster, headers)
             #print("svm_name is ", svm_name)
             tab.add_row([cluster,svm_name,aggr_name,space_convert])
-            tab.set_cols_width([25,25,25,25])
+            tab.set_cols_width([25,25,35,25])
             tab.set_cols_align(['c','c','c','c'])
         #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
     setdisplay = tab.draw()
@@ -121,9 +126,11 @@ def sort_svm(cluster: str, headers_inc: str):
             sys.exit(1)
         if services == 'nfs':
             sort_name = i['name']
+            #print("fn sort_svm sort_name", sort_name)
             if apps in app_list:
                 if apps in sort_name:
-                    sort_row = [sort_name]
+                    sort_row.append(sort_name)
+                    #print("fn sort_svm - sort_row", sort_row) 
             else:
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
@@ -135,7 +142,7 @@ def sort_svm(cluster: str, headers_inc: str):
             sort_name = svm_dt['name']
             if apps in app_list:
                 if apps in sort_name:
-                    sort_row = [sort_name]
+                    sort_row.append(sort_name)
             else:
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
@@ -147,7 +154,7 @@ def sort_svm(cluster: str, headers_inc: str):
             sort_name = tmp3['name']
             if apps in app_list:
                 if apps in sort_name:
-                    sort_row = [sort_name]
+                    sort_row.append(sort_name)
             else:
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
@@ -178,6 +185,7 @@ def list_svm(cluster: str, headers_inc: str):
         ctr = ctr + 1
         if services == 'nfs':
             clus = i['name']
+            print("fn list_svm - clus",clus)
             try:
                 svm_ip_add = socket.gethostbyname(clus).split('.')
                 svm_subnet = '.'.join(svm_ip_add[0:3])
@@ -190,7 +198,8 @@ def list_svm(cluster: str, headers_inc: str):
             srt = sort_svm(cluster, headers_inc)
             #print("srt output",srt)
             #clus = list(set(clus) | set(srt))
-            row = clus
+            #row = clus
+            row = srt
         elif services == 'cifs':
             rcd_dt = dict(i)
             svm_rd = rcd_dt['svm']
@@ -200,8 +209,8 @@ def list_svm(cluster: str, headers_inc: str):
             srt = sort_svm(cluster, headers_inc)
             #print(srt)
             #print(clus)
-            clus = list(set(clus) | set(srt))
-            row=clus
+            #clus = list(set(clus) | set(srt))
+            row=srt
         else:
             tmp=dict(i)
             tmp1 = tmp['svm']
@@ -209,7 +218,7 @@ def list_svm(cluster: str, headers_inc: str):
             clus = tmp3['name']
             srt = sort_svm(cluster, headers_inc)
             #clus = list(set(clus) | set(srt))
-            row=[clus]
+            row=srt
             
         
     return row
