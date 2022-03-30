@@ -22,9 +22,21 @@ ur.disable_warnings()
 
 
 
-def get_size(volume_size):
-    """Convert MBs to Bytes"""
-    tmp = int(volume_size) * 1024 * 1024
+def get_size(volume_size: str):
+    """Convert GBs/TBs to Bytes"""
+    volume_num = volume_size[:-2]
+    volume_unit = volume_size[-2:]
+    #print("volume_num "+volume_num+" volume_unit: "+volume_unit+".")
+    tmp = 0
+    if (volume_unit == "mb" or volume_unit == "MB"):
+        tmp = int(volume_num) * 1024 * 1024
+    elif (volume_unit == "gb" or volume_unit == "GB"):
+        tmp = int(volume_num) * 1024 * 1024 * 1024
+    elif (volume_unit == "tb" or volume_unit == "TB"):
+        tmp = int(volume_num) * 1024 * 1024 * 1024 * 1024
+    else:
+        print("Volume size is invalid, use ex: 1MB|1GB|1TB ")
+        sys.exit()
     return tmp
 
 
@@ -36,7 +48,7 @@ def check_job_status(job_status: str, headers_inc: str):
     if job_status['state'] == "failure":
         print("Volume creation failed due to :{}".format(job_status['message']))
     elif job_status['state'] == "success":
-        print("Volume "+vol_name+" of "+vol_size+" MB created successfully. Junction path is "+path+" .")
+        print("Volume "+vol_name+" of "+vol_size.upper()+" created successfully. Junction path is "+path+" .")
     else:
         job_status_url = "https://{}/api/cluster/jobs/{}".format(clus_name, job_status['uuid'])
         job_response = requests.get(job_status_url, headers=headers_inc, verify=False)
@@ -44,7 +56,7 @@ def check_job_status(job_status: str, headers_inc: str):
         check_job_status( job_status, headers_inc)
 
    
-def crt_vol(SecStyle: str, headers_inc: str):
+def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     """Module to create a volume"""
     #clus_name = ARGS.cluster
     #svmname = ARGS.svm_name
@@ -55,8 +67,20 @@ def crt_vol(SecStyle: str, headers_inc: str):
     #smirror = ARGS.sm
     #svault = ARGS.sv
     
-    volume_size = get_size(vol_size)
-        
+    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=daily&copies.count=7".format(clus_name)
+    response = requests.get(snap_url, headers = headers_inc, verify=False)
+    snap_res = response.json()
+    
+    snap_dt = dict(snap_res)
+    snap_rd = snap_dt['records']
+    snap_list=[]
+    for i in snap_rd:
+        snap = dict(i)
+        snap_policy = snap['name']
+        snap_list.append(snap_policy)
+    print()    
+    snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+":")    
+    
     vol_url = "https://{}/api/storage/volumes/?return_timeout=30".format(clus_name)
     vol_data = {
         "aggregates.name": [aggrname],
@@ -75,7 +99,7 @@ def crt_vol(SecStyle: str, headers_inc: str):
             
             },   
         "snapshot_policy": {
-            "name": "default"
+            "name": snapshot_policy
             },
             
         "space": {
@@ -122,6 +146,9 @@ def parse_args() -> argparse.Namespace:
         "-aggr",  required=True, help="Aggregate Name"
     )
     parser.add_argument(
+        "-volname",  required=False, help="Volume Size"
+    )
+    parser.add_argument(
         "-volsize",  required=True, help="Volume Size"
     )
     parser.add_argument(
@@ -156,44 +183,186 @@ def crt_exp(exp_name: str, headers_inc: str):
         anon = "65534"
         print()
         clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
-        #for loop or while to add more clients to list
         
-        exp_data = {
-            "name": exp_name,
-            "rules": [
-                {
+        client_num = clientlist.split(",")
+        first_client = client_num[0]
+        rest_client = client_num[1:]
+        
+        #sys.exit(1)
+        if len(client_num) > 1:
+            
+            print()
+            rule_chk = input("Do you want to create one rule per client? (y/n): ")
+            
+            if rule_chk == "y":
+            
+                exp_data = {
+                    "name": exp_name,
+                    "rules": [
+                        {
+                        
+                        "anonymous_user": anon,
+                        
+                        "clients": [
+                            {
+                            "match": first_client
+                            }
+                        ],
+                        
+                        "protocols": ["nfs3"],
+                        "ro_rule": ["sys"],
+                        "rw_rule": ["sys"],
+                        "superuser": ["sys"]
+                        }
+                    ],
+                    "svm": {
+                        "name": svmname,
+                        "uuid": svm_uuid
+                    }}
                 
-                "anonymous_user": anon,
                 
-                "clients": [
+                exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
+                try:
+                    response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
+                    exp_res = response.json()
+                    
+                except requests.exceptions.HTTPError as err:
+                    
+                    print(err)
+                    sys.exit(1)
+                print()
+                print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+first_client+"'.")
+                print()
+                exp_id_url = "https://{}/api/protocols/nfs/export-policies/?name={}".format(clus_name,exp_name)
+                response = requests.get(exp_id_url, headers=headers_inc, verify=False)
+                exp_id_res = response.json()
+                
+                exp_id_dt = dict(exp_id_res)
+                exp_id_rd = exp_id_dt['records']
+                
+                for i in exp_id_rd:
+                    pid = dict(i)
+                
+                exp_id = pid['id']
+        
+                for host in rest_client:
+                
+                    rule_add = {
+                        
+                            "clients": [
+                                {
+                                "match": host
+                                }
+                            ],
+                            
+                            "protocols": ["nfs3"],
+                            "ro_rule": ["sys"],
+                            "rw_rule": ["sys"],
+                            "superuser": ["sys"]
+                            }
+                    
+                    exp_url = "https://{}/api/protocols/nfs/export-policies/{}/rules".format(clus_name,exp_id)
+                    try:
+                        response = requests.post(exp_url, headers=headers_inc, json=rule_add, verify=False)
+                        exp_res = response.json()
+                        
+                    except requests.exceptions.HTTPError as err:
+                        print(err)
+                        sys.exit(1)
+                    
+                    print("Rule for export Policy '"+exp_name+"' updated with protocol nfs3 for volume '"+vol_name+"' having access ro/rw/su of sys for client '"+host+"'.")
+                    
+            elif rule_chk == "n":
+            
+                print()
+                re_chk = input("Sure you want one rule for all clients "+clientlist+" ,Type y to continue or q to quit: ")
+                
+                if re_chk == "y":
+                        exp_data = {
+                            "name": exp_name,
+                            "rules": [
+                                {
+                                
+                                "anonymous_user": anon,
+                                
+                                "clients": [
+                                    {
+                                    "match": clientlist
+                                    }
+                                ],
+                                
+                                "protocols": ["nfs3"],
+                                "ro_rule": ["sys"],
+                                "rw_rule": ["sys"],
+                                "superuser": ["sys"]
+                                }
+                            ],
+                            "svm": {
+                                "name": svmname,
+                                "uuid": svm_uuid
+                            }}
+                        
+                        
+                        exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
+                        try:
+                            response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
+                            exp_res = response.json()
+                            
+                        except requests.exceptions.HTTPError as err:
+                            
+                            print(err)
+                            sys.exit(1)
+                        print()
+                        print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+clientlist+"'.")
+                else:
+                    print()
+                    print("Existing script")
+                    sys.exit(1)
+                    
+            else:
+                print()
+                print("Existing script")
+                sys.exit(1)
+            
+        else:
+            
+            
+            exp_data = {
+            
+                "name": exp_name,
+                "rules": [
                     {
-                    "match": clientlist
+                    
+                    "anonymous_user": anon,
+                    
+                    "clients": [
+                        {
+                        "match": clientlist
+                        }
+                    ],
+                    
+                    "protocols": ["nfs3"],
+                    "ro_rule": ["sys"],
+                    "rw_rule": ["sys"],
+                    "superuser": ["sys"]
                     }
                 ],
+                "svm": {
+                    "name": svmname,
+                    "uuid": svm_uuid
+                }}
+                        
+            exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
+            try:
+                response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
+                exp_res = response.json()
                 
-                "protocols": ["nfs3"],
-                "ro_rule": ["sys"],
-                "rw_rule": ["sys"],
-                "superuser": ["sys"]
-                }
-            ],
-            "svm": {
-                "name": svmname,
-                "uuid": svm_uuid
-            }}
-        
-        
-        exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
-        try:
-            response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
-            exp_res = response.json()
-            
-        except requests.exceptions.HTTPError as err:
-             
-            print(err)
-            sys.exit(1)
-        print()
-        print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+clientlist+"'.")
+            except requests.exceptions.HTTPError as err:
+                
+                print(err)
+                sys.exit(1)
+            print()
+            print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+clientlist+"'.")
         
     elif shrproto == "cifs":
         
@@ -238,7 +407,7 @@ def crt_exp(exp_name: str, headers_inc: str):
     elif shrproto == "multi":
         
         anon = "65534"
-        exp_name = vol_name
+        exp_name = vol_name+"_ip"
         print()
                 
         cifs_data = {
@@ -275,7 +444,7 @@ def crt_exp(exp_name: str, headers_inc: str):
             print(err)
             sys.exit(1)
             
-        print("Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
+        print("Export Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
         
         exp_id_url = "https://{}/api/protocols/nfs/export-policies/?name={}".format(clus_name,exp_name)
         response = requests.get(exp_id_url, headers=headers_inc, verify=False)
@@ -288,50 +457,114 @@ def crt_exp(exp_name: str, headers_inc: str):
             pid = dict(i)
         
         exp_id = pid['id']
-        #print(exp_id)
-        
-        #sys.exit(1)
-        
+
         print()
         clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
-        #for loop or while to add more clients to list
-        
-        nfs_data = {
-            "name": exp_name,
-            "rules": [
-                {
-                
-                "anonymous_user": anon,
-                
-                "clients": [
-                    {
-                    "match": clientlist
-                    }
-                ],
-                
-                "protocols": ["nfs3"],
-                "ro_rule": ["sys"],
-                "rw_rule": ["sys"],
-                "superuser": ["sys"]
-                }
-            ],
-            "svm": {
-                "name": svmname,
-                "uuid": svm_uuid
-            }}
         
         
-        exp_url = "https://{}/api/protocols/nfs/export-policies/{}".format(clus_name,exp_id)
-        try:
-            response = requests.patch(exp_url, headers=headers_inc, json=nfs_data, verify=False)
-            exp_res = response.json()
+        client_num = clientlist.split(",")
+                
+        #sys.exit(1)
+        if len(client_num) > 1:
             
-        except requests.exceptions.HTTPError as err:
-             
-            print(err)
-            sys.exit(1)
-        print()
-        print("Export Policy '"+exp_name+"'  rule updated for volume '"+vol_name+"' with ro/rw/su of sys for clients '"+clientlist+"'.")
+            print()
+            rule_chk = input("Do you want to create one rule per client? (y/n): ")
+            
+            if rule_chk == "y":
+            
+                for host in client_num:
+                
+                    rule_add = {
+                        
+                            "clients": [
+                                {
+                                "match": host
+                                }
+                            ],
+                            
+                            "protocols": ["nfs3"],
+                            "ro_rule": ["sys"],
+                            "rw_rule": ["sys"],
+                            "superuser": ["sys"]
+                            }
+                    
+                    exp_url = "https://{}/api/protocols/nfs/export-policies/{}/rules".format(clus_name,exp_id)
+                    try:
+                        response = requests.post(exp_url, headers=headers_inc, json=rule_add, verify=False)
+                        exp_res = response.json()
+                        
+                    except requests.exceptions.HTTPError as err:
+                        print(err)
+                        sys.exit(1)
+                    
+                    print("Rule for export Policy '"+exp_name+"' updated with protocol nfs3 for volume '"+vol_name+"' having access ro/rw/su of sys for client '"+host+"'.")
+                    
+            elif rule_chk == "n":
+            
+                print()
+                re_chk = input("Sure you want one rule for all clients "+clientlist+" ,Type y to continue or q to quit: ")
+                
+                if re_chk == "y":
+                    nfs_data = {
+                    
+                        "clients": [
+                            {
+                            "match": clientlist
+                            }
+                        ],
+                        
+                        "protocols": ["nfs3"],
+                        "ro_rule": ["sys"],
+                        "rw_rule": ["sys"],
+                        "superuser": ["sys"]
+                        }
+                
+                    exp_url = "https://{}/api/protocols/nfs/export-policies/{}/rules".format(clus_name,exp_id)
+                    try:
+                        response = requests.post(exp_url, headers=headers_inc, json=nfs_data, verify=False)
+                        exp_res = response.json()
+                        
+                    except requests.exceptions.HTTPError as err:
+                        print(err)
+                        sys.exit(1)
+                    print()
+                    print("Export Policy '"+exp_name+"'  rule updated for volume '"+vol_name+"' with ro/rw/su of sys for clients '"+clientlist+"'.")
+
+                else:
+                    print()
+                    print("Existing script")
+                    sys.exit(1)
+                    
+            else:
+                print()
+                print("Existing script")
+                sys.exit(1)
+        ##for loop or while to add more clients to list
+        #
+        #nfs_data = {
+        #    
+        #        "clients": [
+        #            {
+        #            "match": clientlist
+        #            }
+        #        ],
+        #        
+        #        "protocols": ["nfs3"],
+        #        "ro_rule": ["sys"],
+        #        "rw_rule": ["sys"],
+        #        "superuser": ["sys"]
+        #        }
+        #
+        #exp_url = "https://{}/api/protocols/nfs/export-policies/{}/rules".format(clus_name,exp_id)
+        #try:
+        #    response = requests.post(exp_url, headers=headers_inc, json=nfs_data, verify=False)
+        #    exp_res = response.json()
+        #    
+        #except requests.exceptions.HTTPError as err:
+        #    print(err)
+        #    sys.exit(1)
+        #print()
+        #print("Export Policy '"+exp_name+"'  rule updated for volume '"+vol_name+"' with ro/rw/su of sys for clients '"+clientlist+"'.")
 
     else:
         print()
@@ -420,7 +653,8 @@ if __name__ == "__main__":
     smirror = ARGS.sm
     svault = ARGS.sv
     
-       
+    volume_size = get_size(vol_size)   
+    
     find_url = "https://{}/api/storage/volumes/?name=*{}*".format(clus_name,funcgrp)
     try:
         response = requests.get(find_url, headers=headers, verify=False)
@@ -429,13 +663,20 @@ if __name__ == "__main__":
     except requests.exceptions.HTTPError as err:
         print(err)
         sys.exit(1)
-    
+    if "error" in find_res:
+        print()
+        print("Invalid username/password")
+        print(find_res)
+        sys.exit(1)
+        
     find_dt = dict(find_res)
     find_rd = find_dt['records']
     vn_list = []
     for i in find_rd:
         vl = dict(i)
         vln = vl['name']
+        vln = vln.split("_")
+        vln = vln[3]
         vn_list.append(vln[-4:])
        
     vid = max(vn_list)
@@ -447,8 +688,11 @@ if __name__ == "__main__":
     #svm_tag = svmname.split("-")
     #svm_tag = svm_tag[2]
     
+    if ARGS.volname:
+        vol_name = ARGS.volname
+    else:
+        vol_name = "v_"+svm_tag+"_"+shrproto+"_"+funcgrp.upper()+res
     
-    vol_name = "v_"+svm_tag+"_"+shrproto+"_"+funcgrp.upper()+res
     path = "/"+vol_name
     Ext_Vol_Style = "flexvol"
     #Space Reserved for Snapshot Copies
@@ -464,7 +708,7 @@ if __name__ == "__main__":
         
         SecStyle = "unix"
         
-        crt_vol(SecStyle, headers)
+        crt_vol(volume_size, SecStyle, headers)
          #Language: en_US.UTF-8  #if volume is dp, make sure language is same of source svm value.
     
     
@@ -509,7 +753,7 @@ if __name__ == "__main__":
             svmd = get_svm()
             svm_uuid = svmd[0]
             svm_lang = svmd[1]
-            crt_vol(SecStyle, headers)
+            crt_vol(volume_size, SecStyle, headers)
             
         else:
             
