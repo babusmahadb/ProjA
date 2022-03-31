@@ -126,6 +126,7 @@ def sort_svm(cluster: str, headers_inc: str):
             sys.exit(1)
         if services == 'nfs':
             sort_name = i['name']
+            sort_row.append(sort_name)
             #print("fn sort_svm sort_name", sort_name)
             if apps in app_list:
                 if apps in sort_name:
@@ -140,6 +141,7 @@ def sort_svm(cluster: str, headers_inc: str):
             svm_rd = rcd_dt['svm']
             svm_dt = dict(svm_rd)
             sort_name = svm_dt['name']
+            sort_row.append(sort_name)
             if apps in app_list:
                 if apps in sort_name:
                     sort_row.append(sort_name)
@@ -152,6 +154,7 @@ def sort_svm(cluster: str, headers_inc: str):
             tmp1 = tmp['svm']
             tmp3 = dict(tmp1)
             sort_name = tmp3['name']
+            sort_row.append(sort_name)
             if apps in app_list:
                 if apps in sort_name:
                     sort_row.append(sort_name)
@@ -159,7 +162,7 @@ def sort_svm(cluster: str, headers_inc: str):
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
             #sort_name = i['name']
-        
+    sort_row = set(sort_row)    
     return sort_row 
 
     

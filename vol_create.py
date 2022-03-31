@@ -1,3 +1,4 @@
+
 #! /usr/bin/env python3
 
 """
@@ -9,6 +10,7 @@ usage:python3 vol_create.py -c cluster1 -vs svm1_cluster1 -aggr -volname -volsiz
 
 """
 
+
 import base64
 import argparse
 import logging
@@ -19,7 +21,6 @@ import urllib3 as ur
 import time
 import re
 ur.disable_warnings()
-
 
 
 def get_size(volume_size: str):
@@ -43,8 +44,7 @@ def get_size(volume_size: str):
 def check_job_status(job_status: str, headers_inc: str):
     """ Check job status"""
     print()
-    #
-    #print("inside fun", job_status) 
+
     if job_status['state'] == "failure":
         print("Volume creation failed due to :{}".format(job_status['message']))
     elif job_status['state'] == "success":
@@ -54,13 +54,12 @@ def check_job_status(job_status: str, headers_inc: str):
         job_response = requests.get(job_status_url, headers=headers_inc, verify=False)
         job_status = job_response.json()
         check_job_status( job_status, headers_inc)
-
    
 def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     """Module to create a volume"""
         
-    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=daily&copies.count=7&svm.name={}".format(clus_name,svmname)
-    response = requests.get(snap_url, headers = headers_inc, verify=False)
+    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=4hourly&copies.count=6".format(clus_name,svmname)
+    response = requests.get(snap_url, headers = headers, verify=False)
     snap_res = response.json()
     
     snap_dt = dict(snap_res)
@@ -69,7 +68,13 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     for i in snap_rd:
         snap = dict(i)
         snap_policy = snap['name']
-        snap_list.append(snap_policy)
+        snap_copies = snap['copies']
+        
+        for j in snap_copies:
+            pref = j['prefix']
+            cnt = j['count']
+            if (pref == "daily" and cnt == 7):
+                snap_list.append(snap_policy)
     print()    
     snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+":")    
     
@@ -116,10 +121,8 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     except requests.exceptions.RequestException as err:
         print(err)
         sys.exit(1)
-    
-        
-      
-        
+
+
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
 
@@ -165,6 +168,7 @@ def parse_args() -> argparse.Namespace:
         parsed_args.api_pass = getpass()
 
     return parsed_args
+
 
 
 def get_exp_id(exp_name: str, headers_inc: str):
@@ -259,6 +263,8 @@ def crt_pol_rule(client: str, headers_inc: str):
     print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+client+"'.")
     print()
     
+
+
 def crt_cifs_exp(exp_name: str, headers_inc: str):   
     """ cifs export policy rule create """
     
@@ -300,14 +306,14 @@ def crt_cifs_exp(exp_name: str, headers_inc: str):
         sys.exit(1)
     print("Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
                     
+
 def crt_exp(exp_name: str, headers_inc: str):
     """ Create export policy name and rule """
     
     if shrproto == "nfs":
-        
-        
+                
         print()
-        clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
+        clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains: ")
         
         client_num = clientlist.split(",")
         first_client = client_num[0]
@@ -315,44 +321,17 @@ def crt_exp(exp_name: str, headers_inc: str):
         
         #sys.exit(1)
         if len(client_num) > 1:
-        
-            rule_chk = input("Do you want to create one rule per client? (y/n): ")
-            
-            if rule_chk == "y":
-    
-                print()
-                exp_pol_rule = crt_pol_rule(first_client,headers_inc)
-            
-                exp_id = get_exp_id(exp_name, headers_inc)
-        
-                crt_add_rule(rest_client, exp_id, headers_inc)
-        
-        
-                     
-            elif rule_chk == "n":
-            
-                print()
-                re_chk = input("Sure you want one rule for all clients "+clientlist+" ,Type y to continue or q to quit: ")
-                
-                if re_chk == "y":
-                
-                    exp_pol_rule = crt_pol_rule(clientlist,headers_inc)
-                        
-                else:
-                    print()
-                    print("Existing script")
-                    sys.exit(1)
                     
-            else:
-                print()
-                print("Existing script")
-                sys.exit(1)
+            crt_pol_rule(first_client,headers_inc)
             
+            exp_id = get_exp_id(exp_name, headers_inc)
+        
+            crt_add_rule(rest_client, exp_id, headers_inc)
+                    
         else:
             
-            exp_pol_rule = crt_pol_rule(clientlist,headers_inc)
-            
-        
+            crt_pol_rule(clientlist,headers_inc)
+               
     elif shrproto == "cifs":
         
         crt_cifs_exp(exp_name, headers_inc) 
@@ -360,8 +339,7 @@ def crt_exp(exp_name: str, headers_inc: str):
     elif shrproto == "multi":
         
         exp_name = vol_name+"_ip"
-        print()
-                
+               
         crt_cifs_exp(exp_name, headers_inc)
         
         exp_id = get_exp_id(exp_name, headers_inc)
@@ -370,31 +348,11 @@ def crt_exp(exp_name: str, headers_inc: str):
         clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
                 
         client_num = clientlist.split(",")
-                
-        #sys.exit(1)
+        
         if len(client_num) > 1:
             
-            print()
-            rule_chk = input("Do you want to create one rule per client? (y/n): ")
+            crt_add_rule(client_num, exp_id, headers_inc)
             
-            if rule_chk == "y":
-            
-                crt_add_rule(client_num, exp_id, headers_inc)
-                                    
-            elif rule_chk == "n":
-            
-                print()
-                re_chk = input("Sure you want one rule for all clients "+clientlist+" ,Type y to continue or q to quit: ")
-                
-                if re_chk == "y":
-                
-                    exp_pol_rule = crt_pol_rule(clientlist,headers_inc)
-                
-                else:
-                    print()
-                    print("Existing script")
-                    sys.exit(1)
-                    
         else:
             
             rule_add = {
@@ -426,6 +384,7 @@ def crt_exp(exp_name: str, headers_inc: str):
         print()
         print("Existing script")
         sys.exit(1)
+
 
 
 def crt_share(svm_uuid: str, headers_inc: str):
@@ -460,6 +419,8 @@ def crt_share(svm_uuid: str, headers_inc: str):
     print()
     print("CIFS share '"+share_name+"' create with path "+path+".")
         
+
+
 def get_svm():
     """ Get SVM nane and UUID """
     
@@ -513,11 +474,6 @@ if __name__ == "__main__":
     
     volume_size = get_size(vol_size)   
     
-    
-    svmd = get_svm()
-    svm_uuid = svmd[0]
-    svm_lang = svmd[1]
-    
     find_url = "https://{}/api/storage/volumes/?name=*{}*".format(clus_name,funcgrp)
     try:
         response = requests.get(find_url, headers=headers, verify=False)
@@ -541,9 +497,26 @@ if __name__ == "__main__":
         vln = vln.split("_")
         vln = vln[3]
         vn_list.append(vln[-4:])
-       
-    vid = max(vn_list)
+    
+    num_list = [s for s in vn_list if s.isdigit()]
+    vid = max(num_list)
     res = re.sub(r'[0-9]+$', lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}",vid)
+    
+    sm_url = "https://{}/api/cluster/peers".format(clus_name)
+    response = requests.get(sm_url, headers=headers, verify=False)
+    sm_res = response.json()
+    
+    sm_dt = dict(sm_res)
+    sm_rd = sm_dt['records']
+    for i in sm_rd:
+        peer = dict(i)
+     
+    peer_clus = peer['name']
+       
+    svmd = get_svm()
+    svm_uuid = svmd[0]
+    svm_lang = svmd[1]
+    
     print()    
     task_id = input("Enter a valid and approved Task number:")
     
