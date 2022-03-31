@@ -185,7 +185,7 @@ def list_svm(cluster: str, headers_inc: str):
         ctr = ctr + 1
         if services == 'nfs':
             clus = i['name']
-            print("fn list_svm - clus",clus)
+            #print("fn list_svm - clus",clus)
             try:
                 svm_ip_add = socket.gethostbyname(clus).split('.')
                 svm_subnet = '.'.join(svm_ip_add[0:3])
