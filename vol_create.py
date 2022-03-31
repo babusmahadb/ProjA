@@ -58,16 +58,8 @@ def check_job_status(job_status: str, headers_inc: str):
    
 def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     """Module to create a volume"""
-    #clus_name = ARGS.cluster
-    #svmname = ARGS.svm_name
-    #aggrname = ARGS.aggr
-    #shrproto = ARGS.proto
-    #funcgrp = ARGS.fgrp
-    #vol_size = ARGS.volsize
-    #smirror = ARGS.sm
-    #svault = ARGS.sv
-    
-    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=daily&copies.count=7".format(clus_name)
+        
+    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=daily&copies.count=7&svm.name={}".format(clus_name,svmname)
     response = requests.get(snap_url, headers = headers_inc, verify=False)
     snap_res = response.json()
     
@@ -267,7 +259,46 @@ def crt_pol_rule(client: str, headers_inc: str):
     print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+client+"'.")
     print()
     
+def crt_cifs_exp(exp_name: str, headers_inc: str):   
+    """ cifs export policy rule create """
+    
+    anon = "65534"
+    print()
+    
+    exp_data = {
+        "name": exp_name,
+        "rules": [
+            {
+            
+            "anonymous_user": anon,
+            
+            "clients": [
+                {
+                "match": "0.0.0.0/0"
+                }
+            ],
+            
+            "protocols": ["cifs"],
+            "ro_rule": ["any"],
+            "rw_rule": ["any"],
+            "superuser": ["any"]
+            }
+        ],
+        "svm": {
+            "name": svmname,
+            "uuid": svm_uuid
+        }}
+            
+    exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
+    try:
+        response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
+        exp_res = response.json()
         
+    except requests.exceptions.HTTPError as err:
+         
+        print(err)
+        sys.exit(1)
+    print("Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
                     
 def crt_exp(exp_name: str, headers_inc: str):
     """ Create export policy name and rule """
@@ -324,85 +355,14 @@ def crt_exp(exp_name: str, headers_inc: str):
         
     elif shrproto == "cifs":
         
-        anon = "65534"
-        print()
-                
-        exp_data = {
-            "name": exp_name,
-            "rules": [
-                {
-                
-                "anonymous_user": anon,
-                
-                "clients": [
-                    {
-                    "match": "0.0.0.0/0"
-                    }
-                ],
-                
-                "protocols": ["cifs"],
-                "ro_rule": ["any"],
-                "rw_rule": ["any"],
-                "superuser": ["any"]
-                }
-            ],
-            "svm": {
-                "name": svmname,
-                "uuid": svm_uuid
-            }}
-                
-        exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
-        try:
-            response = requests.post(exp_url, headers=headers_inc, json=exp_data, verify=False)
-            exp_res = response.json()
+        crt_cifs_exp(exp_name, headers_inc) 
             
-        except requests.exceptions.HTTPError as err:
-             
-            print(err)
-            sys.exit(1)
-        print("Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
-    
     elif shrproto == "multi":
         
-        anon = "65534"
         exp_name = vol_name+"_ip"
         print()
                 
-        cifs_data = {
-            "name": exp_name,
-            "rules": [
-                {
-                
-                "anonymous_user": anon,
-                
-                "clients": [
-                    {
-                    "match": "0.0.0.0/0"
-                    }
-                ],
-                
-                "protocols": ["cifs"],
-                "ro_rule": ["any"],
-                "rw_rule": ["any"],
-                "superuser": ["any"]
-                }
-            ],
-            "svm": {
-                "name": svmname,
-                "uuid": svm_uuid
-            }}
-                
-        exp_url = "https://{}/api/protocols/nfs/export-policies".format(clus_name)
-        try:
-            response = requests.post(exp_url, headers=headers_inc, json=cifs_data, verify=False)
-            exp_res = response.json()
-            
-        except requests.exceptions.HTTPError as err:
-             
-            print(err)
-            sys.exit(1)
-            
-        print("Export Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
+        crt_cifs_exp(exp_name, headers_inc)
         
         exp_id = get_exp_id(exp_name, headers_inc)
         
@@ -553,6 +513,11 @@ if __name__ == "__main__":
     
     volume_size = get_size(vol_size)   
     
+    
+    svmd = get_svm()
+    svm_uuid = svmd[0]
+    svm_lang = svmd[1]
+    
     find_url = "https://{}/api/storage/volumes/?name=*{}*".format(clus_name,funcgrp)
     try:
         response = requests.get(find_url, headers=headers, verify=False)
@@ -599,9 +564,7 @@ if __name__ == "__main__":
     if ( ARGS.proto == "nfs" or ARGS.proto == "multi"):
         
         exp_name = vol_name+"_ip"
-        svmd = get_svm()
-        svm_uuid = svmd[0]
-        svm_lang = svmd[1]
+        
         crt_exp(exp_name, headers)
         
         SecStyle = "unix"
@@ -614,7 +577,7 @@ if __name__ == "__main__":
     
         #Export Policy: cifs-default or default
         cifs_exp_name = []
-        cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs".format(clus_name)
+        cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs&svm.name={}".format(clus_name,svmname)
         try:
             response = requests.get(cifs_exp_url, headers=headers, verify=False)
             cifs_exp_res = response.json()
@@ -648,9 +611,7 @@ if __name__ == "__main__":
         if exp_name in cifs_exp_name:
         
             SecStyle = "ntfs"
-            svmd = get_svm()
-            svm_uuid = svmd[0]
-            svm_lang = svmd[1]
+            
             crt_vol(volume_size, SecStyle, headers)
             
         else:
