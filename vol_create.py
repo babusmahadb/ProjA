@@ -76,7 +76,7 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
             if (pref == "daily" and cnt == 7):
                 snap_list.append(snap_policy)
     print()    
-    snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+":")    
+    snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")    
     
     vol_url = "https://{}/api/storage/volumes/?return_timeout=30".format(clus_name)
     vol_data = {
@@ -345,7 +345,7 @@ def crt_exp(exp_name: str, headers_inc: str):
         exp_id = get_exp_id(exp_name, headers_inc)
         
         print()
-        clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains:")
+        clientlist = input("List of Client Match Hostnames, IP Addresses, Netgroups, or Domains: ")
                 
         client_num = clientlist.split(",")
         
@@ -498,8 +498,13 @@ if __name__ == "__main__":
         vln = vln[3]
         vn_list.append(vln[-4:])
     
-    num_list = [s for s in vn_list if s.isdigit()]
-    vid = max(num_list)
+    num_list = [n for n in vn_list if n.isdigit()]
+    
+    if len(num_list) == 0:
+        vid = "0000"
+    else:    
+        vid = max(num_list)
+    
     res = re.sub(r'[0-9]+$', lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}",vid)
     
     sm_url = "https://{}/api/cluster/peers".format(clus_name)
@@ -522,7 +527,12 @@ if __name__ == "__main__":
     
     svm_tag = svmname[-4:]
     #svm_tag = svmname.split("-")
-    #svm_tag = svm_tag[2]
+    #if len(svm_tag) == 0:
+    #    svm_tag = svmname.split("_")
+    #    svm_tag = svm_tag[2]
+    #else:
+    #    svm_tag = svm_tag[2]
+    
     
     if ARGS.volname:
         vol_name = ARGS.volname

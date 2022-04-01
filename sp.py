@@ -58,10 +58,10 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     #print("==========================================")
     r=0
     tab = tt.Texttable()
-    header = ['Cluster Name','VServer Name','Aggr name','Available space(GB)']
+    header = ['Cluster Name','VServer Name','Aggr name','Size(GB)','Available(GB)','Used %']
     tab.header(header)
-    tab.set_cols_width([25,25,35,25])
-    tab.set_cols_align(['c','c','c','c'])
+    tab.set_cols_width([20,25,35,15,15,10])
+    tab.set_cols_align(['c','c','c','c','c','c'])
 
     for dsk in dsktype:
         url = "https://{}/api/storage/aggregates?name=*{}*".format(cluster,dsk)
@@ -96,14 +96,18 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             tmp = dict(response.json())
             tmp2 = dict(tmp['space'])
             tmp3 = dict(tmp2['block_storage'])
-            avail = tmp3['available']
-            space_convert=(((int(avail)/1024)/1024)/1024)
+            avail = (((int(tmp3['available'])/1024)/1024)/1024)
+            size = (((int(tmp3['size'])/1024)/1024)/1024)
+            used = (((int(tmp3['used'])/1024)/1024)/1024)
+            usedp = tmp3['full_threshold_percent']
+            p_used = (((int(tmp3['physical_used'])/1024)/1024)/1024)
+            #space_convert=(((int(avail)/1024)/1024)/1024)
             aggr_name = i['name']
             svm_name = list_svm(cluster, headers)
             #print("svm_name is ", svm_name)
-            tab.add_row([cluster,svm_name,aggr_name,space_convert])
-            tab.set_cols_width([25,25,35,25])
-            tab.set_cols_align(['c','c','c','c'])
+            tab.add_row([cluster,svm_name,aggr_name,size,avail,used])
+            tab.set_cols_width([20,25,35,15,15,10])
+            tab.set_cols_align(['c','c','c','c','c','c'])
         #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
     setdisplay = tab.draw()
     print(setdisplay)
