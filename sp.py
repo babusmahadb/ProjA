@@ -26,7 +26,7 @@ def find_clstr(site: str, envir: str, domain: str):
     """Get cluster info from inventory using user inputs"""
     
     wb = xl.load_workbook(r'C:\\Users\\Administrator.DEMO\\Documents\\GitHub\\ProjA\\projclstrs.xlsx')
-
+    #wb = xl.load_workbook(r'/opt/storage_scripts/test_env_automation_v2/test_env_automation_v2/projclstrs.xlsx')
 #active worksheet data
     ws = wb.active    
     
@@ -99,13 +99,12 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             avail = (((int(tmp3['available'])/1024)/1024)/1024)
             size = (((int(tmp3['size'])/1024)/1024)/1024)
             used = (((int(tmp3['used'])/1024)/1024)/1024)
-            usedp = tmp3['full_threshold_percent']
-            p_used = (((int(tmp3['physical_used'])/1024)/1024)/1024)
-            #space_convert=(((int(avail)/1024)/1024)/1024)
+            uip = (used * 100)/avail
+            #uip = int(uip)
             aggr_name = i['name']
             svm_name = list_svm(cluster, headers)
             #print("svm_name is ", svm_name)
-            tab.add_row([cluster,svm_name,aggr_name,size,avail,used])
+            tab.add_row([cluster,svm_name,aggr_name,size,avail,uip])
             tab.set_cols_width([20,25,35,15,15,10])
             tab.set_cols_align(['c','c','c','c','c','c'])
         #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
@@ -118,7 +117,7 @@ def sort_svm(cluster: str, headers_inc: str):
     services = ARGS.proto
     app_list = ["svm","arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0","cdoc","cf1","devi","sdb"]
     ctr = 0
-    sort_row = []
+    sort_row = tmp_n = []
     tmp = dict(get_vservers(cluster, headers_inc))
     vservers = tmp['records']
     
@@ -130,7 +129,7 @@ def sort_svm(cluster: str, headers_inc: str):
             sys.exit(1)
         if services == 'nfs':
             sort_name = i['name']
-            sort_row.append(sort_name)
+            tmp_n.append(sort_name)
             #print("fn sort_svm sort_name", sort_name)
             if apps in app_list:
                 if apps in sort_name:
@@ -145,7 +144,7 @@ def sort_svm(cluster: str, headers_inc: str):
             svm_rd = rcd_dt['svm']
             svm_dt = dict(svm_rd)
             sort_name = svm_dt['name']
-            sort_row.append(sort_name)
+            tmp_n.append(sort_name)
             if apps in app_list:
                 if apps in sort_name:
                     sort_row.append(sort_name)
@@ -158,7 +157,7 @@ def sort_svm(cluster: str, headers_inc: str):
             tmp1 = tmp['svm']
             tmp3 = dict(tmp1)
             sort_name = tmp3['name']
-            sort_row.append(sort_name)
+            tmp_n.append(sort_name)
             if apps in app_list:
                 if apps in sort_name:
                     sort_row.append(sort_name)
@@ -166,7 +165,15 @@ def sort_svm(cluster: str, headers_inc: str):
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
             #sort_name = i['name']
-    sort_row = set(sort_row)    
+    tmp_n = set(tmp_n)
+    tmp_n = list(tmp_n)
+    print("tmp_n",tmp_n)
+    sort_row = tmp_n
+    
+    #print("tmp list", tmp_n)
+    #print("sort row value",sort_row)
+        
+            
     return sort_row 
 
     
@@ -174,7 +181,7 @@ def list_svm(cluster: str, headers_inc: str):
     """Lists the VServers"""
     hostname = ARGS.host 
     services = ARGS.proto
-    
+    apps = ARGS.app
     try:
         host_ip_add = socket.gethostbyname(hostname).split('.')
         host_subnet = '.'.join(host_ip_add[0:3])
@@ -218,7 +225,7 @@ def list_svm(cluster: str, headers_inc: str):
             #print(clus)
             #clus = list(set(clus) | set(srt))
             row=srt
-        else:
+        elif services == 'iscsi':
             tmp=dict(i)
             tmp1 = tmp['svm']
             tmp3 = dict(tmp1)
@@ -226,8 +233,27 @@ def list_svm(cluster: str, headers_inc: str):
             srt = sort_svm(cluster, headers_inc)
             #clus = list(set(clus) | set(srt))
             row=srt
-            
+        else:
+            print("Enter valid protocol")
+            sys.exit(1)
+    
+    tmp12 = set(row)
+    tmp12 = list(tmp12)
+    print("tmp12",tmp12)
+    row = tmp12
         
+        
+    for k in tmp12:
+        print(" k ",k)
+        if apps in k:
+            row = []
+            row.append(k)
+            return row
+        if "cf" in k:
+            row = []
+            row.append(k)
+            
+    
     return row
     
 def get_vservers(cluster: str, headers_inc: str):

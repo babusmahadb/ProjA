@@ -507,16 +507,14 @@ if __name__ == "__main__":
     
     res = re.sub(r'[0-9]+$', lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}",vid)
     
-    sm_url = "https://{}/api/cluster/peers".format(clus_name)
-    response = requests.get(sm_url, headers=headers, verify=False)
-    sm_res = response.json()
-    
-    sm_dt = dict(sm_res)
-    sm_rd = sm_dt['records']
-    for i in sm_rd:
-        peer = dict(i)
-     
-    peer_clus = peer['name']
+    if smirror == "y":
+        
+        print()
+        peer_clus = input("Enter a Valid target Cluster name/IP for SnapMirror Configuration: ")
+        
+        crt_tgt_vol()
+        
+        crt_estab_snpmir()
        
     svmd = get_svm()
     svm_uuid = svmd[0]
