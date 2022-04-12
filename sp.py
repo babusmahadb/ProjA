@@ -167,7 +167,7 @@ def sort_svm(cluster: str, headers_inc: str):
             #sort_name = i['name']
     tmp_n = set(tmp_n)
     tmp_n = list(tmp_n)
-    print("tmp_n",tmp_n)
+    #print("tmp_n",tmp_n)
     sort_row = tmp_n
     
     #print("tmp list", tmp_n)
@@ -239,12 +239,14 @@ def list_svm(cluster: str, headers_inc: str):
     
     tmp12 = set(row)
     tmp12 = list(tmp12)
-    print("tmp12",tmp12)
+    #print("tmp12",tmp12)
     row = tmp12
         
         
     for k in tmp12:
-        print(" k ",k)
+        #print(" k ",k)
+        if "afsx" in k:
+            row.remove(k)
         if apps in k:
             row = []
             row.append(k)
@@ -252,9 +254,30 @@ def list_svm(cluster: str, headers_inc: str):
         if "cf" in k:
             row = []
             row.append(k)
+        
             
-    
+    for chk in row:
+        adc = auth_dp_chk(cluster,chk,headers_inc)
+        #print(adc)
+        
     return row
+
+
+def auth_dp_chk(cluster: str, fsvm: str, headers_inc: str):
+    """ excludes auth and dp destination SVM's """
+    
+    url = "https://{}/api/svm/svms?subtype=!dp_destination&name={}".format(cluster,fsvm)
+    try:
+        response = requests.get(url, headers=headers_inc, verify=False)
+        #print(response.json())
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        sys.exit(1)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        sys.exit(1)
+        
+    return response.json()    
     
 def get_vservers(cluster: str, headers_inc: str):
     """ Get vServer"""
