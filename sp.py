@@ -245,7 +245,7 @@ def list_svm(cluster: str, headers_inc: str):
         
     for k in tmp12:
         #print(" k ",k)
-        if "afsx" in k:
+        if ("afsx" in k or "-dr" in k):
             row.remove(k)
         if apps in k:
             row = []
