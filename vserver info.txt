@@ -1,0 +1,161 @@
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01 admin -      -          -           -          -
+uslv-afsx-dmz data  default    running    running     uslv_afsx_ cluster1_
+                                                      dmz_root   02_sata_1
+uslv-vfsx-cf10-dmz data default           running     svm2_      cluster1_
+                               running                cluster1_  02_sata_1
+                                                      root
+uslv-vfsx-sdb10-dmz data default          running     svm1_      cluster1_
+                               running                cluster1_  02_sata_1
+                                                      root
+6 entries were displayed.
+
+site01-pfsx-app01::> vserver show -fields allowed-protocols
+vserver     allowed-protocols
+----------- -----------------
+cluster1-01 -
+cluster1-02 -
+site01-pfsx-app01 -
+uslv-afsx-dmz nfs,cifs,fcp,iscsi,ndmp
+uslv-vfsx-cf10-dmz nfs,cifs,fcp,iscsi,ndmp
+uslv-vfsx-sdb10-dmz nfs,cifs,fcp,iscsi,ndmp
+6 entries were displayed.
+
+site01-pfsx-app01::> nfs show
+
+Vserver: uslv-afsx-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  enabled
+                   4.1:  enabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-cf10-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  enabled
+                   4.1:  enabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-sdb10-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  enabled
+                   4.1:  enabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+3 entries were displayed.
+.
+
+site01-pfsx-app01::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+uslv-vfsx-cf10-dmz SVM2_CLUSTER1 up   DEMO             domain
+uslv-vfsx-sdb10-dmz SVM1_CLUSTER1 up  DEMO             domain
+2 entries were displayed.
+
+
+
+site01-pfsx-app01::> iscsi show
+           Target                           Target                       Status
+Vserver    Name                             Alias                        Admin
+---------- -------------------------------- ---------------------------- ------
+uslv-vfsx-cf10-dmz iqn.1992-08.com.netapp:sn.90da6771affd11ec854e0050568924a2:vs.6 svm2_cluster1 up
+uslv-vfsx-sdb10-dmz iqn.1992-08.com.netapp:sn.875e66eb5ce811ebb88b005056b03999:vs.5 svm2_cluster1 up
+2 entries were displayed.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+site02-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster2-01 node    -          -          -           -          -
+cluster2-02 node    -          -          -           -          -
+site02-pfsx-app01
+            admin   -          -          -           -          -
+svm-dr      data    dp-destination        stopped     svm1_      cluster2_
+                               running                cluster1_  02_ssd_1
+                                                      root
+svm1_cluster2
+            data    default    running    running     svm1_      cluster2_
+                                                      cluster2_  01_sata_1
+                                                      root
+uslv-vfsx-cf11-dmz
+            data    default    running    running     uslv_vfsx_ cluster2_
+                                                      cf11_dmz_  01_sata_1
+                                                      root
+6 entries were displayed.
+
+site02-pfsx-app01::> vserver show -fields allowed-protocols
+vserver     allowed-protocols
+----------- -----------------
+cluster2-01 -
+cluster2-02 -
+site02-pfsx-app01
+            -
+svm-dr      nfs,cifs,fcp,iscsi,ndmp
+svm1_cluster2
+            nfs,cifs,fcp,iscsi,ndmp
+uslv-vfsx-cf11-dmz
+            nfs,cifs,fcp,iscsi,ndmp
+6 entries were displayed.
+
+site02-pfsx-app01::> nfs show
+
+Vserver: svm-dr
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  enabled
+                   4.1:  enabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-cf11-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  enabled
+                   4.1:  enabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+2 entries were displayed.
+
+site02-pfsx-app01::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+svm-dr      SVM1_CLUSTER1   up        DEMO             domain
+
+site02-pfsx-app01::> iscsi show
+           Target                           Target                       Status
+Vserver    Name                             Alias                        Admin
+---------- -------------------------------- ---------------------------- ------
+svm1_cluster2
+           iqn.1992-08.com.netapp:sn.774f957f9bbb11ebad2c005056b08a86:vs.5
+                                            svm1_cluster2                up
+
+site02-pfsx-app01::>
+
