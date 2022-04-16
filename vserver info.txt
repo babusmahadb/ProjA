@@ -1,4 +1,76 @@
+login as: admin
+Using keyboard-interactive authentication.
+Password:
+
+Last login time: 4/12/2022 12:48:17
+site01-pfsx-app01::>
 site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01
+            admin   -          -          -           -          -
+uslv-afsx-dmz
+            data    default    running    running     uslv_afsx_ cluster1_
+                                                      dmz_root   02_sata_1
+uslv-vfsx-cf10-dmz
+            data    default    running    running     svm2_      cluster1_
+                                                      cluster1_  02_sata_1
+                                                      root
+uslv-vfsx-sdb10-dmz
+            data    default    running    running     svm1_      cluster1_
+                                                      cluster1_  02_sata_1
+                                                      root
+6 entries were displayed.
+
+site01-pfsx-app01::> row 0
+  (rows)
+
+site01-pfsx-app01::> row 0
+  (rows)
+
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01 admin -      -          -           -          -
+uslv-afsx-dmz data  default    running    running     uslv_afsx_ cluster1_
+                                                      dmz_root   02_sata_1
+uslv-vfsx-cf10-dmz data default           running     svm2_      cluster1_
+                               running                cluster1_  02_sata_1
+                                                      root
+uslv-vfsx-sdb10-dmz data default          running     svm1_      cluster1_
+                               running                cluster1_  02_sata_1
+                                                      root
+6 entries were displayed.
+
+site01-pfsx-app01::>
+site01-pfsx-app01::> vserver show -allowed-protocols
+
+Error: Missing value for -allowed-protocols. If you want to only display certain fields, use -fields <list of fields>.
+
+site01-pfsx-app01::> vserver show * -allowed-protocols *
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01 admin -      -          -           -          -
+uslv-afsx-dmz data  default    running    running     uslv_afsx_ cluster1_
+                                                      dmz_root   02_sata_1
+uslv-vfsx-cf10-dmz data default           running     svm2_      cluster1_
+                               running                cluster1_  02_sata_1
+                                                      root
+uslv-vfsx-sdb10-dmz data default          running     svm1_      cluster1_
+                               running                cluster1_  02_sata_1
+                                                      root
+6 entries were displayed.
+
+site01-pfsx-app01::> vserver show  -allowed-protocols *
                                Admin      Operational Root
 Vserver     Type    Subtype    State      State       Volume     Aggregate
 ----------- ------- ---------- ---------- ----------- ---------- ----------
@@ -61,7 +133,12 @@ Vserver: uslv-vfsx-sdb10-dmz
   Default Windows User:  -
  Default Windows Group:  -
 3 entries were displayed.
-.
+
+site01-pfsx-app01::> cifs
+
+site01-pfsx-app01::vserver cifs> cd ..
+
+site01-pfsx-app01::vserver> cd ..
 
 site01-pfsx-app01::> cifs show
             Server          Status    Domain/Workgroup Authentication
@@ -71,7 +148,9 @@ uslv-vfsx-cf10-dmz SVM2_CLUSTER1 up   DEMO             domain
 uslv-vfsx-sdb10-dmz SVM1_CLUSTER1 up  DEMO             domain
 2 entries were displayed.
 
+site01-pfsx-app01::> isci show
 
+Error: "isci" is not a recognized command
 
 site01-pfsx-app01::> iscsi show
            Target                           Target                       Status
@@ -96,9 +175,1012 @@ cluster1_02_sata_1 281.3GB 280.7GB 0% online    8 cluster1-02      raid_dp,
                                                                    normal
 4 entries were displayed.
 
+site01-pfsx-app01::> snapshot show
+    show       show-delta
+
+site01-pfsx-app01::> snapshot show
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+cluster1-01 vol0
+                  hourly.5                                   1GB     4%   14%
+                  nightly.1                               1.31GB     6%   18%
+                  hourly.4                                1.10GB     5%   15%
+                  hourly.3                               944.7MB     4%   13%
+                  hourly.2                                1.03GB     4%   14%
+                  hourly.1                               869.4MB     4%   12%
+                  nightly.0                               1.05GB     5%   15%
+                  hourly.0                               513.6MB     2%    8%
+cluster1-02 vol0
+                  hourly.5                                1.04GB     5%   16%
+                  nightly.1                              843.8MB     4%   13%
+                  hourly.4                               938.1MB     4%   14%
+                  hourly.3                               974.9MB     4%   14%
+                  hourly.2                                1.06GB     5%   16%
+                  hourly.1                                 804MB     3%   12%
+                  nightly.0                              996.5MB     4%   15%
+                  hourly.0                               565.3MB     2%    9%
+uslv-afsx-dmz uslv_afsx_dmz_root
+                  daily.2022-04-15_0010                    176KB     1%   34%
+                  daily.2022-04-16_0010                    236KB     1%   41%
+                  hourly.2022-04-16_0405                   128KB     1%   27%
+                  hourly.2022-04-16_0505                   128KB     1%   27%
+                  hourly.2022-04-16_0605                   128KB     1%   27%
+                  hourly.2022-04-16_0705                   128KB     1%   27%
+                  hourly.2022-04-16_0805                   380KB     2%   53%
+                  hourly.2022-04-16_0905                   120KB     1%   26%
+uslv-vfsx-cf10-dmz svm2_cluster1_root
+                  weekly.2022-04-03_0015                   256KB     1%   34%
+                  weekly.2022-04-10_0015                   404KB     2%   45%
+                  daily.2022-04-15_0010                    176KB     1%   26%
+                  daily.2022-04-16_0010                    128KB     1%   21%
+                  hourly.2022-04-16_0405                   380KB     2%   44%
+                  hourly.2022-04-16_0505                   128KB     1%   21%
+                  hourly.2022-04-16_0605                   128KB     1%   21%
+                  hourly.2022-04-16_0705                   128KB     1%   21%
+                  hourly.2022-04-16_0805                   128KB     1%   21%
+                  hourly.2022-04-16_0905                   124KB     1%   20%
+                   v_ter1_cifs_NMS0034
+                  daily.2022-04-10_0010                    348KB     0%   52%
+                  daily.2022-04-11_0010                    248KB     0%   44%
+                  4hourly.2022-04-11_0400                  240KB     0%   43%
+                  daily.2022-04-12_0010                    228KB     0%   42%
+                  4hourly.2022-04-12_0400                  244KB     0%   44%
+                  daily.2022-04-13_0010                    256KB     0%   45%
+                  4hourly.2022-04-13_0400                  252KB     0%   44%
+                  daily.2022-04-14_0010                    268KB     0%   46%
+                  4hourly.2022-04-14_0400                  264KB     0%   46%
+                  daily.2022-04-15_0010                    236KB     0%   43%
+                  4hourly.2022-04-15_0400                  252KB     0%   44%
+                  daily.2022-04-16_0010                    240KB     0%   43%
+                  4hourly.2022-04-16_0400                  228KB     0%   42%
+                   v_ter1_cifs_NMS0036
+                  daily.2022-04-10_0010                    208KB     0%   31%
+                  daily.2022-04-11_0010                    320KB     0%   41%
+                  daily.2022-04-12_0010                    212KB     0%   32%
+                  daily.2022-04-13_0010                    252KB     0%   35%
+                  daily.2022-04-14_0010                    320KB     0%   41%
+                  daily.2022-04-15_0010                    228KB     0%   33%
+                  daily.2022-04-16_0010                    252KB     0%   35%
+                   v_ter1_multi_NMS0035
+                  daily.2022-04-10_0010                    296KB     0%   42%
+                  daily.2022-04-11_0010                    224KB     0%   35%
+                  daily.2022-04-12_0010                    244KB     0%   37%
+                  daily.2022-04-13_0010                    252KB     0%   38%
+                  daily.2022-04-14_0010                    252KB     0%   38%
+                  daily.2022-04-15_0010                    332KB     0%   45%
+                  daily.2022-04-16_0010                    276KB     0%   40%
+                   v_ter1_nfs_NMS0009_vault
+                  weekly.2022-04-03_0015                   360KB     0%   47%
+                  weekly.2022-04-10_0015                   356KB     0%   46%
+                  daily.2022-04-15_0010                    352KB     0%   46%
+                  daily.2022-04-16_0010                    332KB     0%   45%
+                  hourly.2022-04-16_0405                   240KB     0%   37%
+                  hourly.2022-04-16_0505                   248KB     0%   38%
+                  hourly.2022-04-16_0605                   244KB     0%   37%
+                  hourly.2022-04-16_0705                   236KB     0%   36%
+                  hourly.2022-04-16_0805                   224KB     0%   35%
+                  hourly.2022-04-16_0905                   244KB     0%   37%
+                   v_ter1_nfs_NMS0032
+                  daily.2022-04-10_0010                    296KB     0%   49%
+                  daily.2022-04-11_0010                    244KB     0%   45%
+                  4hourly.2022-04-11_0400                  244KB     0%   45%
+                  daily.2022-04-12_0010                    228KB     0%   43%
+                  4hourly.2022-04-12_0400                  240KB     0%   44%
+                  daily.2022-04-13_0010                    236KB     0%   44%
+                  4hourly.2022-04-13_0400                  260KB     0%   46%
+                  daily.2022-04-14_0010                    232KB     0%   43%
+                  4hourly.2022-04-14_0400                  248KB     0%   45%
+                  daily.2022-04-15_0010                    228KB     0%   43%
+                  4hourly.2022-04-15_0400                  256KB     0%   46%
+                  daily.2022-04-16_0010                    228KB     0%   43%
+                  4hourly.2022-04-16_0400                  248KB     0%   45%
+                   v_ter1_nfs_NMS0033
+                  daily.2022-04-10_0010                    304KB     0%   50%
+                  daily.2022-04-11_0010                    240KB     0%   44%
+                  4hourly.2022-04-11_0400                  240KB     0%   44%
+                  daily.2022-04-12_0010                    248KB     0%   45%
+                  4hourly.2022-04-12_0400                  240KB     0%   44%
+                  daily.2022-04-13_0010                    228KB     0%   43%
+                  4hourly.2022-04-13_0400                  240KB     0%   44%
+                  daily.2022-04-14_0010                    232KB     0%   43%
+                  4hourly.2022-04-14_0400                  248KB     0%   45%
+                  daily.2022-04-15_0010                    252KB     0%   45%
+                  4hourly.2022-04-15_0400                  260KB     0%   46%
+                  daily.2022-04-16_0010                    248KB     0%   45%
+                  4hourly.2022-04-16_0400                  244KB     0%   45%
+uslv-vfsx-sdb10-dmz sql1_db1
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 152KB 0% 0%
+                    sql1_log
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 152KB 0% 1%
+                    sql1_system_db
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 152KB 0% 5%
+                    svm1_cluster1_root
+                  weekly.2022-04-03_0015                   400KB     2%   45%
+                  weekly.2022-04-10_0015                   300KB     1%   38%
+                  daily.2022-04-15_0010                    288KB     1%   37%
+                  daily.2022-04-16_0010                    396KB     2%   45%
+                  hourly.2022-04-16_0405                   128KB     1%   21%
+                  hourly.2022-04-16_0505                   368KB     2%   43%
+                  hourly.2022-04-16_0605                   128KB     1%   21%
+                  hourly.2022-04-16_0705                   332KB     2%   40%
+                  hourly.2022-04-16_0805                   128KB     1%   21%
+                  hourly.2022-04-16_0905                   128KB     1%   21%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 128KB 1% 21%
+                    test
+                  weekly.2022-04-03_0015                   988KB     0%   49%
+                  weekly.2022-04-10_0015                   900KB     0%   46%
+                  daily.2022-04-15_0010                    596KB     0%   37%
+                  daily.2022-04-16_0010                    952KB     0%   48%
+                  hourly.2022-04-16_0405                   156KB     0%   13%
+                  hourly.2022-04-16_0505                   156KB     0%   13%
+                  hourly.2022-04-16_0605                   156KB     0%   13%
+                  hourly.2022-04-16_0705                   776KB     0%   43%
+                  hourly.2022-04-16_0805                   156KB     0%   13%
+                  hourly.2022-04-16_0905                   152KB     0%   13%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 12%
+                    test1
+                  test1_snap1                              240KB     0%   13%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 1.40MB 0% 48%
+                  5min.2022-04-16_0955                     144KB     0%    8%
+                    test10
+                  weekly.2022-04-03_0015                   540KB     0%   44%
+                  weekly.2022-04-10_0015                   832KB     0%   55%
+                  daily.2022-04-15_0010                    660KB     0%   49%
+                  daily.2022-04-16_0010                    400KB     0%   37%
+                  hourly.2022-04-16_0405                   156KB     0%   18%
+                  hourly.2022-04-16_0505                   148KB     0%   18%
+                  hourly.2022-04-16_0605                   692KB     0%   50%
+                  hourly.2022-04-16_0705                   156KB     0%   18%
+                  hourly.2022-04-16_0805                   156KB     0%   18%
+                  hourly.2022-04-16_0905                   692KB     0%   50%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 17%
+                    test12
+                  weekly.2022-04-03_0015                   660KB     0%   45%
+                  weekly.2022-04-10_0015                   704KB     0%   46%
+                  daily.2022-04-15_0010                    716KB     0%   47%
+                  daily.2022-04-16_0010                    516KB     0%   39%
+                  hourly.2022-04-16_0405                   156KB     0%   16%
+                  hourly.2022-04-16_0505                   716KB     0%   47%
+                  hourly.2022-04-16_0605                   156KB     0%   16%
+                  hourly.2022-04-16_0705                   156KB     0%   16%
+                  hourly.2022-04-16_0805                   716KB     0%   47%
+                  hourly.2022-04-16_0905                   152KB     0%   16%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 15%
+                    test14
+                  weekly.2022-04-03_0015                   868KB     0%   47%
+                  weekly.2022-04-10_0015                   516KB     0%   34%
+                  daily.2022-04-15_0010                    772KB     0%   44%
+                  daily.2022-04-16_0010                    664KB     0%   40%
+                  hourly.2022-04-16_0405                   676KB     0%   41%
+                  hourly.2022-04-16_0505                   156KB     0%   14%
+                  hourly.2022-04-16_0605                   156KB     0%   14%
+                  hourly.2022-04-16_0705                   676KB     0%   41%
+                  hourly.2022-04-16_0805                   156KB     0%   14%
+                  hourly.2022-04-16_0905                   152KB     0%   13%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 13%
+                    test15
+                  weekly.2022-04-03_0015                  1.02MB     0%   53%
+                  weekly.2022-04-10_0015                   824KB     0%   47%
+                  daily.2022-04-15_0010                    696KB     0%   43%
+                  daily.2022-04-16_0010                    708KB     0%   43%
+                  hourly.2022-04-16_0405                   720KB     0%   43%
+                  hourly.2022-04-16_0505                   156KB     0%   14%
+                  hourly.2022-04-16_0605                   156KB     0%   14%
+                  hourly.2022-04-16_0705                   692KB     0%   43%
+                  hourly.2022-04-16_0805                   148KB     0%   14%
+                  hourly.2022-04-16_0905                   152KB     0%   14%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 13%
+                    test16
+                  weekly.2022-04-03_0015                   624KB     0%   38%
+                  weekly.2022-04-10_0015                   832KB     0%   45%
+                  daily.2022-04-15_0010                    812KB     0%   45%
+                  daily.2022-04-16_0010                    736KB     0%   42%
+                  hourly.2022-04-16_0405                   156KB     0%   13%
+                  hourly.2022-04-16_0505                   156KB     0%   13%
+                  hourly.2022-04-16_0605                   156KB     0%   13%
+                  hourly.2022-04-16_0705                   704KB     0%   41%
+                  hourly.2022-04-16_0805                   156KB     0%   13%
+                  hourly.2022-04-16_0905                   144KB     0%   13%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 13%
+                    test17
+                  weekly.2022-04-03_0015                   568KB     0%   38%
+                  weekly.2022-04-10_0015                   788KB     0%   46%
+                  daily.2022-04-15_0010                    552KB     0%   37%
+                  daily.2022-04-16_0010                    628KB     0%   40%
+                  hourly.2022-04-16_0405                   688KB     0%   42%
+                  hourly.2022-04-16_0505                   156KB     0%   14%
+                  hourly.2022-04-16_0605                   156KB     0%   14%
+                  hourly.2022-04-16_0705                   692KB     0%   42%
+                  hourly.2022-04-16_0805                   148KB     0%   14%
+                  hourly.2022-04-16_0905                   152KB     0%   14%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 13%
+                    test18
+                  weekly.2022-04-03_0015                   636KB     0%   42%
+                  weekly.2022-04-10_0015                   824KB     0%   48%
+                  daily.2022-04-15_0010                    752KB     0%   46%
+                  daily.2022-04-16_0010                    508KB     0%   36%
+                  hourly.2022-04-16_0405                   600KB     0%   40%
+                  hourly.2022-04-16_0505                   156KB     0%   15%
+                  hourly.2022-04-16_0605                   156KB     0%   15%
+                  hourly.2022-04-16_0705                   596KB     0%   40%
+                  hourly.2022-04-16_0805                   148KB     0%   14%
+                  hourly.2022-04-16_0905                   152KB     0%   15%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 14%
+                    test3
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-03-17_134229 208KB 0% 21%
+                  test3_snap1                              204KB     0%   21%
+                  weekly.2022-04-03_0015                   600KB     0%   44%
+                  weekly.2022-04-10_0015                   736KB     0%   49%
+                  daily.2022-04-15_0010                    720KB     0%   49%
+                  daily.2022-04-16_0010                    608KB     0%   44%
+                  hourly.2022-04-16_0405                   436KB     0%   36%
+                  hourly.2022-04-16_0505                   156KB     0%   17%
+                  hourly.2022-04-16_0605                   156KB     0%   17%
+                  hourly.2022-04-16_0705                   440KB     0%   37%
+                  hourly.2022-04-16_0805                   156KB     0%   17%
+                  hourly.2022-04-16_0905                   140KB     0%   15%
+                    test4
+                  weekly.2022-04-03_0015                   588KB     0%   43%
+                  weekly.2022-04-10_0015                   724KB     0%   48%
+                  daily.2022-04-15_0010                    656KB     0%   46%
+                  daily.2022-04-16_0010                    432KB     0%   36%
+                  hourly.2022-04-16_0405                   496KB     0%   39%
+                  hourly.2022-04-16_0505                   148KB     0%   16%
+                  hourly.2022-04-16_0605                   148KB     0%   16%
+                  hourly.2022-04-16_0705                   484KB     0%   38%
+                  hourly.2022-04-16_0805                   148KB     0%   16%
+                  hourly.2022-04-16_0905                   140KB     0%   15%
+                    test6
+                  weekly.2022-04-03_0015                   660KB     0%   43%
+                  weekly.2022-04-10_0015                   636KB     0%   42%
+                  daily.2022-04-15_0010                    860KB     0%   50%
+                  daily.2022-04-16_0010                    572KB     0%   40%
+                  hourly.2022-04-16_0405                   664KB     0%   43%
+                  hourly.2022-04-16_0505                   148KB     0%   14%
+                  hourly.2022-04-16_0605                   156KB     0%   15%
+                  hourly.2022-04-16_0705                   156KB     0%   15%
+                  hourly.2022-04-16_0805                   736KB     0%   46%
+                  hourly.2022-04-16_0905                   152KB     0%   15%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 14%
+                    test_vol
+                  weekly.2022-04-03_0015                   332KB     0%   38%
+                  weekly.2022-04-10_0015                   352KB     0%   39%
+                  daily.2022-04-15_0010                    388KB     0%   42%
+                  daily.2022-04-16_0010                    368KB     0%   41%
+                  hourly.2022-04-16_0405                   256KB     0%   32%
+                  hourly.2022-04-16_0505                   248KB     0%   31%
+                  hourly.2022-04-16_0605                   248KB     0%   31%
+                  hourly.2022-04-16_0705                   240KB     0%   31%
+                  hourly.2022-04-16_0805                   156KB     0%   22%
+                  hourly.2022-04-16_0905                   312KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 21%
+                    uslv_ddbx_ora01_ismodsd_data
+                  daily.2022-04-10_0010                    416KB     0%   49%
+                  daily.2022-04-11_0010                    372KB     0%   46%
+                  4hourly.2022-04-11_0400                  384KB     0%   47%
+                  daily.2022-04-12_0010                    376KB     0%   46%
+                  4hourly.2022-04-12_0400                  344KB     0%   44%
+                  daily.2022-04-13_0010                    320KB     0%   42%
+                  4hourly.2022-04-13_0400                  344KB     0%   44%
+                  daily.2022-04-14_0010                    408KB     0%   48%
+                  4hourly.2022-04-14_0400                  380KB     0%   47%
+                  daily.2022-04-15_0010                    416KB     0%   49%
+                  4hourly.2022-04-15_0400                  440KB     0%   50%
+                  daily.2022-04-16_0010                    376KB     0%   46%
+                  4hourly.2022-04-16_0400                  348KB     0%   44%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 292KB 0% 40%
+                    v_ter1_cifs_GSSC11
+                  weekly.2022-04-03_0015                   340KB     0%   39%
+                  weekly.2022-04-10_0015                   352KB     0%   40%
+                  daily.2022-04-15_0010                    384KB     0%   42%
+                  daily.2022-04-16_0010                    396KB     0%   43%
+                  hourly.2022-04-16_0405                   288KB     0%   35%
+                  hourly.2022-04-16_0505                   304KB     0%   37%
+                  hourly.2022-04-16_0605                   304KB     0%   37%
+                  hourly.2022-04-16_0705                   300KB     0%   36%
+                  hourly.2022-04-16_0805                   320KB     0%   38%
+                  hourly.2022-04-16_0905                   292KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_cifs_GSSC12
+                  weekly.2022-04-03_0015                   380KB     0%   44%
+                  weekly.2022-04-10_0015                   444KB     0%   48%
+                  daily.2022-04-15_0010                    384KB     0%   45%
+                  daily.2022-04-16_0010                    304KB     0%   39%
+                  hourly.2022-04-16_0405                   256KB     0%   35%
+                  hourly.2022-04-16_0505                   264KB     0%   36%
+                  hourly.2022-04-16_0605                   260KB     0%   35%
+                  hourly.2022-04-16_0705                   248KB     0%   34%
+                  hourly.2022-04-16_0805                   252KB     0%   35%
+                  hourly.2022-04-16_0905                   144KB     0%   23%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 264KB 0% 36%
+                    v_ter1_cifs_GSSC14
+                  weekly.2022-04-03_0015                   424KB     0%   45%
+                  weekly.2022-04-10_0015                   348KB     0%   40%
+                  daily.2022-04-15_0010                    316KB     0%   38%
+                  daily.2022-04-16_0010                    356KB     0%   40%
+                  hourly.2022-04-16_0405                   264KB     0%   34%
+                  hourly.2022-04-16_0505                   284KB     0%   35%
+                  hourly.2022-04-16_0605                   280KB     0%   35%
+                  hourly.2022-04-16_0705                   256KB     0%   33%
+                  hourly.2022-04-16_0805                   148KB     0%   22%
+                  hourly.2022-04-16_0905                   312KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_cifs_NMS0003
+                  weekly.2022-04-03_0015                   336KB     0%   39%
+                  weekly.2022-04-10_0015                   348KB     0%   40%
+                  daily.2022-04-15_0010                    412KB     0%   44%
+                  daily.2022-04-16_0010                    360KB     0%   41%
+                  hourly.2022-04-16_0405                   272KB     0%   34%
+                  hourly.2022-04-16_0505                   260KB     0%   33%
+                  hourly.2022-04-16_0605                   252KB     0%   33%
+                  hourly.2022-04-16_0705                   148KB     0%   22%
+                  hourly.2022-04-16_0805                   316KB     0%   38%
+                  hourly.2022-04-16_0905                   296KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_cifs_NMS0005
+                  weekly.2022-04-03_0015                   400KB     0%   57%
+                  weekly.2022-04-10_0015                   356KB     0%   55%
+                  daily.2022-04-15_0010                    396KB     0%   57%
+                  daily.2022-04-16_0010                    348KB     0%   54%
+                  hourly.2022-04-16_0405                   256KB     0%   46%
+                  hourly.2022-04-16_0505                   248KB     0%   46%
+                  hourly.2022-04-16_0605                   232KB     0%   44%
+                  hourly.2022-04-16_0705                   244KB     0%   45%
+                  hourly.2022-04-16_0805                   268KB     0%   48%
+                  hourly.2022-04-16_0905                   152KB     0%   34%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 292KB 0% 50%
+                    v_ter1_cifs_NMS0021
+                  daily.2022-04-10_0010                    412KB     0%   47%
+                  daily.2022-04-11_0010                    404KB     0%   46%
+                  4hourly.2022-04-11_0400                  420KB     0%   47%
+                  daily.2022-04-12_0010                    376KB     0%   45%
+                  4hourly.2022-04-12_0400                  392KB     0%   46%
+                  daily.2022-04-13_0010                    372KB     0%   44%
+                  4hourly.2022-04-13_0400                  380KB     0%   45%
+                  daily.2022-04-14_0010                    396KB     0%   46%
+                  4hourly.2022-04-14_0400                  448KB     0%   49%
+                  daily.2022-04-15_0010                    380KB     0%   45%
+                  4hourly.2022-04-15_0400                  376KB     0%   45%
+                  daily.2022-04-16_0010                    424KB     0%   48%
+                  4hourly.2022-04-16_0400                  384KB     0%   45%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 328KB 0% 41%
+                    v_ter1_cifs_NMS0028
+                  daily.2022-04-10_0010                    416KB     0%   46%
+                  daily.2022-04-11_0010                    392KB     0%   44%
+                  4hourly.2022-04-11_0400                  412KB     0%   45%
+                  daily.2022-04-12_0010                    396KB     0%   44%
+                  4hourly.2022-04-12_0400                  428KB     0%   46%
+                  daily.2022-04-13_0010                    316KB     0%   39%
+                  4hourly.2022-04-13_0400                  424KB     0%   46%
+                  daily.2022-04-14_0010                    400KB     0%   45%
+                  4hourly.2022-04-14_0400                  448KB     0%   47%
+                  daily.2022-04-15_0010                    396KB     0%   44%
+                  4hourly.2022-04-15_0400                  428KB     0%   46%
+                  daily.2022-04-16_0010                    396KB     0%   44%
+                  4hourly.2022-04-16_0400                  412KB     0%   45%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 336KB 0% 40%
+                    v_ter1_cifs_NMS0039
+                  daily.2022-04-10_0010                    408KB     0%   45%
+                  daily.2022-04-11_0010                    372KB     0%   42%
+                  4hourly.2022-04-11_0400                  376KB     0%   43%
+                  daily.2022-04-12_0010                    388KB     0%   43%
+                  4hourly.2022-04-12_0400                  356KB     0%   41%
+                  daily.2022-04-13_0010                    396KB     0%   44%
+                  4hourly.2022-04-13_0400                  432KB     0%   46%
+                  daily.2022-04-14_0010                    272KB     0%   35%
+                  4hourly.2022-04-14_0400                  392KB     0%   44%
+                  daily.2022-04-15_0010                    420KB     0%   45%
+                  4hourly.2022-04-15_0400                  440KB     0%   46%
+                  daily.2022-04-16_0010                    316KB     0%   38%
+                  4hourly.2022-04-16_0400                  384KB     0%   43%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 340KB 0% 40%
+                    v_ter1_multi_DNMS0001
+                  daily.2022-04-10_0010                    340KB     0%   43%
+                  daily.2022-04-11_0010                    284KB     0%   39%
+                  4hourly.2022-04-11_0400                  440KB     0%   50%
+                  daily.2022-04-12_0010                    380KB     0%   46%
+                  4hourly.2022-04-12_0400                  360KB     0%   45%
+                  daily.2022-04-13_0010                    384KB     0%   46%
+                  4hourly.2022-04-13_0400                  424KB     0%   49%
+                  daily.2022-04-14_0010                    276KB     0%   38%
+                  4hourly.2022-04-14_0400                  424KB     0%   49%
+                  daily.2022-04-15_0010                    352KB     0%   44%
+                  4hourly.2022-04-15_0400                  356KB     0%   44%
+                  daily.2022-04-16_0010                    324KB     0%   42%
+                  4hourly.2022-04-16_0400                  424KB     0%   49%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 292KB 0% 39%
+                    v_ter1_multi_NMS0007
+                  weekly.2022-04-03_0015                   380KB     0%   43%
+                  weekly.2022-04-10_0015                   324KB     0%   39%
+                  daily.2022-04-15_0010                    428KB     0%   46%
+                  daily.2022-04-16_0010                    296KB     0%   37%
+                  hourly.2022-04-16_0405                   408KB     0%   44%
+                  hourly.2022-04-16_0505                   264KB     0%   34%
+                  hourly.2022-04-16_0605                   248KB     0%   33%
+                  hourly.2022-04-16_0705                   148KB     0%   22%
+                  hourly.2022-04-16_0805                   320KB     0%   38%
+                  hourly.2022-04-16_0905                   284KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_multi_NMS0011
+                  weekly.2022-04-03_0015                   372KB     0%   42%
+                  weekly.2022-04-10_0015                   304KB     0%   38%
+                  daily.2022-04-15_0010                    388KB     0%   43%
+                  daily.2022-04-16_0010                    364KB     0%   42%
+                  hourly.2022-04-16_0405                   288KB     0%   36%
+                  hourly.2022-04-16_0505                   304KB     0%   38%
+                  hourly.2022-04-16_0605                   284KB     0%   36%
+                  hourly.2022-04-16_0705                   300KB     0%   37%
+                  hourly.2022-04-16_0805                   284KB     0%   36%
+                  hourly.2022-04-16_0905                   284KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_multi_NMS0012
+                  weekly.2022-04-03_0015                   356KB     0%   44%
+                  weekly.2022-04-10_0015                   384KB     0%   45%
+                  daily.2022-04-15_0010                    432KB     0%   48%
+                  daily.2022-04-16_0010                    356KB     0%   44%
+                  hourly.2022-04-16_0405                   252KB     0%   35%
+                  hourly.2022-04-16_0505                   268KB     0%   37%
+                  hourly.2022-04-16_0605                   280KB     0%   38%
+                  hourly.2022-04-16_0705                   272KB     0%   37%
+                  hourly.2022-04-16_0805                   272KB     0%   37%
+                  hourly.2022-04-16_0905                   144KB     0%   24%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 296KB 0% 39%
+                    v_ter1_multi_NMS0013
+                  weekly.2022-04-03_0015                   340KB     0%   41%
+                  weekly.2022-04-10_0015                   356KB     0%   42%
+                  daily.2022-04-15_0010                    352KB     0%   42%
+                  daily.2022-04-16_0010                    312KB     0%   39%
+                  hourly.2022-04-16_0405                   284KB     0%   36%
+                  hourly.2022-04-16_0505                   304KB     0%   38%
+                  hourly.2022-04-16_0605                   292KB     0%   37%
+                  hourly.2022-04-16_0705                   296KB     0%   37%
+                  hourly.2022-04-16_0805                   280KB     0%   36%
+                  hourly.2022-04-16_0905                   312KB     0%   39%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 23%
+                    v_ter1_multi_NMS0014
+                  weekly.2022-04-03_0015                   360KB     0%   40%
+                  weekly.2022-04-10_0015                   348KB     0%   39%
+                  daily.2022-04-15_0010                    432KB     0%   44%
+                  daily.2022-04-16_0010                    412KB     0%   43%
+                  hourly.2022-04-16_0405                   380KB     0%   41%
+                  hourly.2022-04-16_0505                   256KB     0%   32%
+                  hourly.2022-04-16_0605                   272KB     0%   33%
+                  hourly.2022-04-16_0705                   272KB     0%   33%
+                  hourly.2022-04-16_0805                   148KB     0%   21%
+                  hourly.2022-04-16_0905                   324KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 21%
+                    v_ter1_multi_NMS0015
+                  weekly.2022-04-03_0015                   400KB     0%   44%
+                  weekly.2022-04-10_0015                   352KB     0%   41%
+                  daily.2022-04-15_0010                    372KB     0%   42%
+                  daily.2022-04-16_0010                    364KB     0%   42%
+                  hourly.2022-04-16_0405                   284KB     0%   36%
+                  hourly.2022-04-16_0505                   276KB     0%   35%
+                  hourly.2022-04-16_0605                   260KB     0%   34%
+                  hourly.2022-04-16_0705                   148KB     0%   23%
+                  hourly.2022-04-16_0805                   292KB     0%   37%
+                  hourly.2022-04-16_0905                   280KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_multi_NMS0016
+                  weekly.2022-04-03_0015                   400KB     0%   43%
+                  weekly.2022-04-10_0015                   348KB     0%   40%
+                  daily.2022-04-15_0010                    420KB     0%   45%
+                  daily.2022-04-16_0010                    288KB     0%   36%
+                  hourly.2022-04-16_0405                   292KB     0%   36%
+                  hourly.2022-04-16_0505                   312KB     0%   38%
+                  hourly.2022-04-16_0605                   296KB     0%   36%
+                  hourly.2022-04-16_0705                   300KB     0%   37%
+                  hourly.2022-04-16_0805                   308KB     0%   37%
+                  hourly.2022-04-16_0905                   304KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_multi_NMS0022
+                  daily.2022-04-10_0010                    408KB     0%   42%
+                  daily.2022-04-11_0010                    380KB     0%   40%
+                  4hourly.2022-04-11_0400                  396KB     0%   41%
+                  daily.2022-04-12_0010                    372KB     0%   40%
+                  4hourly.2022-04-12_0400                  364KB     0%   39%
+                  daily.2022-04-13_0010                    332KB     0%   37%
+                  4hourly.2022-04-13_0400                  428KB     0%   43%
+                  daily.2022-04-14_0010                    412KB     0%   42%
+                  4hourly.2022-04-14_0400                  376KB     0%   40%
+                  daily.2022-04-15_0010                    392KB     0%   41%
+                  4hourly.2022-04-15_0400                  380KB     0%   40%
+                  daily.2022-04-16_0010                    320KB     0%   36%
+                  4hourly.2022-04-16_0400                  404KB     0%   42%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 152KB 0% 21%
+                    v_ter1_multi_NMS0023
+                  daily.2022-04-10_0010                    416KB     0%   46%
+                  daily.2022-04-11_0010                    392KB     0%   44%
+                  4hourly.2022-04-11_0400                  448KB     0%   48%
+                  daily.2022-04-12_0010                    400KB     0%   45%
+                  4hourly.2022-04-12_0400                  428KB     0%   47%
+                  daily.2022-04-13_0010                    384KB     0%   44%
+                  4hourly.2022-04-13_0400                  428KB     0%   47%
+                  daily.2022-04-14_0010                    308KB     0%   39%
+                  4hourly.2022-04-14_0400                  412KB     0%   46%
+                  daily.2022-04-15_0010                    400KB     0%   45%
+                  4hourly.2022-04-15_0400                  424KB     0%   46%
+                  daily.2022-04-16_0010                    400KB     0%   45%
+                  4hourly.2022-04-16_0400                  408KB     0%   45%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 336KB 0% 41%
+                    v_ter1_multi_NMS0029
+                  daily.2022-04-10_0010                    420KB     0%   42%
+                  daily.2022-04-11_0010                    388KB     0%   40%
+                  4hourly.2022-04-11_0400                  388KB     0%   40%
+                  daily.2022-04-12_0010                    424KB     0%   43%
+                  4hourly.2022-04-12_0400                  392KB     0%   41%
+                  daily.2022-04-13_0010                    396KB     0%   41%
+                  4hourly.2022-04-13_0400                  416KB     0%   42%
+                  daily.2022-04-14_0010                    408KB     0%   42%
+                  4hourly.2022-04-14_0400                  360KB     0%   39%
+                  daily.2022-04-15_0010                    324KB     0%   36%
+                  4hourly.2022-04-15_0400                  424KB     0%   43%
+                  daily.2022-04-16_0010                    332KB     0%   37%
+                  4hourly.2022-04-16_0400                  456KB     0%   44%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 152KB 0% 21%
+                    v_ter1_multi_NMS0030
+                  daily.2022-04-10_0010                    420KB     0%   59%
+                  daily.2022-04-11_0010                    380KB     0%   57%
+                  4hourly.2022-04-11_0400                  428KB     0%   60%
+                  daily.2022-04-12_0010                    376KB     0%   57%
+                  4hourly.2022-04-12_0400                  368KB     0%   56%
+                  daily.2022-04-13_0010                    396KB     0%   58%
+                  4hourly.2022-04-13_0400                  424KB     0%   60%
+                  daily.2022-04-14_0010                    388KB     0%   57%
+                  4hourly.2022-04-14_0400                  368KB     0%   56%
+                  daily.2022-04-15_0010                    396KB     0%   58%
+                  4hourly.2022-04-15_0400                  372KB     0%   56%
+                  daily.2022-04-16_0010                    376KB     0%   57%
+                  4hourly.2022-04-16_0400                  360KB     0%   56%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 304KB 0% 51%
+                    v_ter1_multi_NMS0031
+                  daily.2022-04-10_0010                    432KB     0%   59%
+                  daily.2022-04-11_0010                    412KB     0%   58%
+                  4hourly.2022-04-11_0400                  368KB     0%   55%
+                  daily.2022-04-12_0010                    388KB     0%   56%
+                  4hourly.2022-04-12_0400                  368KB     0%   55%
+                  daily.2022-04-13_0010                    392KB     0%   57%
+                  4hourly.2022-04-13_0400                  408KB     0%   58%
+                  daily.2022-04-14_0010                    408KB     0%   58%
+                  4hourly.2022-04-14_0400                  392KB     0%   57%
+                  daily.2022-04-15_0010                    396KB     0%   57%
+                  4hourly.2022-04-15_0400                  460KB     0%   61%
+                  daily.2022-04-16_0010                    332KB     0%   53%
+                  4hourly.2022-04-16_0400                  312KB     0%   51%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 284KB 0% 49%
+                    v_ter1_multi_NMS0040
+                  daily.2022-04-10_0010                    416KB     0%   58%
+                  daily.2022-04-11_0010                    368KB     0%   55%
+                  4hourly.2022-04-11_0400                  396KB     0%   57%
+                  daily.2022-04-12_0010                    384KB     0%   56%
+                  4hourly.2022-04-12_0400                  416KB     0%   58%
+                  daily.2022-04-13_0010                    400KB     0%   57%
+                  4hourly.2022-04-13_0400                  420KB     0%   58%
+                  daily.2022-04-14_0010                    408KB     0%   57%
+                  4hourly.2022-04-14_0400                  432KB     0%   59%
+                  daily.2022-04-15_0010                    400KB     0%   57%
+                  4hourly.2022-04-15_0400                  380KB     0%   56%
+                  daily.2022-04-16_0010                    404KB     0%   57%
+                  4hourly.2022-04-16_0400                  376KB     0%   55%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 296KB 0% 49%
+                    v_ter1_nfs_DNMS0002
+                  daily.2022-04-10_0010                    408KB     0%   48%
+                  daily.2022-04-11_0010                    328KB     0%   43%
+                  4hourly.2022-04-11_0400                  368KB     0%   46%
+                  daily.2022-04-12_0010                    376KB     0%   46%
+                  4hourly.2022-04-12_0400                  384KB     0%   47%
+                  daily.2022-04-13_0010                    376KB     0%   46%
+                  4hourly.2022-04-13_0400                  380KB     0%   46%
+                  daily.2022-04-14_0010                    384KB     0%   47%
+                  4hourly.2022-04-14_0400                  424KB     0%   49%
+                  daily.2022-04-15_0010                    392KB     0%   47%
+                  4hourly.2022-04-15_0400                  384KB     0%   47%
+                  daily.2022-04-16_0010                    336KB     0%   43%
+                  4hourly.2022-04-16_0400                  336KB     0%   43%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 284KB 0% 39%
+                    v_ter1_nfs_GSSC10
+                  weekly.2022-04-03_0015                   380KB     0%   46%
+                  weekly.2022-04-10_0015                   404KB     0%   48%
+                  daily.2022-04-15_0010                    376KB     0%   46%
+                  daily.2022-04-16_0010                    368KB     0%   45%
+                  hourly.2022-04-16_0405                   244KB     0%   35%
+                  hourly.2022-04-16_0505                   248KB     0%   36%
+                  hourly.2022-04-16_0605                   248KB     0%   36%
+                  hourly.2022-04-16_0705                   260KB     0%   37%
+                  hourly.2022-04-16_0805                   268KB     0%   38%
+                  hourly.2022-04-16_0905                   144KB     0%   24%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 292KB 0% 40%
+                    v_ter1_nfs_GSSC11
+                  weekly.2022-04-03_0015                   352KB     0%   40%
+                  weekly.2022-04-10_0015                   384KB     0%   42%
+                  daily.2022-04-15_0010                    372KB     0%   42%
+                  daily.2022-04-16_0010                    356KB     0%   40%
+                  hourly.2022-04-16_0405                   276KB     0%   35%
+                  hourly.2022-04-16_0505                   284KB     0%   35%
+                  hourly.2022-04-16_0605                   264KB     0%   34%
+                  hourly.2022-04-16_0705                   252KB     0%   32%
+                  hourly.2022-04-16_0805                   156KB     0%   23%
+                  hourly.2022-04-16_0905                   316KB     0%   38%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_GSSC14
+                  weekly.2022-04-03_0015                   436KB     0%   50%
+                  weekly.2022-04-10_0015                   360KB     0%   45%
+                  daily.2022-04-15_0010                    368KB     0%   46%
+                  daily.2022-04-16_0010                    356KB     0%   45%
+                  hourly.2022-04-16_0405                   308KB     0%   41%
+                  hourly.2022-04-16_0505                   292KB     0%   40%
+                  hourly.2022-04-16_0605                   288KB     0%   40%
+                  hourly.2022-04-16_0705                   312KB     0%   42%
+                  hourly.2022-04-16_0805                   296KB     0%   40%
+                  hourly.2022-04-16_0905                   144KB     0%   25%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 304KB 0% 41%
+                    v_ter1_nfs_GSSC15
+                  weekly.2022-04-03_0015                   336KB     0%   40%
+                  weekly.2022-04-10_0015                   380KB     0%   43%
+                  daily.2022-04-15_0010                    448KB     0%   47%
+                  daily.2022-04-16_0010                    360KB     0%   41%
+                  hourly.2022-04-16_0405                   296KB     0%   37%
+                  hourly.2022-04-16_0505                   300KB     0%   37%
+                  hourly.2022-04-16_0605                   312KB     0%   38%
+                  hourly.2022-04-16_0705                   316KB     0%   38%
+                  hourly.2022-04-16_0805                   292KB     0%   36%
+                  hourly.2022-04-16_0905                   312KB     0%   38%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_GSSC3
+                  weekly.2022-04-03_0015                   356KB     0%   41%
+                  weekly.2022-04-10_0015                   348KB     0%   40%
+                  daily.2022-04-15_0010                    416KB     0%   45%
+                  daily.2022-04-16_0010                    280KB     0%   35%
+                  hourly.2022-04-16_0405                   304KB     0%   37%
+                  hourly.2022-04-16_0505                   292KB     0%   36%
+                  hourly.2022-04-16_0605                   296KB     0%   37%
+                  hourly.2022-04-16_0705                   284KB     0%   36%
+                  hourly.2022-04-16_0805                   296KB     0%   37%
+                  hourly.2022-04-16_0905                   304KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_GSSC4
+                  weekly.2022-04-03_0015                   412KB     0%   47%
+                  weekly.2022-04-10_0015                   312KB     0%   40%
+                  daily.2022-04-15_0010                    380KB     0%   45%
+                  daily.2022-04-16_0010                    376KB     0%   44%
+                  hourly.2022-04-16_0405                   260KB     0%   36%
+                  hourly.2022-04-16_0505                   272KB     0%   37%
+                  hourly.2022-04-16_0605                   284KB     0%   38%
+                  hourly.2022-04-16_0705                   312KB     0%   40%
+                  hourly.2022-04-16_0805                   292KB     0%   38%
+                  hourly.2022-04-16_0905                   152KB     0%   24%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 312KB 0% 40%
+                    v_ter1_nfs_GSSC5
+                  weekly.2022-04-03_0015                   368KB     0%   41%
+                  weekly.2022-04-10_0015                   348KB     0%   40%
+                  daily.2022-04-15_0010                    372KB     0%   42%
+                  daily.2022-04-16_0010                    300KB     0%   36%
+                  hourly.2022-04-16_0405                   300KB     0%   36%
+                  hourly.2022-04-16_0505                   296KB     0%   36%
+                  hourly.2022-04-16_0605                   280KB     0%   35%
+                  hourly.2022-04-16_0705                   296KB     0%   36%
+                  hourly.2022-04-16_0805                   300KB     0%   36%
+                  hourly.2022-04-16_0905                   312KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_GSSC6
+                  weekly.2022-04-03_0015                   396KB     0%   43%
+                  weekly.2022-04-10_0015                   312KB     0%   38%
+                  daily.2022-04-15_0010                    432KB     0%   46%
+                  daily.2022-04-16_0010                    360KB     0%   41%
+                  hourly.2022-04-16_0405                   348KB     0%   40%
+                  hourly.2022-04-16_0505                   236KB     0%   31%
+                  hourly.2022-04-16_0605                   156KB     0%   23%
+                  hourly.2022-04-16_0705                   312KB     0%   38%
+                  hourly.2022-04-16_0805                   296KB     0%   36%
+                  hourly.2022-04-16_0905                   300KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_GSSC7
+                  weekly.2022-04-03_0015                   332KB     0%   42%
+                  weekly.2022-04-10_0015                   352KB     0%   43%
+                  daily.2022-04-15_0010                    316KB     0%   41%
+                  daily.2022-04-16_0010                    364KB     0%   44%
+                  hourly.2022-04-16_0405                   272KB     0%   37%
+                  hourly.2022-04-16_0505                   260KB     0%   36%
+                  hourly.2022-04-16_0605                   148KB     0%   24%
+                  hourly.2022-04-16_0705                   316KB     0%   41%
+                  hourly.2022-04-16_0805                   308KB     0%   40%
+                  hourly.2022-04-16_0905                   316KB     0%   41%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 24%
+                    v_ter1_nfs_GSSC8
+                  weekly.2022-04-03_0015                   308KB     0%   38%
+                  weekly.2022-04-10_0015                   344KB     0%   40%
+                  daily.2022-04-15_0010                    372KB     0%   42%
+                  daily.2022-04-16_0010                    364KB     0%   42%
+                  hourly.2022-04-16_0405                   284KB     0%   36%
+                  hourly.2022-04-16_0505                   300KB     0%   37%
+                  hourly.2022-04-16_0605                   296KB     0%   37%
+                  hourly.2022-04-16_0705                   312KB     0%   38%
+                  hourly.2022-04-16_0805                   264KB     0%   34%
+                  hourly.2022-04-16_0905                   288KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_GSSC9
+                  weekly.2022-04-03_0015                   472KB     0%   62%
+                  weekly.2022-04-10_0015                   444KB     0%   61%
+                  daily.2022-04-15_0010                    384KB     0%   57%
+                  daily.2022-04-16_0010                    364KB     0%   56%
+                  hourly.2022-04-16_0405                   256KB     0%   47%
+                  hourly.2022-04-16_0505                   260KB     0%   47%
+                  hourly.2022-04-16_0605                   268KB     0%   48%
+                  hourly.2022-04-16_0705                   248KB     0%   46%
+                  hourly.2022-04-16_0805                   264KB     0%   48%
+                  hourly.2022-04-16_0905                   152KB     0%   35%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 300KB 0% 51%
+                    v_ter1_nfs_NMS0001
+                  weekly.2022-04-03_0015                   348KB     0%   41%
+                  weekly.2022-04-10_0015                   372KB     0%   42%
+                  daily.2022-04-15_0010                    376KB     0%   43%
+                  daily.2022-04-16_0010                    296KB     0%   37%
+                  hourly.2022-04-16_0405                   300KB     0%   37%
+                  hourly.2022-04-16_0505                   300KB     0%   37%
+                  hourly.2022-04-16_0605                   312KB     0%   38%
+                  hourly.2022-04-16_0705                   296KB     0%   37%
+                  hourly.2022-04-16_0805                   280KB     0%   36%
+                  hourly.2022-04-16_0905                   284KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_NMS0002
+                  weekly.2022-04-03_0015                   336KB     0%   40%
+                  weekly.2022-04-10_0015                   352KB     0%   41%
+                  daily.2022-04-15_0010                    368KB     0%   42%
+                  daily.2022-04-16_0010                    420KB     0%   45%
+                  hourly.2022-04-16_0405                   292KB     0%   37%
+                  hourly.2022-04-16_0505                   300KB     0%   37%
+                  hourly.2022-04-16_0605                   296KB     0%   37%
+                  hourly.2022-04-16_0705                   288KB     0%   36%
+                  hourly.2022-04-16_0805                   276KB     0%   35%
+                  hourly.2022-04-16_0905                   304KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_NMS0004
+                  weekly.2022-04-03_0015                   344KB     0%   46%
+                  weekly.2022-04-10_0015                   348KB     0%   46%
+                  daily.2022-04-15_0010                    416KB     0%   50%
+                  daily.2022-04-16_0010                    412KB     0%   50%
+                  hourly.2022-04-16_0405                   288KB     0%   41%
+                  hourly.2022-04-16_0505                   308KB     0%   43%
+                  hourly.2022-04-16_0605                   288KB     0%   41%
+                  hourly.2022-04-16_0705                   300KB     0%   42%
+                  hourly.2022-04-16_0805                   268KB     0%   39%
+                  hourly.2022-04-16_0905                   144KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 284KB 0% 41%
+                    v_ter1_nfs_NMS0006
+                  weekly.2022-04-03_0015                   412KB     0%   45%
+                  weekly.2022-04-10_0015                   348KB     0%   41%
+                  daily.2022-04-15_0010                    376KB     0%   43%
+                  daily.2022-04-16_0010                    360KB     0%   41%
+                  hourly.2022-04-16_0405                   264KB     0%   34%
+                  hourly.2022-04-16_0505                   252KB     0%   33%
+                  hourly.2022-04-16_0605                   148KB     0%   23%
+                  hourly.2022-04-16_0705                   328KB     0%   39%
+                  hourly.2022-04-16_0805                   288KB     0%   36%
+                  hourly.2022-04-16_0905                   292KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_NMS0008
+                  weekly.2022-04-03_0015                   424KB     0%   60%
+                  weekly.2022-04-10_0015                   436KB     0%   60%
+                  daily.2022-04-15_0010                    372KB     0%   56%
+                  daily.2022-04-16_0010                    364KB     0%   56%
+                  hourly.2022-04-16_0405                   276KB     0%   49%
+                  hourly.2022-04-16_0505                   292KB     0%   50%
+                  hourly.2022-04-16_0605                   296KB     0%   51%
+                  hourly.2022-04-16_0705                   260KB     0%   47%
+                  hourly.2022-04-16_0805                   244KB     0%   46%
+                  hourly.2022-04-16_0905                   144KB     0%   33%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 280KB 0% 49%
+                    v_ter1_nfs_NMS0010
+                  weekly.2022-04-03_0015                   412KB     0%   44%
+                  weekly.2022-04-10_0015                   380KB     0%   42%
+                  daily.2022-04-15_0010                    444KB     0%   46%
+                  daily.2022-04-16_0010                    360KB     0%   41%
+                  hourly.2022-04-16_0405                   280KB     0%   35%
+                  hourly.2022-04-16_0505                   284KB     0%   35%
+                  hourly.2022-04-16_0605                   276KB     0%   34%
+                  hourly.2022-04-16_0705                   256KB     0%   33%
+                  hourly.2022-04-16_0805                   148KB     0%   22%
+                  hourly.2022-04-16_0905                   316KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 21%
+                    v_ter1_nfs_NMS0017
+                  weekly.2022-04-03_0015                   332KB     0%   39%
+                  weekly.2022-04-10_0015                   324KB     0%   39%
+                  daily.2022-04-15_0010                    384KB     0%   43%
+                  daily.2022-04-16_0010                    352KB     0%   41%
+                  hourly.2022-04-16_0405                   288KB     0%   36%
+                  hourly.2022-04-16_0505                   292KB     0%   36%
+                  hourly.2022-04-16_0605                   304KB     0%   37%
+                  hourly.2022-04-16_0705                   304KB     0%   37%
+                  hourly.2022-04-16_0805                   276KB     0%   35%
+                  hourly.2022-04-16_0905                   296KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 22%
+                    v_ter1_nfs_NMS0018
+                  weekly.2022-04-03_0015                   356KB     0%   43%
+                  weekly.2022-04-10_0015                   456KB     0%   49%
+                  daily.2022-04-15_0010                    380KB     0%   45%
+                  daily.2022-04-16_0010                    360KB     0%   43%
+                  hourly.2022-04-16_0405                   288KB     0%   38%
+                  hourly.2022-04-16_0505                   308KB     0%   39%
+                  hourly.2022-04-16_0605                   300KB     0%   39%
+                  hourly.2022-04-16_0705                   316KB     0%   40%
+                  hourly.2022-04-16_0805                   300KB     0%   39%
+                  hourly.2022-04-16_0905                   144KB     0%   23%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 320KB 0% 40%
+                    v_ter1_nfs_NMS0019
+                  daily.2022-04-10_0010                    420KB     0%   58%
+                  daily.2022-04-11_0010                    376KB     0%   56%
+                  4hourly.2022-04-11_0400                  380KB     0%   56%
+                  daily.2022-04-12_0010                    396KB     0%   57%
+                  4hourly.2022-04-12_0400                  424KB     0%   59%
+                  daily.2022-04-13_0010                    400KB     0%   57%
+                  4hourly.2022-04-13_0400                  420KB     0%   58%
+                  daily.2022-04-14_0010                    400KB     0%   57%
+                  4hourly.2022-04-14_0400                  424KB     0%   59%
+                  daily.2022-04-15_0010                    396KB     0%   57%
+                  4hourly.2022-04-15_0400                  376KB     0%   56%
+                  daily.2022-04-16_0010                    392KB     0%   57%
+                  4hourly.2022-04-16_0400                  428KB     0%   59%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 264KB 0% 47%
+                    v_ter1_nfs_NMS0020
+                  daily.2022-04-10_0010                    420KB     0%   48%
+                  daily.2022-04-11_0010                    400KB     0%   47%
+                  4hourly.2022-04-11_0400                  388KB     0%   46%
+                  daily.2022-04-12_0010                    372KB     0%   45%
+                  4hourly.2022-04-12_0400                  384KB     0%   46%
+                  daily.2022-04-13_0010                    388KB     0%   46%
+                  4hourly.2022-04-13_0400                  412KB     0%   48%
+                  daily.2022-04-14_0010                    372KB     0%   45%
+                  4hourly.2022-04-14_0400                  364KB     0%   45%
+                  daily.2022-04-15_0010                    344KB     0%   43%
+                  4hourly.2022-04-15_0400                  360KB     0%   45%
+                  daily.2022-04-16_0010                    400KB     0%   47%
+                  4hourly.2022-04-16_0400                  420KB     0%   48%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 296KB 0% 40%
+                    v_ter1_nfs_NMS0024
+                  daily.2022-04-10_0010                    412KB     0%   44%
+                  daily.2022-04-11_0010                    348KB     0%   40%
+                  4hourly.2022-04-11_0400                  416KB     0%   44%
+                  daily.2022-04-12_0010                    416KB     0%   44%
+                  4hourly.2022-04-12_0400                  484KB     0%   48%
+                  daily.2022-04-13_0010                    340KB     0%   39%
+                  4hourly.2022-04-13_0400                  400KB     0%   43%
+                  daily.2022-04-14_0010                    304KB     0%   36%
+                  4hourly.2022-04-14_0400                  600KB     0%   53%
+                  daily.2022-04-15_0010                    328KB     0%   38%
+                  4hourly.2022-04-15_0400                  388KB     0%   42%
+                  daily.2022-04-16_0010                    436KB     0%   45%
+                  4hourly.2022-04-16_0400                  392KB     0%   42%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 396KB 0% 43%
+                    v_ter1_nfs_NMS0025
+                  daily.2022-04-10_0010                    428KB     0%   50%
+                  daily.2022-04-11_0010                    412KB     0%   49%
+                  4hourly.2022-04-11_0400                  388KB     0%   47%
+                  daily.2022-04-12_0010                    400KB     0%   48%
+                  4hourly.2022-04-12_0400                  380KB     0%   47%
+                  daily.2022-04-13_0010                    416KB     0%   49%
+                  4hourly.2022-04-13_0400                  416KB     0%   49%
+                  daily.2022-04-14_0010                    360KB     0%   45%
+                  4hourly.2022-04-14_0400                  452KB     0%   51%
+                  daily.2022-04-15_0010                    384KB     0%   47%
+                  4hourly.2022-04-15_0400                  380KB     0%   47%
+                  daily.2022-04-16_0010                    392KB     0%   47%
+                  4hourly.2022-04-16_0400                  360KB     0%   45%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 304KB 0% 41%
+                    v_ter1_nfs_NMS0026
+                  daily.2022-04-10_0010                    424KB     0%   49%
+                  daily.2022-04-11_0010                    396KB     0%   47%
+                  4hourly.2022-04-11_0400                  372KB     0%   46%
+                  daily.2022-04-12_0010                    384KB     0%   47%
+                  4hourly.2022-04-12_0400                  380KB     0%   46%
+                  daily.2022-04-13_0010                    396KB     0%   47%
+                  4hourly.2022-04-13_0400                  444KB     0%   50%
+                  daily.2022-04-14_0010                    392KB     0%   47%
+                  4hourly.2022-04-14_0400                  448KB     0%   50%
+                  daily.2022-04-15_0010                    400KB     0%   48%
+                  4hourly.2022-04-15_0400                  420KB     0%   49%
+                  daily.2022-04-16_0010                    384KB     0%   47%
+                  4hourly.2022-04-16_0400                  404KB     0%   48%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 292KB 0% 40%
+                    v_ter1_nfs_NMS0027
+                  daily.2022-04-10_0010                    404KB     0%   45%
+                  daily.2022-04-11_0010                    396KB     0%   45%
+                  4hourly.2022-04-11_0400                  392KB     0%   45%
+                  daily.2022-04-12_0010                    356KB     0%   42%
+                  4hourly.2022-04-12_0400                  356KB     0%   42%
+                  daily.2022-04-13_0010                    384KB     0%   44%
+                  4hourly.2022-04-13_0400                  412KB     0%   46%
+                  daily.2022-04-14_0010                    368KB     0%   43%
+                  4hourly.2022-04-14_0400                  336KB     0%   41%
+                  daily.2022-04-15_0010                    336KB     0%   41%
+                  4hourly.2022-04-15_0400                  436KB     0%   47%
+                  daily.2022-04-16_0010                    388KB     0%   44%
+                  4hourly.2022-04-16_0400                  360KB     0%   43%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 316KB 0% 40%
+                    v_ter1_nfs_NMS0037
+                  daily.2022-04-10_0010                    412KB     0%   46%
+                  daily.2022-04-11_0010                    404KB     0%   45%
+                  4hourly.2022-04-11_0400                  428KB     0%   47%
+                  daily.2022-04-12_0010                    376KB     0%   44%
+                  4hourly.2022-04-12_0400                  364KB     0%   43%
+                  daily.2022-04-13_0010                    396KB     0%   45%
+                  4hourly.2022-04-13_0400                  428KB     0%   47%
+                  daily.2022-04-14_0010                    284KB     0%   37%
+                  4hourly.2022-04-14_0400                  380KB     0%   44%
+                  daily.2022-04-15_0010                    372KB     0%   43%
+                  4hourly.2022-04-15_0400                  352KB     0%   42%
+                  daily.2022-04-16_0010                    320KB     0%   40%
+                  4hourly.2022-04-16_0400                  372KB     0%   43%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 316KB 0% 39%
+                    v_ter1_nfs_NMS0038
+                  daily.2022-04-10_0010                    424KB     0%   43%
+                  daily.2022-04-11_0010                    408KB     0%   43%
+                  4hourly.2022-04-11_0400                  428KB     0%   44%
+                  daily.2022-04-12_0010                    392KB     0%   42%
+                  4hourly.2022-04-12_0400                  424KB     0%   43%
+                  daily.2022-04-13_0010                    396KB     0%   42%
+                  4hourly.2022-04-13_0400                  428KB     0%   44%
+                  daily.2022-04-14_0010                    400KB     0%   42%
+                  4hourly.2022-04-14_0400                  420KB     0%   43%
+                  daily.2022-04-15_0010                    388KB     0%   41%
+                  4hourly.2022-04-15_0400                  372KB     0%   40%
+                  daily.2022-04-16_0010                    388KB     0%   41%
+                  4hourly.2022-04-16_0400                  416KB     0%   43%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 144KB 0% 21%
+                    vol12
+                  weekly.2022-04-03_0015                   388KB     0%   59%
+                  weekly.2022-04-10_0015                   348KB     0%   56%
+                  daily.2022-04-15_0010                    372KB     0%   58%
+                  daily.2022-04-16_0010                    368KB     0%   58%
+                  hourly.2022-04-16_0405                   272KB     0%   50%
+                  hourly.2022-04-16_0505                   260KB     0%   49%
+                  hourly.2022-04-16_0605                   248KB     0%   48%
+                  hourly.2022-04-16_0705                   256KB     0%   49%
+                  hourly.2022-04-16_0805                   256KB     0%   49%
+                  hourly.2022-04-16_0905                   152KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 296KB 0% 52%
+                    vol13
+                  weekly.2022-04-03_0015                   336KB     0%   42%
+                  weekly.2022-04-10_0015                   428KB     0%   48%
+                  daily.2022-04-15_0010                    368KB     0%   44%
+                  daily.2022-04-16_0010                    344KB     0%   43%
+                  hourly.2022-04-16_0405                   292KB     0%   39%
+                  hourly.2022-04-16_0505                   312KB     0%   40%
+                  hourly.2022-04-16_0605                   296KB     0%   39%
+                  hourly.2022-04-16_0705                   288KB     0%   38%
+                  hourly.2022-04-16_0805                   304KB     0%   40%
+                  hourly.2022-04-16_0905                   152KB     0%   25%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500 328KB 0% 41%
+889 entries were displayed.
+
+site01-pfsx-app01::> snapmirror show
+This table is currently empty.
+
+site01-pfsx-app01::> cluster show
+Node                  Health  Eligibility
+--------------------- ------- ------------
+cluster1-01           true    true
+cluster1-02           true    true
+2 entries were displayed.
+
+site01-pfsx-app01::> cluster peer show
+Peer Cluster Name         Cluster Serial Number Availability   Authentication
+------------------------- --------------------- -------------- --------------
+cluster2                  1-80-000011           Available      ok
+
+site01-pfsx-app01::>
+
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+login as: admin
+Using keyboard-interactive authentication.
+Password:
+
+Last login time: 4/12/2022 12:48:02
+site02-pfsx-app01::>
+site02-pfsx-app01::>
 site02-pfsx-app01::> vserver show
                                Admin      Operational Root
 Vserver     Type    Subtype    State      State       Volume     Aggregate
@@ -192,5 +1274,1225 @@ cluster2_02_ssd_1
                                                                    normal
 4 entries were displayed.
 
+site02-pfsx-app01::>
+site02-pfsx-app01::> snapshot show
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+cluster2-01
+         vol0
+                  hourly.5                                1.02GB     4%   12%
+                  nightly.1                               1.34GB     6%   15%
+                  hourly.4                               837.8MB     4%   10%
+                  hourly.3                                1.01GB     4%   12%
+                  hourly.2                                1.14GB     5%   13%
+                  hourly.1                                1.16GB     5%   13%
+                  nightly.0                               1.09GB     5%   13%
+                  hourly.0                               556.3MB     2%    7%
+cluster2-02
+         vol0
+                  hourly.5                               889.8MB     4%   12%
+                  nightly.1                               1.14GB     5%   15%
+                  hourly.4                               828.7MB     4%   11%
+                  hourly.3                               883.5MB     4%   12%
+                  hourly.2                               984.2MB     4%   13%
+                  hourly.1                                1.03GB     4%   14%
+                  nightly.0                               1.25GB     5%   17%
+                  hourly.0                               539.6MB     2%    8%
+svm-dr   sql1_db1
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           372KB     0%    0%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%    0%
+         sql1_log
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%    3%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%    1%
+         sql1_system_db
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           360KB     0%   18%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%    8%
+         svm1_cluster1_root
+                  weekly.2022-04-03_0015                   332KB     2%   55%
+                  weekly.2022-04-10_0015                   384KB     2%   58%
+                  daily.2022-04-15_0010                    332KB     2%   55%
+                  daily.2022-04-16_0010                    376KB     2%   58%
+                  hourly.2022-04-16_0405                   140KB     1%   34%
+                  hourly.2022-04-16_0505                   140KB     1%   34%
+                  hourly.2022-04-16_0605                   380KB     2%   58%
+                  hourly.2022-04-16_0705                   140KB     1%   34%
+                  hourly.2022-04-16_0805                   140KB     1%   34%
+                  hourly.2022-04-16_0905                   136KB     1%   33%
+         test
+                  weekly.2022-04-03_0015                   508KB     0%   39%
+                  weekly.2022-04-10_0015                   516KB     0%   39%
 
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   test
+                  daily.2022-04-15_0010                    532KB     0%   40%
+                  daily.2022-04-16_0010                    392KB     0%   33%
+                  hourly.2022-04-16_0405                   308KB     0%   28%
+                  hourly.2022-04-16_0505                   332KB     0%   30%
+                  hourly.2022-04-16_0605                   300KB     0%   27%
+                  hourly.2022-04-16_0705                   292KB     0%   27%
+                  hourly.2022-04-16_0805                   268KB     0%   25%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   28%
+                  hourly.2022-04-16_0905                   272KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   15%
+         test1
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   30%
+                  5min.2022-04-16_0905                     268KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   16%
+         test10
+                  weekly.2022-04-03_0015                   508KB     0%   40%
+                  weekly.2022-04-10_0015                   520KB     0%   41%
+                  daily.2022-04-15_0010                    528KB     0%   41%
+                  daily.2022-04-16_0010                    392KB     0%   34%
+                  hourly.2022-04-16_0405                   312KB     0%   29%
+                  hourly.2022-04-16_0505                   316KB     0%   29%
+                  hourly.2022-04-16_0605                   300KB     0%   28%
+                  hourly.2022-04-16_0705                   300KB     0%   28%
+                  hourly.2022-04-16_0805                   264KB     0%   26%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           296KB     0%   28%
+                  hourly.2022-04-16_0905                   264KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   16%
+         test12
+                  weekly.2022-04-03_0015                   512KB     0%   41%
+                  weekly.2022-04-10_0015                   520KB     0%   42%
+                  daily.2022-04-15_0010                    532KB     0%   42%
+                  daily.2022-04-16_0010                    392KB     0%   35%
+                  hourly.2022-04-16_0405                   312KB     0%   30%
+                  hourly.2022-04-16_0505                   336KB     0%   32%
+                  hourly.2022-04-16_0605                   312KB     0%   30%
+                  hourly.2022-04-16_0705                   304KB     0%   29%
+                  hourly.2022-04-16_0805                   268KB     0%   27%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           292KB     0%   29%
+                  hourly.2022-04-16_0905                   260KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   17%
 
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   test14
+                  weekly.2022-04-03_0015                   516KB     0%   41%
+                  weekly.2022-04-10_0015                   516KB     0%   41%
+                  daily.2022-04-15_0010                    520KB     0%   41%
+                  daily.2022-04-16_0010                    388KB     0%   34%
+                  hourly.2022-04-16_0405                   316KB     0%   30%
+                  hourly.2022-04-16_0505                   336KB     0%   31%
+                  hourly.2022-04-16_0605                   304KB     0%   29%
+                  hourly.2022-04-16_0705                   296KB     0%   29%
+                  hourly.2022-04-16_0805                   260KB     0%   26%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           304KB     0%   29%
+                  hourly.2022-04-16_0905                   272KB     0%   27%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   16%
+         test15
+                  weekly.2022-04-03_0015                   512KB     0%   41%
+                  weekly.2022-04-10_0015                   528KB     0%   42%
+                  daily.2022-04-15_0010                    532KB     0%   42%
+                  daily.2022-04-16_0010                    408KB     0%   36%
+                  hourly.2022-04-16_0405                   324KB     0%   31%
+                  hourly.2022-04-16_0505                   340KB     0%   32%
+                  hourly.2022-04-16_0605                   284KB     0%   28%
+                  hourly.2022-04-16_0705                   300KB     0%   29%
+                  hourly.2022-04-16_0805                   264KB     0%   27%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   30%
+                  hourly.2022-04-16_0905                   268KB     0%   27%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   16%
+         test16
+                  weekly.2022-04-03_0015                   516KB     0%   41%
+                  weekly.2022-04-10_0015                   524KB     0%   41%
+                  daily.2022-04-15_0010                    516KB     0%   41%
+                  daily.2022-04-16_0010                    388KB     0%   34%
+                  hourly.2022-04-16_0405                   300KB     0%   29%
+                  hourly.2022-04-16_0505                   328KB     0%   31%
+                  hourly.2022-04-16_0605                   300KB     0%   29%
+                  hourly.2022-04-16_0705                   300KB     0%   29%
+                  hourly.2022-04-16_0805                   276KB     0%   27%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   29%
+                  hourly.2022-04-16_0905                   260KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   16%
+         test17
+                  weekly.2022-04-03_0015                   520KB     0%   42%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   test17
+                  weekly.2022-04-10_0015                   516KB     0%   42%
+                  daily.2022-04-15_0010                    540KB     0%   43%
+                  daily.2022-04-16_0010                    368KB     0%   34%
+                  hourly.2022-04-16_0405                   320KB     0%   31%
+                  hourly.2022-04-16_0505                   328KB     0%   31%
+                  hourly.2022-04-16_0605                   300KB     0%   29%
+                  hourly.2022-04-16_0705                   300KB     0%   29%
+                  hourly.2022-04-16_0805                   272KB     0%   27%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           312KB     0%   30%
+                  hourly.2022-04-16_0905                   272KB     0%   27%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   17%
+         test18
+                  weekly.2022-04-03_0015                   516KB     0%   41%
+                  weekly.2022-04-10_0015                   524KB     0%   41%
+                  daily.2022-04-15_0010                    528KB     0%   42%
+                  daily.2022-04-16_0010                    388KB     0%   34%
+                  hourly.2022-04-16_0405                   324KB     0%   30%
+                  hourly.2022-04-16_0505                   332KB     0%   31%
+                  hourly.2022-04-16_0605                   300KB     0%   29%
+                  hourly.2022-04-16_0705                   292KB     0%   28%
+                  hourly.2022-04-16_0805                   264KB     0%   26%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   30%
+                  hourly.2022-04-16_0905                   264KB     0%   26%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   16%
+         test3
+                  vserverdr.0.17f60edb-a5f3-11ec-abe9-00505689982a.2022-03-17_134211
+                                                           264KB     0%   34%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-03-17_134229
+                                                           208KB     0%   29%
+         test6
+                  weekly.2022-04-03_0015                   512KB     0%   41%
+                  weekly.2022-04-10_0015                   520KB     0%   42%
+                  daily.2022-04-15_0010                    540KB     0%   43%
+                  daily.2022-04-16_0010                    392KB     0%   35%
+                  hourly.2022-04-16_0405                   320KB     0%   31%
+                  hourly.2022-04-16_0505                   332KB     0%   31%
+                  hourly.2022-04-16_0605                   312KB     0%   30%
+                  hourly.2022-04-16_0705                   284KB     0%   28%
+                  hourly.2022-04-16_0805                   260KB     0%   26%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           312KB     0%   30%
+                  hourly.2022-04-16_0905                   284KB     0%   28%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   17%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   test_vol
+                  weekly.2022-04-03_0015                   372KB     0%   40%
+                  weekly.2022-04-10_0015                   368KB     0%   40%
+                  daily.2022-04-15_0010                    376KB     0%   41%
+                  daily.2022-04-16_0010                    348KB     0%   39%
+                  hourly.2022-04-16_0405                   300KB     0%   35%
+                  hourly.2022-04-16_0505                   308KB     0%   36%
+                  hourly.2022-04-16_0605                   292KB     0%   35%
+                  hourly.2022-04-16_0705                   300KB     0%   35%
+                  hourly.2022-04-16_0805                   284KB     0%   34%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   39%
+                  hourly.2022-04-16_0905                   256KB     0%   32%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+         uslv_ddbx_ora01_ismodsd_data
+                  daily.2022-04-10_0010                    388KB     0%   40%
+                  daily.2022-04-11_0010                    356KB     0%   38%
+                  4hourly.2022-04-11_0400                  384KB     0%   40%
+                  daily.2022-04-12_0010                    348KB     0%   38%
+                  4hourly.2022-04-12_0400                  388KB     0%   40%
+                  daily.2022-04-13_0010                    356KB     0%   38%
+                  4hourly.2022-04-13_0400                  400KB     0%   41%
+                  daily.2022-04-14_0010                    344KB     0%   38%
+                  4hourly.2022-04-14_0400                  372KB     0%   39%
+                  daily.2022-04-15_0010                    344KB     0%   38%
+                  4hourly.2022-04-15_0400                  384KB     0%   40%
+                  daily.2022-04-16_0010                    348KB     0%   38%
+                  4hourly.2022-04-16_0400                  340KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           344KB     0%   38%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_cifs_GSSC11
+                  weekly.2022-04-03_0015                   380KB     0%   39%
+                  weekly.2022-04-10_0015                   368KB     0%   38%
+                  daily.2022-04-15_0010                    376KB     0%   39%
+                  daily.2022-04-16_0010                    348KB     0%   37%
+                  hourly.2022-04-16_0405                   304KB     0%   34%
+                  hourly.2022-04-16_0505                   312KB     0%   35%
+                  hourly.2022-04-16_0605                   284KB     0%   33%
+                  hourly.2022-04-16_0705                   296KB     0%   33%
+                  hourly.2022-04-16_0805                   276KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           320KB     0%   35%
+                  hourly.2022-04-16_0905                   256KB     0%   30%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_cifs_GSSC12
+                  weekly.2022-04-03_0015                   380KB     0%   39%
+                  weekly.2022-04-10_0015                   368KB     0%   38%
+                  daily.2022-04-15_0010                    372KB     0%   39%
+                  daily.2022-04-16_0010                    348KB     0%   37%
+                  hourly.2022-04-16_0405                   300KB     0%   34%
+                  hourly.2022-04-16_0505                   300KB     0%   34%
+                  hourly.2022-04-16_0605                   284KB     0%   33%
+                  hourly.2022-04-16_0705                   280KB     0%   32%
+                  hourly.2022-04-16_0805                   260KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           304KB     0%   34%
+                  hourly.2022-04-16_0905                   264KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_cifs_GSSC14
+                  weekly.2022-04-03_0015                   372KB     0%   39%
+                  weekly.2022-04-10_0015                   380KB     0%   40%
+                  daily.2022-04-15_0010                    380KB     0%   40%
+                  daily.2022-04-16_0010                    336KB     0%   37%
+                  hourly.2022-04-16_0405                   308KB     0%   35%
+                  hourly.2022-04-16_0505                   316KB     0%   35%
+                  hourly.2022-04-16_0605                   292KB     0%   34%
+                  hourly.2022-04-16_0705                   300KB     0%   34%
+                  hourly.2022-04-16_0805                   276KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           328KB     0%   36%
+                  hourly.2022-04-16_0905                   260KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_cifs_NMS0003
+                  weekly.2022-04-03_0015                   376KB     0%   43%
+                  weekly.2022-04-10_0015                   372KB     0%   43%
+                  daily.2022-04-15_0010                    388KB     0%   44%
+                  daily.2022-04-16_0010                    352KB     0%   41%
+                  hourly.2022-04-16_0405                   316KB     0%   39%
+                  hourly.2022-04-16_0505                   312KB     0%   38%
+                  hourly.2022-04-16_0605                   284KB     0%   36%
+                  hourly.2022-04-16_0705                   292KB     0%   37%
+                  hourly.2022-04-16_0805                   284KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           324KB     0%   39%
+                  hourly.2022-04-16_0905                   280KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           240KB     0%   32%
+         v_ter1_cifs_NMS0005
+                  weekly.2022-04-03_0015                   380KB     0%   44%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_cifs_NMS0005
+                  weekly.2022-04-10_0015                   376KB     0%   44%
+                  daily.2022-04-15_0010                    384KB     0%   44%
+                  daily.2022-04-16_0010                    344KB     0%   42%
+                  hourly.2022-04-16_0405                   324KB     0%   40%
+                  hourly.2022-04-16_0505                   336KB     0%   41%
+                  hourly.2022-04-16_0605                   312KB     0%   39%
+                  hourly.2022-04-16_0705                   284KB     0%   37%
+                  hourly.2022-04-16_0805                   256KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           296KB     0%   38%
+                  hourly.2022-04-16_0905                   256KB     0%   35%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           256KB     0%   35%
+         v_ter1_cifs_NMS0021
+                  daily.2022-04-10_0010                    368KB     0%   39%
+                  daily.2022-04-11_0010                    332KB     0%   36%
+                  4hourly.2022-04-11_0400                  392KB     0%   40%
+                  daily.2022-04-12_0010                    356KB     0%   38%
+                  4hourly.2022-04-12_0400                  372KB     0%   39%
+                  daily.2022-04-13_0010                    340KB     0%   37%
+                  4hourly.2022-04-13_0400                  380KB     0%   39%
+                  daily.2022-04-14_0010                    360KB     0%   38%
+                  4hourly.2022-04-14_0400                  388KB     0%   40%
+                  daily.2022-04-15_0010                    336KB     0%   37%
+                  4hourly.2022-04-15_0400                  376KB     0%   39%
+                  daily.2022-04-16_0010                    340KB     0%   37%
+                  4hourly.2022-04-16_0400                  340KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           336KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_cifs_NMS0028
+                  daily.2022-04-10_0010                    384KB     0%   39%
+                  daily.2022-04-11_0010                    312KB     0%   35%
+                  4hourly.2022-04-11_0400                  388KB     0%   40%
+                  daily.2022-04-12_0010                    348KB     0%   37%
+                  4hourly.2022-04-12_0400                  376KB     0%   39%
+                  daily.2022-04-13_0010                    348KB     0%   37%
+                  4hourly.2022-04-13_0400                  380KB     0%   39%
+                  daily.2022-04-14_0010                    328KB     0%   36%
+                  4hourly.2022-04-14_0400                  380KB     0%   39%
+                  daily.2022-04-15_0010                    352KB     0%   37%
+                  4hourly.2022-04-15_0400                  376KB     0%   39%
+                  daily.2022-04-16_0010                    340KB     0%   36%
+                  4hourly.2022-04-16_0400                  336KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   37%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_cifs_NMS0028
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_cifs_NMS0039
+                  daily.2022-04-10_0010                    376KB     0%   38%
+                  daily.2022-04-11_0010                    348KB     0%   36%
+                  4hourly.2022-04-11_0400                  380KB     0%   38%
+                  daily.2022-04-12_0010                    332KB     0%   35%
+                  4hourly.2022-04-12_0400                  380KB     0%   38%
+                  daily.2022-04-13_0010                    364KB     0%   37%
+                  4hourly.2022-04-13_0400                  384KB     0%   39%
+                  daily.2022-04-14_0010                    344KB     0%   36%
+                  4hourly.2022-04-14_0400                  388KB     0%   39%
+                  daily.2022-04-15_0010                    320KB     0%   34%
+                  4hourly.2022-04-15_0400                  388KB     0%   39%
+                  daily.2022-04-16_0010                    344KB     0%   36%
+                  4hourly.2022-04-16_0400                  336KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           340KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_multi_DNMS0001
+                  daily.2022-04-10_0010                    372KB     0%   39%
+                  daily.2022-04-11_0010                    324KB     0%   36%
+                  4hourly.2022-04-11_0400                  380KB     0%   39%
+                  daily.2022-04-12_0010                    348KB     0%   37%
+                  4hourly.2022-04-12_0400                  376KB     0%   39%
+                  daily.2022-04-13_0010                    328KB     0%   36%
+                  4hourly.2022-04-13_0400                  376KB     0%   39%
+                  daily.2022-04-14_0010                    336KB     0%   37%
+                  4hourly.2022-04-14_0400                  376KB     0%   39%
+                  daily.2022-04-15_0010                    340KB     0%   37%
+                  4hourly.2022-04-15_0400                  380KB     0%   39%
+                  daily.2022-04-16_0010                    372KB     0%   39%
+                  4hourly.2022-04-16_0400                  344KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           356KB     0%   38%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0007
+                  weekly.2022-04-03_0015                   388KB     0%   41%
+                  weekly.2022-04-10_0015                   380KB     0%   40%
+                  daily.2022-04-15_0010                    384KB     0%   40%
+                  daily.2022-04-16_0010                    332KB     0%   37%
+                  hourly.2022-04-16_0405                   320KB     0%   36%
+                  hourly.2022-04-16_0505                   312KB     0%   35%
+                  hourly.2022-04-16_0605                   268KB     0%   32%
+                  hourly.2022-04-16_0705                   284KB     0%   33%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_multi_NMS0007
+                  hourly.2022-04-16_0805                   256KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           320KB     0%   36%
+                  hourly.2022-04-16_0905                   256KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0011
+                  weekly.2022-04-03_0015                   372KB     0%   39%
+                  weekly.2022-04-10_0015                   372KB     0%   39%
+                  daily.2022-04-15_0010                    380KB     0%   40%
+                  daily.2022-04-16_0010                    332KB     0%   36%
+                  hourly.2022-04-16_0405                   300KB     0%   34%
+                  hourly.2022-04-16_0505                   304KB     0%   34%
+                  hourly.2022-04-16_0605                   280KB     0%   33%
+                  hourly.2022-04-16_0705                   292KB     0%   33%
+                  hourly.2022-04-16_0805                   268KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           324KB     0%   36%
+                  hourly.2022-04-16_0905                   260KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0012
+                  weekly.2022-04-03_0015                   368KB     0%   43%
+                  weekly.2022-04-10_0015                   388KB     0%   45%
+                  daily.2022-04-15_0010                    380KB     0%   44%
+                  daily.2022-04-16_0010                    344KB     0%   42%
+                  hourly.2022-04-16_0405                   296KB     0%   38%
+                  hourly.2022-04-16_0505                   296KB     0%   38%
+                  hourly.2022-04-16_0605                   288KB     0%   38%
+                  hourly.2022-04-16_0705                   284KB     0%   37%
+                  hourly.2022-04-16_0805                   256KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           312KB     0%   39%
+                  hourly.2022-04-16_0905                   248KB     0%   34%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           256KB     0%   35%
+         v_ter1_multi_NMS0013
+                  weekly.2022-04-03_0015                   380KB     0%   39%
+                  weekly.2022-04-10_0015                   368KB     0%   39%
+                  daily.2022-04-15_0010                    388KB     0%   40%
+                  daily.2022-04-16_0010                    348KB     0%   37%
+                  hourly.2022-04-16_0405                   300KB     0%   34%
+                  hourly.2022-04-16_0505                   316KB     0%   35%
+                  hourly.2022-04-16_0605                   288KB     0%   33%
+                  hourly.2022-04-16_0705                   288KB     0%   33%
+                  hourly.2022-04-16_0805                   268KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           328KB     0%   36%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_multi_NMS0013
+                  hourly.2022-04-16_0905                   264KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0014
+                  weekly.2022-04-03_0015                   380KB     0%   40%
+                  weekly.2022-04-10_0015                   376KB     0%   40%
+                  daily.2022-04-15_0010                    376KB     0%   40%
+                  daily.2022-04-16_0010                    340KB     0%   37%
+                  hourly.2022-04-16_0405                   296KB     0%   34%
+                  hourly.2022-04-16_0505                   300KB     0%   34%
+                  hourly.2022-04-16_0605                   284KB     0%   33%
+                  hourly.2022-04-16_0705                   288KB     0%   33%
+                  hourly.2022-04-16_0805                   264KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           296KB     0%   34%
+                  hourly.2022-04-16_0905                   260KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0015
+                  weekly.2022-04-03_0015                   376KB     0%   40%
+                  weekly.2022-04-10_0015                   372KB     0%   40%
+                  daily.2022-04-15_0010                    392KB     0%   41%
+                  daily.2022-04-16_0010                    344KB     0%   38%
+                  hourly.2022-04-16_0405                   312KB     0%   36%
+                  hourly.2022-04-16_0505                   308KB     0%   35%
+                  hourly.2022-04-16_0605                   284KB     0%   34%
+                  hourly.2022-04-16_0705                   288KB     0%   34%
+                  hourly.2022-04-16_0805                   280KB     0%   33%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           328KB     0%   37%
+                  hourly.2022-04-16_0905                   256KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0016
+                  weekly.2022-04-03_0015                   376KB     0%   39%
+                  weekly.2022-04-10_0015                   380KB     0%   40%
+                  daily.2022-04-15_0010                    372KB     0%   39%
+                  daily.2022-04-16_0010                    340KB     0%   37%
+                  hourly.2022-04-16_0405                   316KB     0%   35%
+                  hourly.2022-04-16_0505                   304KB     0%   35%
+                  hourly.2022-04-16_0605                   292KB     0%   34%
+                  hourly.2022-04-16_0705                   284KB     0%   33%
+                  hourly.2022-04-16_0805                   256KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   35%
+                  hourly.2022-04-16_0905                   260KB     0%   31%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_multi_NMS0016
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0022
+                  daily.2022-04-10_0010                    368KB     0%   39%
+                  daily.2022-04-11_0010                    340KB     0%   37%
+                  4hourly.2022-04-11_0400                  384KB     0%   40%
+                  daily.2022-04-12_0010                    364KB     0%   38%
+                  4hourly.2022-04-12_0400                  372KB     0%   39%
+                  daily.2022-04-13_0010                    360KB     0%   38%
+                  4hourly.2022-04-13_0400                  376KB     0%   39%
+                  daily.2022-04-14_0010                    348KB     0%   37%
+                  4hourly.2022-04-14_0400                  376KB     0%   39%
+                  daily.2022-04-15_0010                    352KB     0%   38%
+                  4hourly.2022-04-15_0400                  372KB     0%   39%
+                  daily.2022-04-16_0010                    344KB     0%   37%
+                  4hourly.2022-04-16_0400                  352KB     0%   38%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           360KB     0%   38%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0023
+                  daily.2022-04-10_0010                    376KB     0%   38%
+                  daily.2022-04-11_0010                    340KB     0%   35%
+                  4hourly.2022-04-11_0400                  388KB     0%   38%
+                  daily.2022-04-12_0010                    336KB     0%   35%
+                  4hourly.2022-04-12_0400                  392KB     0%   39%
+                  daily.2022-04-13_0010                    344KB     0%   36%
+                  4hourly.2022-04-13_0400                  392KB     0%   39%
+                  daily.2022-04-14_0010                    348KB     0%   36%
+                  4hourly.2022-04-14_0400                  388KB     0%   38%
+                  daily.2022-04-15_0010                    340KB     0%   35%
+                  4hourly.2022-04-15_0400                  376KB     0%   38%
+                  daily.2022-04-16_0010                    344KB     0%   36%
+                  4hourly.2022-04-16_0400                  344KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           356KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_multi_NMS0029
+                  daily.2022-04-10_0010                    392KB     0%   40%
+                  daily.2022-04-11_0010                    352KB     0%   37%
+                  4hourly.2022-04-11_0400                  384KB     0%   39%
+                  daily.2022-04-12_0010                    324KB     0%   35%
+                  4hourly.2022-04-12_0400                  380KB     0%   39%
+                  daily.2022-04-13_0010                    344KB     0%   37%
+                  4hourly.2022-04-13_0400                  392KB     0%   40%
+                  daily.2022-04-14_0010                    332KB     0%   36%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_multi_NMS0029
+                  4hourly.2022-04-14_0400                  380KB     0%   39%
+                  daily.2022-04-15_0010                    348KB     0%   37%
+                  4hourly.2022-04-15_0400                  388KB     0%   39%
+                  daily.2022-04-16_0010                    332KB     0%   36%
+                  4hourly.2022-04-16_0400                  336KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           328KB     0%   35%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_multi_NMS0030
+                  daily.2022-04-10_0010                    384KB     0%   39%
+                  daily.2022-04-11_0010                    348KB     0%   37%
+                  4hourly.2022-04-11_0400                  376KB     0%   39%
+                  daily.2022-04-12_0010                    336KB     0%   36%
+                  4hourly.2022-04-12_0400                  376KB     0%   39%
+                  daily.2022-04-13_0010                    332KB     0%   36%
+                  4hourly.2022-04-13_0400                  384KB     0%   39%
+                  daily.2022-04-14_0010                    348KB     0%   37%
+                  4hourly.2022-04-14_0400                  384KB     0%   39%
+                  daily.2022-04-15_0010                    332KB     0%   36%
+                  4hourly.2022-04-15_0400                  376KB     0%   39%
+                  daily.2022-04-16_0010                    352KB     0%   37%
+                  4hourly.2022-04-16_0400                  352KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           352KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_multi_NMS0031
+                  daily.2022-04-10_0010                    408KB     0%   46%
+                  daily.2022-04-11_0010                    332KB     0%   41%
+                  4hourly.2022-04-11_0400                  376KB     0%   44%
+                  daily.2022-04-12_0010                    332KB     0%   41%
+                  4hourly.2022-04-12_0400                  380KB     0%   44%
+                  daily.2022-04-13_0010                    348KB     0%   42%
+                  4hourly.2022-04-13_0400                  376KB     0%   44%
+                  daily.2022-04-14_0010                    348KB     0%   42%
+                  4hourly.2022-04-14_0400                  400KB     0%   46%
+                  daily.2022-04-15_0010                    352KB     0%   43%
+                  4hourly.2022-04-15_0400                  384KB     0%   45%
+                  daily.2022-04-16_0010                    332KB     0%   41%
+                  4hourly.2022-04-16_0400                  372KB     0%   44%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           360KB     0%   43%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           276KB     0%   37%
+         v_ter1_multi_NMS0040
+                  daily.2022-04-10_0010                    388KB     0%   40%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_multi_NMS0040
+                  daily.2022-04-11_0010                    360KB     0%   38%
+                  4hourly.2022-04-11_0400                  380KB     0%   39%
+                  daily.2022-04-12_0010                    340KB     0%   37%
+                  4hourly.2022-04-12_0400                  376KB     0%   39%
+                  daily.2022-04-13_0010                    344KB     0%   37%
+                  4hourly.2022-04-13_0400                  384KB     0%   40%
+                  daily.2022-04-14_0010                    344KB     0%   37%
+                  4hourly.2022-04-14_0400                  380KB     0%   39%
+                  daily.2022-04-15_0010                    336KB     0%   37%
+                  4hourly.2022-04-15_0400                  376KB     0%   39%
+                  daily.2022-04-16_0010                    352KB     0%   38%
+                  4hourly.2022-04-16_0400                  344KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_DNMS0002
+                  daily.2022-04-10_0010                    380KB     0%   39%
+                  daily.2022-04-11_0010                    348KB     0%   37%
+                  4hourly.2022-04-11_0400                  388KB     0%   40%
+                  daily.2022-04-12_0010                    344KB     0%   37%
+                  4hourly.2022-04-12_0400                  400KB     0%   40%
+                  daily.2022-04-13_0010                    340KB     0%   37%
+                  4hourly.2022-04-13_0400                  376KB     0%   39%
+                  daily.2022-04-14_0010                    344KB     0%   37%
+                  4hourly.2022-04-14_0400                  384KB     0%   40%
+                  daily.2022-04-15_0010                    324KB     0%   36%
+                  4hourly.2022-04-15_0400                  380KB     0%   39%
+                  daily.2022-04-16_0010                    364KB     0%   38%
+                  4hourly.2022-04-16_0400                  344KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_GSSC10
+                  weekly.2022-04-03_0015                   372KB     0%   43%
+                  weekly.2022-04-10_0015                   368KB     0%   42%
+                  daily.2022-04-15_0010                    388KB     0%   44%
+                  daily.2022-04-16_0010                    356KB     0%   42%
+                  hourly.2022-04-16_0405                   312KB     0%   38%
+                  hourly.2022-04-16_0505                   296KB     0%   37%
+                  hourly.2022-04-16_0605                   304KB     0%   38%
+                  hourly.2022-04-16_0705                   284KB     0%   36%
+                  hourly.2022-04-16_0805                   272KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   38%
+                  hourly.2022-04-16_0905                   264KB     0%   35%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_GSSC10
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           244KB     0%   33%
+         v_ter1_nfs_GSSC11
+                  weekly.2022-04-03_0015                   368KB     0%   39%
+                  weekly.2022-04-10_0015                   376KB     0%   40%
+                  daily.2022-04-15_0010                    388KB     0%   41%
+                  daily.2022-04-16_0010                    348KB     0%   38%
+                  hourly.2022-04-16_0405                   300KB     0%   35%
+                  hourly.2022-04-16_0505                   300KB     0%   35%
+                  hourly.2022-04-16_0605                   288KB     0%   34%
+                  hourly.2022-04-16_0705                   292KB     0%   34%
+                  hourly.2022-04-16_0805                   260KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   36%
+                  hourly.2022-04-16_0905                   268KB     0%   32%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_GSSC14
+                  weekly.2022-04-03_0015                   372KB     0%   44%
+                  weekly.2022-04-10_0015                   368KB     0%   44%
+                  daily.2022-04-15_0010                    372KB     0%   44%
+                  daily.2022-04-16_0010                    356KB     0%   43%
+                  hourly.2022-04-16_0405                   308KB     0%   39%
+                  hourly.2022-04-16_0505                   304KB     0%   39%
+                  hourly.2022-04-16_0605                   304KB     0%   39%
+                  hourly.2022-04-16_0705                   304KB     0%   39%
+                  hourly.2022-04-16_0805                   256KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           312KB     0%   40%
+                  hourly.2022-04-16_0905                   280KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           244KB     0%   34%
+         v_ter1_nfs_GSSC15
+                  weekly.2022-04-03_0015                   372KB     0%   39%
+                  weekly.2022-04-10_0015                   380KB     0%   39%
+                  daily.2022-04-15_0010                    380KB     0%   39%
+                  daily.2022-04-16_0010                    344KB     0%   37%
+                  hourly.2022-04-16_0405                   304KB     0%   34%
+                  hourly.2022-04-16_0505                   296KB     0%   33%
+                  hourly.2022-04-16_0605                   280KB     0%   32%
+                  hourly.2022-04-16_0705                   284KB     0%   33%
+                  hourly.2022-04-16_0805                   268KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   35%
+                  hourly.2022-04-16_0905                   264KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_GSSC3
+                  weekly.2022-04-03_0015                   376KB     0%   43%
+                  weekly.2022-04-10_0015                   376KB     0%   43%
+                  daily.2022-04-15_0010                    376KB     0%   43%
+                  daily.2022-04-16_0010                    352KB     0%   41%
+                  hourly.2022-04-16_0405                   316KB     0%   39%
+                  hourly.2022-04-16_0505                   308KB     0%   38%
+                  hourly.2022-04-16_0605                   312KB     0%   38%
+                  hourly.2022-04-16_0705                   288KB     0%   37%
+                  hourly.2022-04-16_0805                   260KB     0%   34%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   38%
+                  hourly.2022-04-16_0905                   260KB     0%   34%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           240KB     0%   32%
+         v_ter1_nfs_GSSC4
+                  weekly.2022-04-03_0015                   368KB     0%   39%
+                  weekly.2022-04-10_0015                   372KB     0%   40%
+                  daily.2022-04-15_0010                    392KB     0%   41%
+                  daily.2022-04-16_0010                    340KB     0%   37%
+                  hourly.2022-04-16_0405                   296KB     0%   34%
+                  hourly.2022-04-16_0505                   296KB     0%   34%
+                  hourly.2022-04-16_0605                   284KB     0%   33%
+                  hourly.2022-04-16_0705                   284KB     0%   33%
+                  hourly.2022-04-16_0805                   256KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           300KB     0%   35%
+                  hourly.2022-04-16_0905                   268KB     0%   32%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_GSSC5
+                  weekly.2022-04-03_0015                   372KB     0%   44%
+                  weekly.2022-04-10_0015                   368KB     0%   44%
+                  daily.2022-04-15_0010                    384KB     0%   45%
+                  daily.2022-04-16_0010                    360KB     0%   43%
+                  hourly.2022-04-16_0405                   316KB     0%   40%
+                  hourly.2022-04-16_0505                   304KB     0%   39%
+                  hourly.2022-04-16_0605                   296KB     0%   38%
+                  hourly.2022-04-16_0705                   284KB     0%   37%
+                  hourly.2022-04-16_0805                   252KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           312KB     0%   40%
+                  hourly.2022-04-16_0905                   276KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           272KB     0%   36%
+         v_ter1_nfs_GSSC6
+                  weekly.2022-04-03_0015                   380KB     0%   41%
+                  weekly.2022-04-10_0015                   372KB     0%   40%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_GSSC6
+                  daily.2022-04-15_0010                    388KB     0%   41%
+                  daily.2022-04-16_0010                    352KB     0%   39%
+                  hourly.2022-04-16_0405                   300KB     0%   35%
+                  hourly.2022-04-16_0505                   336KB     0%   38%
+                  hourly.2022-04-16_0605                   284KB     0%   34%
+                  hourly.2022-04-16_0705                   284KB     0%   34%
+                  hourly.2022-04-16_0805                   256KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           300KB     0%   35%
+                  hourly.2022-04-16_0905                   252KB     0%   32%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+         v_ter1_nfs_GSSC7
+                  weekly.2022-04-03_0015                   380KB     0%   38%
+                  weekly.2022-04-10_0015                   372KB     0%   38%
+                  daily.2022-04-15_0010                    376KB     0%   38%
+                  daily.2022-04-16_0010                    332KB     0%   35%
+                  hourly.2022-04-16_0405                   296KB     0%   33%
+                  hourly.2022-04-16_0505                   304KB     0%   33%
+                  hourly.2022-04-16_0605                   284KB     0%   32%
+                  hourly.2022-04-16_0705                   288KB     0%   32%
+                  hourly.2022-04-16_0805                   260KB     0%   30%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   34%
+                  hourly.2022-04-16_0905                   260KB     0%   30%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_nfs_GSSC8
+                  weekly.2022-04-03_0015                   372KB     0%   39%
+                  weekly.2022-04-10_0015                   376KB     0%   39%
+                  daily.2022-04-15_0010                    392KB     0%   40%
+                  daily.2022-04-16_0010                    348KB     0%   37%
+                  hourly.2022-04-16_0405                   300KB     0%   34%
+                  hourly.2022-04-16_0505                   304KB     0%   34%
+                  hourly.2022-04-16_0605                   280KB     0%   32%
+                  hourly.2022-04-16_0705                   280KB     0%   32%
+                  hourly.2022-04-16_0805                   276KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           324KB     0%   36%
+                  hourly.2022-04-16_0905                   264KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_GSSC9
+                  weekly.2022-04-03_0015                   376KB     0%   39%
+                  weekly.2022-04-10_0015                   376KB     0%   39%
+                  daily.2022-04-15_0010                    380KB     0%   39%
+                  daily.2022-04-16_0010                    356KB     0%   38%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_GSSC9
+                  hourly.2022-04-16_0405                   308KB     0%   34%
+                  hourly.2022-04-16_0505                   300KB     0%   34%
+                  hourly.2022-04-16_0605                   280KB     0%   32%
+                  hourly.2022-04-16_0705                   300KB     0%   34%
+                  hourly.2022-04-16_0805                   260KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   35%
+                  hourly.2022-04-16_0905                   256KB     0%   30%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0001
+                  weekly.2022-04-03_0015                   372KB     0%   40%
+                  weekly.2022-04-10_0015                   372KB     0%   40%
+                  daily.2022-04-15_0010                    388KB     0%   41%
+                  daily.2022-04-16_0010                    340KB     0%   38%
+                  hourly.2022-04-16_0405                   296KB     0%   35%
+                  hourly.2022-04-16_0505                   292KB     0%   34%
+                  hourly.2022-04-16_0605                   292KB     0%   34%
+                  hourly.2022-04-16_0705                   284KB     0%   34%
+                  hourly.2022-04-16_0805                   264KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   35%
+                  hourly.2022-04-16_0905                   276KB     0%   33%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0002
+                  weekly.2022-04-03_0015                   372KB     0%   39%
+                  weekly.2022-04-10_0015                   372KB     0%   39%
+                  daily.2022-04-15_0010                    372KB     0%   39%
+                  daily.2022-04-16_0010                    352KB     0%   38%
+                  hourly.2022-04-16_0405                   316KB     0%   35%
+                  hourly.2022-04-16_0505                   300KB     0%   34%
+                  hourly.2022-04-16_0605                   300KB     0%   34%
+                  hourly.2022-04-16_0705                   280KB     0%   33%
+                  hourly.2022-04-16_0805                   260KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           296KB     0%   34%
+                  hourly.2022-04-16_0905                   260KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0004
+                  weekly.2022-04-03_0015                   368KB     0%   42%
+                  weekly.2022-04-10_0015                   368KB     0%   42%
+                  daily.2022-04-15_0010                    384KB     0%   43%
+                  daily.2022-04-16_0010                    356KB     0%   42%
+                  hourly.2022-04-16_0405                   304KB     0%   38%
+                  hourly.2022-04-16_0505                   300KB     0%   38%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_NMS0004
+                  hourly.2022-04-16_0605                   292KB     0%   37%
+                  hourly.2022-04-16_0705                   284KB     0%   36%
+                  hourly.2022-04-16_0805                   268KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           312KB     0%   38%
+                  hourly.2022-04-16_0905                   268KB     0%   35%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           240KB     0%   32%
+         v_ter1_nfs_NMS0006
+                  weekly.2022-04-03_0015                   372KB     0%   43%
+                  weekly.2022-04-10_0015                   372KB     0%   43%
+                  daily.2022-04-15_0010                    376KB     0%   44%
+                  daily.2022-04-16_0010                    356KB     0%   42%
+                  hourly.2022-04-16_0405                   312KB     0%   39%
+                  hourly.2022-04-16_0505                   296KB     0%   38%
+                  hourly.2022-04-16_0605                   296KB     0%   38%
+                  hourly.2022-04-16_0705                   280KB     0%   36%
+                  hourly.2022-04-16_0805                   268KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           316KB     0%   39%
+                  hourly.2022-04-16_0905                   260KB     0%   35%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           236KB     0%   33%
+         v_ter1_nfs_NMS0008
+                  weekly.2022-04-03_0015                   368KB     0%   39%
+                  weekly.2022-04-10_0015                   372KB     0%   39%
+                  daily.2022-04-15_0010                    380KB     0%   39%
+                  daily.2022-04-16_0010                    344KB     0%   37%
+                  hourly.2022-04-16_0405                   308KB     0%   35%
+                  hourly.2022-04-16_0505                   304KB     0%   34%
+                  hourly.2022-04-16_0605                   284KB     0%   33%
+                  hourly.2022-04-16_0705                   292KB     0%   33%
+                  hourly.2022-04-16_0805                   268KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           308KB     0%   35%
+                  hourly.2022-04-16_0905                   256KB     0%   30%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0010
+                  weekly.2022-04-03_0015                   368KB     0%   40%
+                  weekly.2022-04-10_0015                   372KB     0%   40%
+                  daily.2022-04-15_0010                    392KB     0%   42%
+                  daily.2022-04-16_0010                    356KB     0%   39%
+                  hourly.2022-04-16_0405                   296KB     0%   35%
+                  hourly.2022-04-16_0505                   304KB     0%   36%
+                  hourly.2022-04-16_0605                   268KB     0%   33%
+                  hourly.2022-04-16_0705                   272KB     0%   33%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_NMS0010
+                  hourly.2022-04-16_0805                   264KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           304KB     0%   36%
+                  hourly.2022-04-16_0905                   256KB     0%   32%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+         v_ter1_nfs_NMS0017
+                  weekly.2022-04-03_0015                   372KB     0%   39%
+                  weekly.2022-04-10_0015                   372KB     0%   39%
+                  daily.2022-04-15_0010                    380KB     0%   40%
+                  daily.2022-04-16_0010                    336KB     0%   37%
+                  hourly.2022-04-16_0405                   308KB     0%   35%
+                  hourly.2022-04-16_0505                   292KB     0%   34%
+                  hourly.2022-04-16_0605                   296KB     0%   34%
+                  hourly.2022-04-16_0705                   296KB     0%   34%
+                  hourly.2022-04-16_0805                   252KB     0%   31%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           300KB     0%   34%
+                  hourly.2022-04-16_0905                   256KB     0%   31%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0018
+                  weekly.2022-04-03_0015                   368KB     0%   40%
+                  weekly.2022-04-10_0015                   380KB     0%   41%
+                  daily.2022-04-15_0010                    380KB     0%   41%
+                  daily.2022-04-16_0010                    360KB     0%   40%
+                  hourly.2022-04-16_0405                   300KB     0%   36%
+                  hourly.2022-04-16_0505                   300KB     0%   36%
+                  hourly.2022-04-16_0605                   284KB     0%   34%
+                  hourly.2022-04-16_0705                   284KB     0%   34%
+                  hourly.2022-04-16_0805                   260KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           296KB     0%   35%
+                  hourly.2022-04-16_0905                   256KB     0%   32%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+         v_ter1_nfs_NMS0019
+                  daily.2022-04-10_0010                    372KB     0%   38%
+                  daily.2022-04-11_0010                    332KB     0%   35%
+                  4hourly.2022-04-11_0400                  380KB     0%   39%
+                  daily.2022-04-12_0010                    360KB     0%   37%
+                  4hourly.2022-04-12_0400                  380KB     0%   39%
+                  daily.2022-04-13_0010                    336KB     0%   36%
+                  4hourly.2022-04-13_0400                  380KB     0%   39%
+                  daily.2022-04-14_0010                    348KB     0%   37%
+                  4hourly.2022-04-14_0400                  388KB     0%   39%
+                  daily.2022-04-15_0010                    364KB     0%   38%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_NMS0019
+                  4hourly.2022-04-15_0400                  380KB     0%   39%
+                  daily.2022-04-16_0010                    336KB     0%   36%
+                  4hourly.2022-04-16_0400                  336KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           336KB     0%   36%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_nfs_NMS0020
+                  daily.2022-04-10_0010                    396KB     0%   40%
+                  daily.2022-04-11_0010                    328KB     0%   36%
+                  4hourly.2022-04-11_0400                  380KB     0%   39%
+                  daily.2022-04-12_0010                    320KB     0%   35%
+                  4hourly.2022-04-12_0400                  376KB     0%   39%
+                  daily.2022-04-13_0010                    356KB     0%   38%
+                  4hourly.2022-04-13_0400                  388KB     0%   40%
+                  daily.2022-04-14_0010                    360KB     0%   38%
+                  4hourly.2022-04-14_0400                  380KB     0%   39%
+                  daily.2022-04-15_0010                    340KB     0%   37%
+                  4hourly.2022-04-15_0400                  372KB     0%   39%
+                  daily.2022-04-16_0010                    324KB     0%   36%
+                  4hourly.2022-04-16_0400                  340KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0024
+                  daily.2022-04-10_0010                    440KB     0%   40%
+                  daily.2022-04-11_0010                    360KB     0%   35%
+                  4hourly.2022-04-11_0400                  448KB     0%   40%
+                  daily.2022-04-12_0010                    352KB     0%   35%
+                  4hourly.2022-04-12_0400                  424KB     0%   39%
+                  daily.2022-04-13_0010                    360KB     0%   35%
+                  4hourly.2022-04-13_0400                  432KB     0%   39%
+                  daily.2022-04-14_0010                    372KB     0%   36%
+                  4hourly.2022-04-14_0400                  424KB     0%   39%
+                  daily.2022-04-15_0010                    368KB     0%   36%
+                  4hourly.2022-04-15_0400                  420KB     0%   39%
+                  daily.2022-04-16_0010                    364KB     0%   35%
+                  4hourly.2022-04-16_0400                  352KB     0%   35%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           336KB     0%   34%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   18%
+         v_ter1_nfs_NMS0025
+                  daily.2022-04-10_0010                    376KB     0%   38%
+                  daily.2022-04-11_0010                    332KB     0%   35%
+                  4hourly.2022-04-11_0400                  368KB     0%   38%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_NMS0025
+                  daily.2022-04-12_0010                    328KB     0%   35%
+                  4hourly.2022-04-12_0400                  372KB     0%   38%
+                  daily.2022-04-13_0010                    320KB     0%   35%
+                  4hourly.2022-04-13_0400                  368KB     0%   38%
+                  daily.2022-04-14_0010                    356KB     0%   37%
+                  4hourly.2022-04-14_0400                  368KB     0%   38%
+                  daily.2022-04-15_0010                    336KB     0%   36%
+                  4hourly.2022-04-15_0400                  372KB     0%   38%
+                  daily.2022-04-16_0010                    332KB     0%   35%
+                  4hourly.2022-04-16_0400                  344KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_nfs_NMS0026
+                  daily.2022-04-10_0010                    404KB     0%   40%
+                  daily.2022-04-11_0010                    332KB     0%   36%
+                  4hourly.2022-04-11_0400                  372KB     0%   38%
+                  daily.2022-04-12_0010                    364KB     0%   38%
+                  4hourly.2022-04-12_0400                  368KB     0%   38%
+                  daily.2022-04-13_0010                    332KB     0%   36%
+                  4hourly.2022-04-13_0400                  368KB     0%   38%
+                  daily.2022-04-14_0010                    348KB     0%   37%
+                  4hourly.2022-04-14_0400                  372KB     0%   38%
+                  daily.2022-04-15_0010                    368KB     0%   38%
+                  4hourly.2022-04-15_0400                  368KB     0%   38%
+                  daily.2022-04-16_0010                    352KB     0%   37%
+                  4hourly.2022-04-16_0400                  344KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           348KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   19%
+         v_ter1_nfs_NMS0027
+                  daily.2022-04-10_0010                    376KB     0%   39%
+                  daily.2022-04-11_0010                    312KB     0%   35%
+                  4hourly.2022-04-11_0400                  376KB     0%   39%
+                  daily.2022-04-12_0010                    340KB     0%   37%
+                  4hourly.2022-04-12_0400                  364KB     0%   38%
+                  daily.2022-04-13_0010                    344KB     0%   37%
+                  4hourly.2022-04-13_0400                  364KB     0%   38%
+                  daily.2022-04-14_0010                    356KB     0%   38%
+                  4hourly.2022-04-14_0400                  380KB     0%   39%
+                  daily.2022-04-15_0010                    336KB     0%   36%
+                  4hourly.2022-04-15_0400                  384KB     0%   40%
+                  daily.2022-04-16_0010                    352KB     0%   37%
+                  4hourly.2022-04-16_0400                  340KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           356KB     0%   38%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   v_ter1_nfs_NMS0027
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0037
+                  daily.2022-04-10_0010                    372KB     0%   39%
+                  daily.2022-04-11_0010                    372KB     0%   39%
+                  4hourly.2022-04-11_0400                  388KB     0%   40%
+                  daily.2022-04-12_0010                    344KB     0%   37%
+                  4hourly.2022-04-12_0400                  376KB     0%   39%
+                  daily.2022-04-13_0010                    320KB     0%   36%
+                  4hourly.2022-04-13_0400                  360KB     0%   38%
+                  daily.2022-04-14_0010                    352KB     0%   38%
+                  4hourly.2022-04-14_0400                  380KB     0%   40%
+                  daily.2022-04-15_0010                    336KB     0%   37%
+                  4hourly.2022-04-15_0400                  384KB     0%   40%
+                  daily.2022-04-16_0010                    340KB     0%   37%
+                  4hourly.2022-04-16_0400                  332KB     0%   36%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           340KB     0%   37%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   20%
+         v_ter1_nfs_NMS0038
+                  daily.2022-04-10_0010                    388KB     0%   41%
+                  daily.2022-04-11_0010                    356KB     0%   39%
+                  4hourly.2022-04-11_0400                  368KB     0%   40%
+                  daily.2022-04-12_0010                    336KB     0%   38%
+                  4hourly.2022-04-12_0400                  368KB     0%   40%
+                  daily.2022-04-13_0010                    364KB     0%   40%
+                  4hourly.2022-04-13_0400                  376KB     0%   41%
+                  daily.2022-04-14_0010                    344KB     0%   38%
+                  4hourly.2022-04-14_0400                  380KB     0%   41%
+                  daily.2022-04-15_0010                    360KB     0%   39%
+                  4hourly.2022-04-15_0400                  368KB     0%   40%
+                  daily.2022-04-16_0010                    320KB     0%   37%
+                  4hourly.2022-04-16_0400                  328KB     0%   37%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           332KB     0%   38%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+         vol12
+                  weekly.2022-04-03_0015                   376KB     0%   41%
+                  weekly.2022-04-10_0015                   368KB     0%   41%
+                  daily.2022-04-15_0010                    376KB     0%   41%
+                  daily.2022-04-16_0010                    336KB     0%   39%
+                  hourly.2022-04-16_0405                   304KB     0%   36%
+                  hourly.2022-04-16_0505                   300KB     0%   36%
+                  hourly.2022-04-16_0605                   292KB     0%   35%
+
+                                                                 ---Blocks---
+Vserver  Volume   Snapshot                                  Size Total% Used%
+-------- -------- ------------------------------------- -------- ------ -----
+svm-dr   vol12
+                  hourly.2022-04-16_0705                   300KB     0%   36%
+                  hourly.2022-04-16_0805                   268KB     0%   33%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           292KB     0%   35%
+                  hourly.2022-04-16_0905                   264KB     0%   33%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+         vol13
+                  weekly.2022-04-03_0015                   368KB     0%   41%
+                  weekly.2022-04-10_0015                   380KB     0%   41%
+                  daily.2022-04-15_0010                    380KB     0%   41%
+                  daily.2022-04-16_0010                    340KB     0%   39%
+                  hourly.2022-04-16_0405                   304KB     0%   36%
+                  hourly.2022-04-16_0505                   300KB     0%   36%
+                  hourly.2022-04-16_0605                   288KB     0%   35%
+                  hourly.2022-04-16_0705                   292KB     0%   35%
+                  hourly.2022-04-16_0805                   256KB     0%   32%
+                  vserverdr.1.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_080500
+                                                           292KB     0%   35%
+                  hourly.2022-04-16_0905                   260KB     0%   33%
+                  vserverdr.2.17f60edb-a5f3-11ec-abe9-00505689982a.2022-04-16_090500
+                                                           144KB     0%   21%
+svm1_cluster2
+         svm1_cluster2_root
+                  weekly.2022-04-03_0015                   176KB     1%   36%
+                  weekly.2022-04-10_0015                   240KB     1%   43%
+                  daily.2022-04-15_0010                    220KB     1%   41%
+                  daily.2022-04-16_0010                    272KB     1%   46%
+                  hourly.2022-04-16_0405                   128KB     1%   29%
+                  hourly.2022-04-16_0505                   128KB     1%   29%
+                  hourly.2022-04-16_0605                   128KB     1%   29%
+                  hourly.2022-04-16_0705                   128KB     1%   29%
+                  hourly.2022-04-16_0805                   352KB     2%   53%
+                  hourly.2022-04-16_0905                   124KB     1%   28%
+uslv-vfsx-cf11-dmz
+         uslv_vfsx_cf11_dmz_root
+                  daily.2022-04-15_0010                    220KB     1%   36%
+                  daily.2022-04-16_0010                    292KB     1%   42%
+                  hourly.2022-04-16_0405                   128KB     1%   24%
+                  hourly.2022-04-16_0505                   128KB     1%   24%
+                  hourly.2022-04-16_0605                   128KB     1%   24%
+                  hourly.2022-04-16_0705                   380KB     2%   49%
+                  hourly.2022-04-16_0805                   128KB     1%   24%
+                  hourly.2022-04-16_0905                   120KB     1%   23%
+871 entries were displayed.
+
+site02-pfsx-app01::>                                                                                                                                                                snapmirror snapmir
+
+Error: "snapmir" is not a recognized command
+site02-pfsx-app01::>                                                                                                                                                                snapmirror show
+                                                                       Progress
+Source            Destination Mirror  Relationship   Total             Last
+Path        Type  Path        State   Status         Progress  Healthy Updated
+----------- ---- ------------ ------- -------------- --------- ------- --------
+uslv-vfsx-sdb10-dmz:
+            XDP  svm-dr:      Snapmirrored
+                                      Idle           -         false   -
+
+site02-pfsx-app01::>
+site02-pfsx-app01::>
+site02-pfsx-app01::>
+site02-pfsx-app01::> cluster peer sjhow
+
+Error: "sjhow" is not a recognized command
+
+site02-pfsx-app01::> cluster peer show
+Peer Cluster Name         Cluster Serial Number Availability   Authentication
+------------------------- --------------------- -------------- --------------
+cluster1                  1-80-000011           Available      ok
+
+site02-pfsx-app01::>
