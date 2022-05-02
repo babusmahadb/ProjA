@@ -523,13 +523,13 @@ if __name__ == "__main__":
     print()    
     task_id = input("Enter a valid and approved Task number:")
     
-    svm_tag = svmname[-4:]
-    #svm_tag = svmname.split("-")
-    #if len(svm_tag) == 0:
-    #    svm_tag = svmname.split("_")
-    #    svm_tag = svm_tag[2]
-    #else:
-    #    svm_tag = svm_tag[2]
+    #svm_tag = svmname[-4:]
+    svm_tag = svmname.split("-")
+    if len(svm_tag) == 0:
+        svm_tag = svmname.split("_")
+        svm_tag = svm_tag[2]
+    else:
+        svm_tag = svm_tag[2]
     
     
     if ARGS.volname:

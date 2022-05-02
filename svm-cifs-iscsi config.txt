@@ -48,6 +48,8 @@ Vserver     Name            Admin     Name             Style
 svm1_cluster1
             SVM1_CLUSTER1   up        DEMO             domain
 
+net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+
 
 site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -vserver svm2_cluster1 -skip-config-validation true
 

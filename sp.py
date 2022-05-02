@@ -241,25 +241,39 @@ def list_svm(cluster: str, headers_inc: str):
     tmp12 = list(tmp12)
     #print("tmp12",tmp12)
     row = tmp12
-        
-        
+    #print("row",row)
+    #
+    #   
     for k in tmp12:
         #print(" k ",k)
-        if ("afsx" in k or "-dr" in k):
-            row.remove(k)
+        
         if apps in k:
             row = []
             row.append(k)
             return row
-        if "cf" in k:
+        elif "cf" in k:
             row = []
             row.append(k)
-        
+        elif "afsx" in k and "afsx" in row:
+            row.remove(k)
+    #    elif "-dr" in k and "-dr" in row:
+    #        row.remove(k)
+    #    else:
+    #        row.append(k)
             
+    #print("last finl row", row)        
     for chk in row:
         adc = auth_dp_chk(cluster,chk,headers_inc)
         #print(adc)
         
+        row_dt = dict(adc)
+        chk_ind = row_dt['num_records']
+        
+        if chk_ind == 0:
+            row.remove(chk)
+            
+    #print("finl row", row)
+    
     return row
 
 
