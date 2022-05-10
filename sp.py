@@ -13,6 +13,7 @@ import socket
 import base64
 import argparse
 from getpass import getpass
+from time import sleep
 import logging
 import texttable as tt
 import requests
@@ -115,7 +116,7 @@ def sort_svm(cluster: str, headers_inc: str):
     """Sorts VServers with app condition"""
     apps = ARGS.app
     services = ARGS.proto
-    app_list = ["svm","arch","bkp","cdp","cf0","dap","ddb","dmz","dp01","dpt","erp","hd0","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm0","cdoc","cf1","devi","sdb"]
+    app_list = ["svm","arch","bkp","cdp","cf","dap","ddb","dmz","dp","dpt","erp","hd","mist","nps","pap","pdb","rdb","san","sris","tap","tdb","test","vm","cdoc","devi","sdb"]
     ctr = 0
     sort_row = tmp_n = []
     tmp = dict(get_vservers(cluster, headers_inc))
@@ -218,7 +219,7 @@ def list_svm(cluster: str, headers_inc: str):
             rcd_dt = dict(i)
             svm_rd = rcd_dt['svm']
             svm_dt = dict(svm_rd)
-            clus = [svm_dt['name']]
+            clus = svm_dt['name']
             #clus = list(clus)
             srt = sort_svm(cluster, headers_inc)
             #print(srt)
@@ -237,50 +238,49 @@ def list_svm(cluster: str, headers_inc: str):
             print("Enter valid protocol")
             sys.exit(1)
     
-    tmp12 = set(row)
-    tmp12 = list(tmp12)
-    #print("tmp12",tmp12)
-    row = tmp12
-    #print("row",row)
-    #
-    #   
-    for k in tmp12:
-        #print(" k ",k)
-        
+    flt_vs = set(row)
+    flt_vs = list(flt_vs)
+    flt_vs.sort()
+    upd_vs = []
+    for j in flt_vs:
+        if "afsx" in j:
+            flt_vs.remove(j)
+    for i in flt_vs:
+        if apps in i:
+            upd_vs.append(i)
+        elif "cf" in i:
+            upd_vs.append(i)
+
+    for chk in upd_vs:
+        adc = auth_dp_chk(cluster,chk,headers_inc)
+        #print(adc)
+
+        row_dt = dict(adc)
+        chk_ind = row_dt['num_records']
+
+        if chk_ind == 0:
+            upd_vs.remove(chk)
+
+    sleep(3)      
+    row = []
+      
+    for k in upd_vs:
+                
         if apps in k:
             row = []
             row.append(k)
             return row
         elif "cf" in k:
-            row = []
             row.append(k)
-        elif "afsx" in k and "afsx" in row:
-            row.remove(k)
-    #    elif "-dr" in k and "-dr" in row:
-    #        row.remove(k)
-    #    else:
-    #        row.append(k)
-            
-    #print("last finl row", row)        
-    for chk in row:
-        adc = auth_dp_chk(cluster,chk,headers_inc)
-        #print(adc)
-        
-        row_dt = dict(adc)
-        chk_ind = row_dt['num_records']
-        
-        if chk_ind == 0:
-            row.remove(chk)
-            
-    #print("finl row", row)
-    
+     
     return row
+
 
 
 def auth_dp_chk(cluster: str, fsvm: str, headers_inc: str):
     """ excludes auth and dp destination SVM's """
     
-    url = "https://{}/api/svm/svms?subtype=!dp_destination&name={}".format(cluster,fsvm)
+    url = "https://{}/api/svm/svms?subtype=!dp_destination&name={}&return_timeout=15".format(cluster,fsvm)
     try:
         response = requests.get(url, headers=headers_inc, verify=False)
         #print(response.json())
@@ -407,12 +407,16 @@ if __name__ == "__main__":
     
     
     
-    if ARGS.env == 'prod':
+    if (ARGS.env == 'prod' or ARGS.domain == 'dmz'):
         if ARGS.dskt == 'sata':
             dsktype = ['sas','ssd','sata']
         else:
             dsktype = ['sas','ssd']
-        ARGS.env = 'pfsx'
+            if ARGS.env == 'nprod':
+                ARGS.env = 'sfsx'
+            else:
+                ARGS.env = 'pfsx'
+        
         clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
