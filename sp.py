@@ -1,9 +1,9 @@
 """
-ONTAP REST API Sample Scripts
+ONTAP REST API Scripts
 
-Purpose: Script to list volumes properties using ONTAP REST API.
+Purpose: Validation Script to list Cluster/VServer/Aggrerate details using ONTAP REST API.
 
-Usage: csa.py [-h] -s SITE_CODE -env PROD [-u API_USER] [-p API_PASS]
+Usage: sp.py [-h] -s SITE_NAME -env ENV -host HOST -app APP -proto PROTO -domain DOMAIN [-dskt DSKT] [-u API_USER] [-p API_PASS]
 """
 
 import pandas as pd
@@ -380,11 +380,6 @@ def parse_args() -> argparse.Namespace:
 
     return parsed_args
 
-#def get_volumes(cluster: str, svm_name: str, volume_name: str, headers_inc: str):
-#    """Get Volumes"""
-#    url = "https://{}/api/storage/volumes/?svm.name={}".format(cluster, volume_name)
-#    response = requests.get(url, headers=headers_inc, verify=False)
-#    return response.json()
 
                 
                 
@@ -435,10 +430,5 @@ if __name__ == "__main__":
         print()
         print("-env value invalid, it should be prod or nprod")
         sys.exit(1)
-        
-
-    
-    
-    
-    #disp_vservers(ARGS.cluster, headers)
+ 
     
