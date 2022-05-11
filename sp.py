@@ -100,7 +100,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             avail = (((int(tmp3['available'])/1024)/1024)/1024)
             size = (((int(tmp3['size'])/1024)/1024)/1024)
             used = (((int(tmp3['used'])/1024)/1024)/1024)
-            uip = (used * 100)/avail
+            uip = (used * 100)/size
             #uip = int(uip)
             aggr_name = i['name']
             svm_name = list_svm(cluster, headers)
