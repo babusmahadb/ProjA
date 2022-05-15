@@ -365,7 +365,10 @@ def parse_args() -> argparse.Namespace:
                         )
     parser.add_argument(
         "-dskt", required=False, help="It should be sas,ssd or sata"  
-                        )         
+                        )
+    parser.add_argument(
+        "-sm", required=False, help="Pull Peer Cluster/SVM/Aggr Info"  
+                        )                        
     parser.add_argument(
         "-u",
         "--api_user",
@@ -400,7 +403,7 @@ if __name__ == "__main__":
         'accept': "application/json"
     }
     
-    
+    smirror = ARGS.sm
     
     if (ARGS.env == 'prod' or ARGS.domain == 'dmz'):
         if ARGS.dskt == 'sata':
@@ -430,5 +433,13 @@ if __name__ == "__main__":
         print()
         print("-env value invalid, it should be prod or nprod")
         sys.exit(1)
- 
+
+        
+    if smirror == "y":
+        
+        print()
+        peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration: ")
+        dsktype = ['sas','ssd','sata']
+        peer_aggr_list = list_aggregate(peer_clus,dsktype,headers)
+
     
