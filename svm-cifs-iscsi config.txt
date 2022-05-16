@@ -97,3 +97,542 @@ svm2_cluster1
 2 entries were displayed.
 
 site01-pfsx-app01::>
+
+
+login as: admin
+Using keyboard-interactive authentication.
+Password:
+
+Last login time: 6/7/2021 19:00:23
+cluster1::>
+cluster1::>
+cluster1::> cluster identity
+    modify show
+
+cluster1::> cluster identity modify -name site01-pfsx-app01
+
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01
+            admin   -          -          -           -          -
+svm1_cluster1
+            data    default    running    running     svm1_      cluster1_
+                                                      cluster1_  02_SSD_1
+                                                      root
+4 entries were displayed.
+
+site01-pfsx-app01::> vserver ide
+
+Error: "ide" is not a recognized command
+site01-pfsx-app01::> vserver re
+    remove-aggregates remove-protocols  rename
+
+site01-pfsx-app01::> vserver rename -newname
+  <vserver name>              New Vserver name (Use Fully Qualified Domain Name, For example: data.example.com)
+site01-pfsx-app01::> vserver rename -newname uslv-vfsx-cf10-dmz
+
+site01-pfsx-app01::> vserver sh
+Error: Ambiguous command.  Possible matches include:
+       vserver show
+       vserver show-aggregates
+       vserver show-protocols
+
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01
+            admin   -          -          -           -          -
+uslv-vfsx-cf10-dmz
+            data    default    running    running     svm1_      cluster1_
+                                                      cluster1_  02_SSD_1
+                                                      root
+4 entries were displayed.
+
+site01-pfsx-app01::> vserver create -vserver
+  <vserver name>              Vserver
+site01-pfsx-app01::> vserver create -vserver uslv-afsx-dmz -subtype default
+[Job 739] Job succeeded: Success
+Vserver creation completed.
+
+site01-pfsx-app01::> vserver create -vserver
+  <vserver name>              Vserver
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-sdb10-dmz -subtype default -rootvolume uslv_vfsx_sdb10_dmz_root
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01
+            admin   -          -          -           -          -
+uslv-afsx-dmz
+            data    default    running    running     uslv_afsx_ cluster1_
+                                                      dmz_root   01_SSD_1
+uslv-vfsx-cf10-dmz
+            data    default    running    running     svm1_      cluster1_
+                                                      cluster1_  02_SSD_1
+                                                      root
+5 entries were displayed.
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-sdb10-dmz -subtype default -rootvolume uslv_vfsx_sdb10_dmz_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> vserver show -fields allowed-protocols
+vserver     allowed-protocols
+----------- -----------------
+cluster1-01 -
+cluster1-02 -
+site01-pfsx-app01
+            -
+uslv-afsx-dmz
+            nfs,cifs,fcp,iscsi,ndmp
+uslv-vfsx-cf10-dmz
+            nfs,cifs,fcp,iscsi,ndmp,nvme
+5 entries were displayed.
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-sdb10-dmz -subtype default
+[Job 740] Job succeeded: Success
+Vserver creation completed.
+
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> cluster peer show
+Peer Cluster Name         Cluster Serial Number Availability   Authentication
+------------------------- --------------------- -------------- --------------
+cluster2                  1-80-000011           Available      ok
+
+site01-pfsx-app01::> vserver peer show
+There are no Vserver peer relationships.
+
+site01-pfsx-app01::> net int show -lif lif_svm1_cluster1_iscsi2 -instance
+  (network interface show)
+
+                      Vserver Name: uslv-vfsx-cf10-dmz
+            Logical Interface Name: lif_svm1_cluster1_iscsi2
+                    Service Policy: default-data-blocks
+                      Service List: data-core, data-iscsi
+                 (DEPRECATED)-Role: data
+                     Data Protocol: iscsi
+                   Network Address: 192.168.0.136
+                           Netmask: 255.255.255.0
+               Bits in the Netmask: 24
+                        Is VIP LIF: false
+                       Subnet Name: -
+                         Home Node: cluster1-01
+                         Home Port: e0e
+                      Current Node: cluster1-01
+                      Current Port: e0e
+                Operational Status: up
+                   Extended Status: -
+                           Is Home: true
+             Administrative Status: up
+                   Failover Policy: disabled
+                   Firewall Policy: data
+                       Auto Revert: false
+     Fully Qualified DNS Zone Name: none
+           DNS Query Listen Enable: false
+               Failover Group Name: Default
+                          FCP WWPN: -
+                    Address family: ipv4
+                           Comment: -
+                    IPspace of LIF: Default
+    Is Dynamic DNS Update Enabled?: false
+Probe-port for Cloud Load Balancer: -
+                  Broadcast Domain: Default
+                      Vserver Type: data
+
+site01-pfsx-app01::> net int modify -lif lif_svm1_cluster1_iscsi2 -vserver svm1_cluster1 -status-admin down
+  (network interface modify)
+
+Error: "svm1_cluster1" is an invalid value for field "-vserver <vserver>"
+
+site01-pfsx-app01::> net int modify -lif lif_svm1_cluster1_iscsi2 -vserver uslv-vfsx-cf10-dmz -status-admin down
+  (network interface modify)
+
+site01-pfsx-app01::> net int delete -lif lif_svm1_cluster1_iscsi2 -vserver uslv-vfsx-cf10-dmz
+  (network interface delete)
+
+site01-pfsx-app01::> cifs show
+This table is currently empty.
+
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+Error: command failed: DNS Update is supported only on LIFs configured with the NFS or CIFS protocol.
+
+site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -vserver uslv-vfsx-cf10-dmz -skip-config-validation true
+
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+Error: command failed: DNS Update is supported only on LIFs configured with the NFS or CIFS protocol.
+
+site01-pfsx-app01::> cifs create -cifs-server svm2_cluster1 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-cf10-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with
+sufficient privileges to add computers to the "CN=Computers" container within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for
+SMB1 might be removed in a future release. If required, use the (privilege: advanced) "vserver cifs options modify -vserver
+uslv-vfsx-cf10-dmz -smb1-enabled true" to enable it.
+
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+uslv-vfsx-cf10-dmz
+            SVM2_CLUSTER1   up        DEMO             domain
+
+site01-pfsx-app01::> nfs show
+This table is currently empty.
+
+site01-pfsx-app01::> nfs create -vserver uslv-
+    uslv-afsx-dmz       uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+site01-pfsx-app01::> nfs create -vserver uslv-vfsx-cf10-dmz -access true -v3 enabled -v4.0 enabled -tcp enabled -v4.0-acl disabled
+
+site01-pfsx-app01::> nfs create -vserver uslv-
+    uslv-afsx-dmz       uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+site01-pfsx-app01::> nfs create -vserver uslv-vfsx-sdb10-dmz -access true -v3 enabled -v4.0 enabled -tcp enabled -v4.0-acl disabled
+
+site01-pfsx-app01::> cifs create -cifs-server svm1_cluster1 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb10-dmz
+
+Error: command failed: Cannot find a suitable DNS server. Check your Vserver's DNS configuration.
+
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+Error: command failed: DNS Update is supported only on LIFs configured with the NFS or CIFS protocol.
+
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-file                         (network interface create)                                                                                                                
+Error: command failed: "address" is a required field
+
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-files -address
+  <IP Address>                Network Address
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -vserver uslv-vfsx-sdb10-dmz
+
+Error: command failed: Failed to verify the specified DNS configuration.
+       192.168.0.253: Network is unreachable.
+       Verify that the network configuration is correct and that DNS servers are available. Specify "-skip-config-validation" to skip the
+       configuration validation.
+
+site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -vserver uslv-vfsx-sdb10-dmz -skip-config-validation true
+
+site01-pfsx-app01::> cifs create -cifs-server svm1_cluster1 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb10-dmz                                                                                                         
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with
+sufficient privileges to add computers to the "CN=Computers" container within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Error: Machine account creation procedure failed
+  [  0 ms] Trying to create machine account 'SVM1_CLUSTER1' in
+           'DEMO.NETAPP.COM' for Vserver 'uslv-vfsx-sdb10-dmz'
+  [     6] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+**[    15] FAILURE: Unable to contact DNS to discover domain
+**         controllers.
+  [    15] Unable to connect to any (0) domain controllers.
+  [    21] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+  [    22] Unable to contact DNS to discover domain controllers.
+  [    24] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+  [    24] Unable to contact DNS to discover domain controllers.
+  [    26] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+  [    27] Unable to contact DNS to discover domain controllers.
+  [    27] No servers available for MS_LDAP_AD, vserver: 7, domain:
+           DEMO.NETAPP.COM.
+
+Error: command failed: Failed to create the Active Directory machine account "SVM1_CLUSTER1". Reason: SecD Error: no server available.
+
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-cf10-dmz -lif lif_cf10 -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+Error: command failed: DNS Update is supported only on LIFs configured with the NFS or CIFS protocol.
+
+site01-pfsx-app01::> cifs create -cifs-server svm2_cluster1 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb10-dmz                                                                                                         
+Error: command failed: Unable to create the CIFS server. The server name "SVM2_CLUSTER1" is already used by Vserver "uslv-vfsx-cf10-dmz"
+       within the "DEMO.NETAPP.COM" domain and the "Default" IP space.
+
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01
+            admin   -          -          -           -          -
+uslv-afsx-dmz
+            data    default    running    running     uslv_afsx_ cluster1_
+                                                      dmz_root   01_SSD_1
+uslv-vfsx-cf10-dmz
+            data    default    running    running     svm1_      cluster1_
+                                                      cluster1_  02_SSD_1
+                                                      root
+uslv-vfsx-sdb10-dmz
+            data    default    running    running     uslv_vfsx_ cluster1_
+                                                      sdb10_dmz_ 02_SSD_1
+                                                      root
+6 entries were displayed.
+
+site01-pfsx-app01::> net int show -vserver
+    -vserver      -vserver-type
+site01-pfsx-app01::> net int show -vserver uslv-vfsx-cf10-dmz
+  (network interface show)
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+uslv-vfsx-cf10-dmz
+            lif_svm1_cluster1_iscsi1
+                         up/up    192.168.0.135/24   cluster1-01   e0e     true
+            lif_svm1_cluster1_iscsi3
+                         up/up    192.168.0.137/24   cluster1-02   e0e     true
+            lif_svm1_cluster1_iscsi4
+                         up/up    192.168.0.138/24   cluster1-02   e0g     true
+            lif_svm1_cluster1_mgmt
+                         up/up    192.168.0.139/24   cluster1-01   e0c     true
+4 entries were displayed.
+
+site01-pfsx-app01::> net int show -vserver uslv-vfsx-sdb10-dmz
+  (network interface show)
+There are no entries matching your query.
+
+site01-pfsx-app01::> dns show -vserver uslv-vfsx-sdb10-dmz
+
+                        Vserver: uslv-vfsx-sdb10-dmz
+                        Domains: demo.netapp.com
+                   Name Servers: 192.168.0.253
+                 Timeout (secs): 2
+               Maximum Attempts: 1
+
+site01-pfsx-app01::> net route show
+  (network route show)
+Vserver             Destination     Gateway         Metric
+------------------- --------------- --------------- ------
+site01-pfsx-app01
+                    0.0.0.0/0       192.168.0.1     20
+uslv-vfsx-cf10-dmz
+                    0.0.0.0/0       192.168.0.1     20
+2 entries were displayed.
+
+site01-pfsx-app01::> net
+    arp              bgp              connections      device-discovery
+    fcp              interface        ipspace          options
+    ping             ping6            port             qos-marking
+    route            subnet           tcpdump          trace
+    traceroute       traceroute6      tuning
+
+site01-pfsx-app01::> net subnet show
+  (network subnet show)
+This table is currently empty.
+
+site01-pfsx-app01::> net int show
+  (network interface show)
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+Cluster
+            cluster1-01_clus1
+                         up/up    169.254.145.151/16 cluster1-01   e0a     true
+            cluster1-01_clus2
+                         up/up    169.254.58.159/16  cluster1-01   e0b     true
+            cluster1-02_clus1
+                         up/up    169.254.110.0/16   cluster1-02   e0a     true
+            cluster1-02_clus2
+                         up/up    169.254.212.198/16 cluster1-02   e0b     true
+site01-pfsx-app01
+            cluster1-01_mgmt1
+                         up/up    192.168.0.111/24   cluster1-01   e0c     true
+            cluster1-02_mgmt1
+                         up/up    192.168.0.112/24   cluster1-02   e0c     true
+            cluster_mgmt up/up    192.168.0.101/24   cluster1-01   e0c     true
+            lif_Default_110
+                         up/up    192.168.0.142/24   cluster1-02   e0c     true
+            lif_Default_830
+                         up/up    192.168.0.141/24   cluster1-01   e0c     true
+uslv-vfsx-cf10-dmz
+            lif_svm1_cluster1_iscsi1
+                         up/up    192.168.0.135/24   cluster1-01   e0e     true
+            lif_svm1_cluster1_iscsi3
+                         up/up    192.168.0.137/24   cluster1-02   e0e     true
+            lif_svm1_cluster1_iscsi4
+                         up/up    192.168.0.138/24   cluster1-02   e0g     true
+
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+uslv-vfsx-cf10-dmz
+            lif_svm1_cluster1_mgmt
+                         up/up    192.168.0.139/24   cluster1-01   e0c     true
+13 entries were displayed.
+
+site01-pfsx-app01::> net int create -vserver
+    Cluster             cluster1-01         cluster1-02
+    site01-pfsx-app01   uslv-afsx-dmz       uslv-vfsx-cf10-dmz
+    uslv-vfsx-sdb10-dmz
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif
+  <lif-name>                  Logical Interface Name
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_cf -service-policy default-data-files -address
+  <IP Address>                Network Address
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_cf -service-policy ?
+  (network interface create)
+  default-data-blocks
+  default-data-files
+  default-management
+
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_cf -service-policy default-data-files -address
+  <IP Address>                Network Address
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_cf -service-policy default-data-files -address 192.168.0.136 -netmask
+  <IP Address>                Netmask
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_cf -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -
+    -dns-zone                 -listen-for-dns-query
+    -comment                  -force-subnet-association
+    -broadcast-domain
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_cf -service-policy default-data-files -address 192.168.0.136 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+site01-pfsx-app01::> net int show -vserver
+    -vserver      -vserver-type
+site01-pfsx-app01::> net int show -vserver uslv-vfsx-sdb10-dmz
+  (network interface show)
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+uslv-vfsx-sdb10-dmz
+            list_cf      up/up    192.168.0.136/24   cluster1-01   e0e     true
+
+site01-pfsx-app01::> net route show
+  (network route show)
+Vserver             Destination     Gateway         Metric
+------------------- --------------- --------------- ------
+site01-pfsx-app01
+                    0.0.0.0/0       192.168.0.1     20
+uslv-vfsx-cf10-dmz
+                    0.0.0.0/0       192.168.0.1     20
+2 entries were displayed.
+
+site01-pfsx-app01::> net route create -vserver
+    Cluster             site01-pfsx-app01   uslv-afsx-dmz
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+site01-pfsx-app01::> net route create -vserver uslv-vfsx-sdb10-dmz -destination
+  <IP Address/Mask>           Destination/Mask
+site01-pfsx-app01::> net route create -vserver uslv-vfsx-sdb10-dmz -destination 0.0.0.0/0 -gateway
+  <IP Address>                Gateway
+site01-pfsx-app01::> net route create -vserver uslv-vfsx-sdb10-dmz -destination 0.0.0.0/0 -gateway 192.168.0.1 -metric 20
+  (network route create)
+
+site01-pfsx-app01::> net route show
+  (network route show)
+Vserver             Destination     Gateway         Metric
+------------------- --------------- --------------- ------
+site01-pfsx-app01
+                    0.0.0.0/0       192.168.0.1     20
+uslv-vfsx-cf10-dmz
+                    0.0.0.0/0       192.168.0.1     20
+uslv-vfsx-sdb10-dmz
+                    0.0.0.0/0       192.168.0.1     20
+3 entries were displayed.
+
+site01-pfsx-app01::> net int show
+  (network interface show)
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+Cluster
+            cluster1-01_clus1
+                         up/up    169.254.145.151/16 cluster1-01   e0a     true
+            cluster1-01_clus2
+                         up/up    169.254.58.159/16  cluster1-01   e0b     true
+            cluster1-02_clus1
+                         up/up    169.254.110.0/16   cluster1-02   e0a     true
+            cluster1-02_clus2
+                         up/up    169.254.212.198/16 cluster1-02   e0b     true
+site01-pfsx-app01
+            cluster1-01_mgmt1
+                         up/up    192.168.0.111/24   cluster1-01   e0c     true
+            cluster1-02_mgmt1
+                         up/up    192.168.0.112/24   cluster1-02   e0c     true
+            cluster_mgmt up/up    192.168.0.101/24   cluster1-01   e0c     true
+            lif_Default_110
+                         up/up    192.168.0.142/24   cluster1-02   e0c     true
+            lif_Default_830
+                         up/up    192.168.0.141/24   cluster1-01   e0c     true
+uslv-vfsx-cf10-dmz
+            lif_svm1_cluster1_iscsi1
+                         up/up    192.168.0.135/24   cluster1-01   e0e     true
+            lif_svm1_cluster1_iscsi3
+                         up/up    192.168.0.137/24   cluster1-02   e0e     true
+            lif_svm1_cluster1_iscsi4
+                         up/up    192.168.0.138/24   cluster1-02   e0g     true
+
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+uslv-vfsx-cf10-dmz
+            lif_svm1_cluster1_mgmt
+                         up/up    192.168.0.139/24   cluster1-01   e0c     true
+uslv-vfsx-sdb10-dmz
+            list_cf      up/up    192.168.0.136/24   cluster1-01   e0e     true
+14 entries were displayed.
+
+site01-pfsx-app01::> net int show -vserver
+    -vserver      -vserver-type
+site01-pfsx-app01::> net int show -vserver uslv-vfsx-sdb10-dmz -fields data-protocol
+  (network interface show)
+vserver             lif     data-protocol
+------------------- ------- ---------------
+uslv-vfsx-sdb10-dmz list_cf nfs,cifs,fcache
+
+site01-pfsx-app01::> cifs create -cifs-server svm1_cluster1 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb10-dmz                                                                                                         
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with
+sufficient privileges to add computers to the "CN=Computers" container within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for
+SMB1 might be removed in a future release. If required, use the (privilege: advanced) "vserver cifs options modify -vserver
+uslv-vfsx-sdb10-dmz -smb1-enabled true" to enable it.
+
+site01-pfsx-app01::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+uslv-vfsx-cf10-dmz
+            SVM2_CLUSTER1   up        DEMO             domain
+uslv-vfsx-sdb10-dmz
+            SVM1_CLUSTER1   up        DEMO             domain
+2 entries were displayed.
+
+site01-pfsx-app01::>
