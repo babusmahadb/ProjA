@@ -339,7 +339,37 @@ def get_vservers(cluster: str, headers_inc: str):
     out_response = response.json() 
     
     return out_response
+
+
+def get_clus_peer(cluster: str, headers_inc: str):
+    """ get cluster peer details """
+
+    cls_pr_url = "https://{}/api/cluster/peers?return_records=true&return_timeout=15".format(cluster)
+    try:
+        response = requests.get(cls_pr_url, headers=headers_inc, verify=False)
+        #print(response.json())
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        sys.exit(1)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        sys.exit(1)
     
+    cls_pr_json = response.json()
+    
+    cls_pr_dt = dict(cls_pr_json)
+    cls_pr_rd = cls_pr_dt['records']
+    
+    cls_lst = []
+    
+    for r in cls_pr_rd:
+        cls_pr_lt = r['name']
+        cls_lst.append(cls_pr_lt)
+        
+    print("peer cls", cls_lst)
+    
+    return cls_pr_lt
+        
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
 
@@ -434,11 +464,13 @@ if __name__ == "__main__":
         print("-env value invalid, it should be prod or nprod")
         sys.exit(1)
 
-        
+    clus_peer = get_clus_peer(clstr, headers)
+    
     if smirror == "y":
         
         print()
         peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration: ")
+        
         dsktype = ['sas','ssd','sata']
         peer_aggr_list = list_aggregate(peer_clus,dsktype,headers)
 
