@@ -26,8 +26,8 @@ ur.disable_warnings()
 def find_clstr(site: str, envir: str, domain: str):
     """Get cluster info from inventory using user inputs"""
     
-    wb = xl.load_workbook(r'C:\\Users\\Administrator.DEMO\\Documents\\GitHub\\ProjA\\projclstrs.xlsx')
-    #wb = xl.load_workbook(r'/opt/storage_scripts/test_env_automation_v2/test_env_automation_v2/projclstrs.xlsx')
+    #wb = xl.load_workbook(r'C:\\Users\\Administrator.DEMO\\Documents\\GitHub\\ProjA\\projclstrs.xlsx')
+    wb = xl.load_workbook(r'/opt/storage_scripts/test_env_automation_v2/test_env_automation_v2/projclstrs.xlsx')
 #active worksheet data
     ws = wb.active    
     
@@ -55,8 +55,7 @@ def find_clstr(site: str, envir: str, domain: str):
 def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     """Lists the Aggregate"""
     print()
-    #print("List of Aggregates on ",cluster)
-    #print("==========================================")
+
     r=0
     tab = tt.Texttable()
     header = ['Cluster Name','VServer Name','Aggr name','Size(GB)','Available(GB)','Used %']
@@ -172,11 +171,7 @@ def sort_svm(cluster: str, headers_inc: str):
     tmp_n = list(tmp_n)
     #print("tmp_n",tmp_n)
     sort_row = tmp_n
-    
-    #print("tmp list", tmp_n)
-    #print("sort row value",sort_row)
-        
-            
+
     return sort_row 
 
     
@@ -213,9 +208,7 @@ def list_svm(cluster: str, headers_inc: str):
                 row = [clus+"*"]
                 return row
             srt = sort_svm(cluster, headers_inc)
-            #print("srt output",srt)
-            #clus = list(set(clus) | set(srt))
-            #row = clus
+
             row = srt
         elif services == 'cifs':
             rcd_dt = dict(i)
@@ -224,9 +217,7 @@ def list_svm(cluster: str, headers_inc: str):
             clus = svm_dt['name']
             #clus = list(clus)
             srt = sort_svm(cluster, headers_inc)
-            #print(srt)
-            #print(clus)
-            #clus = list(set(clus) | set(srt))
+
             row=srt
         elif services == 'iscsi':
             tmp=dict(i)
@@ -274,13 +265,6 @@ def list_svm(cluster: str, headers_inc: str):
             return row
         elif "cf" in k:
             row.append(k)
-    
-    #if ARGS.sm == 'y':
-    #    
-    #    row = []
-    #    row = svm_peer
-    #    print("snapm row", row)
-    
     
     return row
 
@@ -440,13 +424,7 @@ def parse_args() -> argparse.Namespace:
 
     return parsed_args
 
-#def prmt():
-#    
-#    peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration: ")
-#    
-#    return peer_clus
-#                
-                
+
 if __name__ == "__main__":
 
     logging.basicConfig(
@@ -479,7 +457,7 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
-                #svm_list = list_svm(clstr, headers)
+
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
             dsktype = ['sas','ssd','sata']
@@ -489,21 +467,17 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
-                #svm_list = list_svm(clstr, headers)
+
     else:
         print()
         print("-env value invalid, it should be prod or nprod")
         sys.exit(1)
-
-    #clus_peer = get_clus_peer(clstr, headers)
     
     if smirror == "y":
         
         print()
         clus_peer = get_clus_peer(clstr, headers)
-        #svm_peer = svm_peer(clstr, clus_peer, headers)
-        #print("Cluster/SVM Peer", clus_peer, svm_peer)
-        
+                
         while True:
             
             peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration[Can be - uspa-pfsx-cf01, usas-pfsx-nps01]: ")
