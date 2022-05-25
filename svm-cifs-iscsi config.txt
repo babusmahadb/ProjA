@@ -636,3 +636,301 @@ uslv-vfsx-sdb10-dmz
 2 entries were displayed.
 
 site01-pfsx-app01::>
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+cluster1::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1    admin   -          -          -           -          -
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+3 entries were displayed.
+
+cluster1::> vserver create -vserver
+  <vserver name>              Vserver
+cluster1::> vserver create -vserver uslv-vfsx-cf10-dmz -subtype default -rootvolume uslv_vfsx_cf10_dmz_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+[Job 385] Job succeeded:
+Vserver creation completed.
+
+cluster1::> vserver create -vserver uslv-vfsx-sdb10-dmz -subtype default -rootvolume uslv_vfsx_sdb10_dmz_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+[Job 386] Job succeeded:
+Vserver creation completed.
+
+cluster1::> vserver show                                                                                                                                                                                                                          Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1    admin   -          -          -           -          -
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+uslv-vfsx-cf10-dmz
+            data    default    running    running     uslv_vfsx_ cluster1_
+                                                      cf10_dmz_  01_ssd_1
+                                                      root
+uslv-vfsx-sdb10-dmz
+            data    default    running    running     uslv_vfsx_ cluster1_
+                                                      sdb10_dmz_ 02_sata_1
+                                                      root
+5 entries were displayed.
+
+cluster1::> aggr show
+
+
+Aggregate     Size Available Used% State   #Vols  Nodes            RAID Status
+--------- -------- --------- ----- ------- ------ ---------------- ------------
+aggr0_cluster1_01
+           24.30GB    1.18GB   95% online       1 cluster1-01      raid_dp,
+                                                                   normal
+aggr0_cluster1_02
+           24.30GB    1.18GB   95% online       1 cluster1-02      raid_dp,
+                                                                   normal
+cluster1_01_ssd_1
+           281.3GB   281.3GB    0% online       1 cluster1-01      raid_dp,
+                                                                   normal
+cluster1_02_sata_1
+           281.3GB   281.3GB    0% online       1 cluster1-02      raid_dp,
+                                                                   normal
+4 entries were displayed.
+
+cluster1::> nfs show
+This table is currently empty.
+
+cluster1::> nfs create -vserver uslv-vfsx-
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> nfs create -vserver uslv-vfsx-cf10-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled -v4.0-read-delegation disabled -v4.0-write-delegation disabled
+
+cluster1::> nfs create -vserver uslv-vfsx-
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> nfs create -vserver uslv-vfsx-sdb10-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled -v4.0-read-delegation disabled -v4.0-write-delegation disabled
+
+cluster1::> cifs show
+This table is currently empty.
+
+cluster1::> dns
+    check          create         delete         dynamic-update hosts
+    modify         show
+
+cluster1::> dns create -vserver uslv-vfsx-
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> dns create -vserver uslv-vfsx-cf10-dmz -domains
+  <text>                      Domains
+cluster1::>
+cluster1::>
+cluster1::>
+cluster1::>
+cluster1::>
+cluster1::>
+cluster1::> net int show
+  (network interface show)
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+Cluster
+            cluster1-01_clus1
+                         up/up    169.254.142.216/16 cluster1-01   e0a     true
+            cluster1-01_clus2
+                         up/up    169.254.202.119/16 cluster1-01   e0b     true
+            cluster1-02_clus1
+                         up/up    169.254.229.53/16  cluster1-02   e0a     true
+            cluster1-02_clus2
+                         up/up    169.254.77.62/16   cluster1-02   e0b     true
+cluster1
+            Intercluster_LIF1
+                         up/up    192.168.0.105/24   cluster1-01   e0f     true
+            Intercluster_LIF2
+                         up/up    192.168.0.106/24   cluster1-02   e0c     true
+            cluster1-01_mgmt1
+                         up/up    192.168.0.111/24   cluster1-01   e0c     true
+            cluster1-02_mgmt1
+                         up/up    192.168.0.112/24   cluster1-02   e0c     true
+            cluster_mgmt up/up    192.168.0.101/24   cluster1-01   e0c     true
+9 entries were displayed.
+
+cluster1::>
+cluster1::>
+cluster1::>
+cluster1::> net int
+    capacity        check           create          delete
+    failover-groups migrate         migrate-all     modify
+    rename          revert          service         service-policy
+    show
+
+cluster1::> net int create -vserver
+    Cluster             cluster1            cluster1-01
+    cluster1-02         uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif
+  <lif-name>                  Logical Interface Name
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address
+  <IP Address>                Network Address
+cluster1::> net int create -vserver
+    Cluster             cluster1            cluster1-01
+    cluster1-02         uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif
+  <lif-name>                  Logical Interface Name
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address
+  <IP Address>                Network Address
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address 192.168.0.108 -netmask
+  <IP Address>                Netmask
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address 192.168.0.108 -netmask
+  <IP Address>                Netmask
+
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address 192.168.0.108 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0c -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -
+    -dns-zone                 -listen-for-dns-query
+    -comment                  -force-subnet-association
+    -broadcast-domain
+cluster1::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address 192.168.0.108 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0c -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+cluster1::> net interface show
+  (network interface show)
+            Logical    Status     Network            Current       Current Is
+Vserver     Interface  Admin/Oper Address/Mask       Node          Port    Home
+----------- ---------- ---------- ------------------ ------------- ------- ----
+Cluster
+            cluster1-01_clus1
+                         up/up    169.254.142.216/16 cluster1-01   e0a     true
+            cluster1-01_clus2
+                         up/up    169.254.202.119/16 cluster1-01   e0b     true
+            cluster1-02_clus1
+                         up/up    169.254.229.53/16  cluster1-02   e0a     true
+            cluster1-02_clus2
+                         up/up    169.254.77.62/16   cluster1-02   e0b     true
+cluster1
+            Intercluster_LIF1
+                         up/up    192.168.0.105/24   cluster1-01   e0f     true
+            Intercluster_LIF2
+                         up/up    192.168.0.106/24   cluster1-02   e0c     true
+            cluster1-01_mgmt1
+                         up/up    192.168.0.111/24   cluster1-01   e0c     true
+            cluster1-02_mgmt1
+                         up/up    192.168.0.112/24   cluster1-02   e0c     true
+            cluster_mgmt up/up    192.168.0.101/24   cluster1-01   e0c     true
+uslv-vfsx-cf10-dmz
+            lif_cf       up/up    192.168.0.108/24   cluster1-01   e0c     true
+10 entries were displayed.
+
+cluster1::> dns create -vserver uslv-vfsx-
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> dns create -vserver uslv-vfsx-cf10-dmz -domains
+  <text>                      Domains
+cluster1::> dns create -vserver uslv-vfsx-cf10-dmz -domains demo.netapp.com -name-servers
+  <IP Address>                Name Servers
+cluster1::> dns create -vserver uslv-vfsx-cf10-dmz -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true
+
+cluster1::> cifs c
+    character-mapping check             connection        create
+
+cluster1::> cifs create -vserver uslv-vfsx-
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> cifs create -vserver uslv-vfsx-cf10-dmz -cifs-server
+  <NetBIOS>                   CIFS Server NetBIOS Name
+cluster1::> cifs create -vserver uslv-vfsx-cf10-dmz -cifs-server uslv-vfsx-cf10 -domain
+  <TextNoCase>                Fully Qualified Domain Name
+cluster1::> cifs create -vserver uslv-vfsx-cf10-dmz -cifs-server uslv-vfsx-cf10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -vs
+
+Error: invalid argument "-vs"
+cluster1::> cifs create -vserver uslv-vfsx-cf10-dmz -cifs-server uslv-vfsx-cf10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -v
+
+Error: invalid argument "-v"
+cluster1::> cifs create -vserver uslv-vfsx-cf10-dmz -cifs-server uslv-vfsx-cf10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-cf10-dmz -smb1-enabled true" to enable it.
+
+cluster1::>
+cluster1::>
+cluster1::> dns create -domains
+  <text>                      Domains
+cluster1::> dns create -domains demo.netapp.com -name-servers
+  <IP Address>                Name Servers
+cluster1::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -
+    -vserver                -skip-config-validation
+cluster1::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-sdb10-dmz
+
+cluster1::> cifs
+    add-netbios-aliases    branchcache            character-mapping
+    check                  connection             create
+    delete                 domain                 group-policy
+    home-directory         modify                 nbtstat
+    options                remove-netbios-aliases security
+    session                share                  show
+    start                  stop                   symlink
+    users-and-groups
+
+cluster1::> cifs create -cifs-server
+  <NetBIOS>                   CIFS Server NetBIOS Name
+cluster1::> cifs create -cifs-server  uslv-vfsx-sdb10 -domain
+  <TextNoCase>                Fully Qualified Domain Name
+cluster1::> cifs create -cifs-server  uslv-vfsx-sdb10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver  uslv-vfsx-sdb10-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Error: Machine account creation procedure failed
+  [  0 ms] Trying to create machine account 'USLV-VFSX-SDB10' in
+           'DEMO.NETAPP.COM' for Vserver 'uslv-vfsx-sdb10-dmz'
+  [     4] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+**[    14] FAILURE: Unable to contact DNS to discover domain
+**         controllers.
+  [    14] Unable to connect to any (0) domain controllers.
+  [    18] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+  [    19] Unable to contact DNS to discover domain controllers.
+  [    22] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+  [    23] Unable to contact DNS to discover domain controllers.
+  [    25] Failed to connect to 192.168.0.253 for DNS: Network is
+           unreachable
+  [    27] Unable to contact DNS to discover domain controllers.
+  [    27] No servers available for MS_LDAP_AD, vserver: 4, domain:
+           DEMO.NETAPP.COM.
+
+Error: command failed: Failed to create the Active Directory machine account "USLV-VFSX-SDB10". Reason: SecD Error: no server available.
+
+cluster1::> net interface
+    capacity        check           create          delete
+    failover-groups migrate         migrate-all     modify
+    rename          revert          service         service-policy
+    show
+
+cluster1::> net interface create -vserver
+    Cluster             cluster1            cluster1-01
+    cluster1-02         uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+cluster1::> net interface create -vserver uslv-vfsx-sdb10-dmz -lif
+  <lif-name>                  Logical Interface Name
+cluster1::> net interface create -vserver uslv-vfsx-sdb10-dmz -lif lif_sdb -service-policy default-data-files -address
+  <IP Address>                Network Address
+cluster1::> net interface create -vserver uslv-vfsx-sdb10-dmz -lif lif_sdb -service-policy default-data-files -address 192.168.0.109 -netmask
+  <IP Address>                Netmask
+cluster1::> net interface create -vserver uslv-vfsx-sdb10-dmz -lif lif_sdb -service-policy default-data-files -address 192.168.0.109 -netmask
+  <IP Address>                Netmask
+
+cluster1::> net interface create -vserver uslv-vfsx-sdb10-dmz -lif lif_sdb -service-policy default-data-files -address 192.168.0.109 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0f -status-admin up
+  (network interface create)
+
+cluster1::> cifs create -cifs-server  uslv-vfsx-sdb10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver  uslv-vfsx-sdb10-dmz                                         
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-sdb10-dmz -smb1-enabled true" to enable it.
+
+cluster1::>
