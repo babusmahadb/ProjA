@@ -76,18 +76,22 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
             if (pref == "daily" and cnt == 7):
                 snap_list.append(snap_policy)
     
-    if smirror == "y":
-        
-        typ = "dp"
-        lang = svm_lang
-        snapshot_policy = "none"
-        smirror == "n"
-        
-    else:
-        typ = "rw"
-        lang = svm_lang
-        print()    
-        snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")    
+    #if smirror == "y":
+    #    
+    #    typ = "dp"
+    #    lang = svm_lang
+    #    snapshot_policy = "none"
+    #    path = ""
+    #    smirror == "n"
+    #    clus_name = ARGS.cluster
+    #    svmname = ARGS.svm_name
+    #    aggrname = ARGS.aggr
+    #    
+    #else:
+    #typ = "rw"
+    #    lang = svm_lang
+    print()    
+    snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")    
     
     vol_url = "https://{}/api/storage/volumes/?return_timeout=30".format(clus_name)
     vol_data = {
@@ -187,20 +191,22 @@ def parse_args() -> argparse.Namespace:
 def get_exp_id(exp_name: str, headers_inc: str):
     """ Get's Export Policy ID using policy name """
     
+    #print("clus_name,exp_name",clus_name,exp_name)
     exp_id_url = "https://{}/api/protocols/nfs/export-policies/?name={}".format(clus_name,exp_name)
     response = requests.get(exp_id_url, headers=headers_inc, verify=False)
     exp_id_res = response.json()
     
     exp_id_dt = dict(exp_id_res)
+    #print("exp_id_dt",exp_id_dt)
     exp_id_rd = exp_id_dt['records']
-    
+    #print("exp_id_rd",exp_id_rd)
     for i in exp_id_rd:
         pid = dict(i)
-        print("pid ",pid)
+        #print("pid ",pid)
     
-    exp_id = pid['id']
+    expt_id = pid['id']
                 
-    return  exp_id           
+    return  expt_id           
 
 
 def crt_add_rule(rest_client: str, exp_id: str, headers_inc: str):
@@ -238,7 +244,7 @@ def crt_add_rule(rest_client: str, exp_id: str, headers_inc: str):
 def crt_pol_rule(client: str, headers_inc: str):
     """ creates export policy name and rule index 1 """
     anon = "65534"
-    
+    #print("exp_name,vol_name,clus_name", exp_name,vol_name,clus_name)
     exp_data = {
         "name": exp_name,
         "rules": [
@@ -273,6 +279,7 @@ def crt_pol_rule(client: str, headers_inc: str):
         
         print(err)
         sys.exit(1)
+    #print("exp_res",exp_res) 
     print()
     print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+client+"'.")
     print()
@@ -485,6 +492,7 @@ if __name__ == "__main__":
     vol_size = ARGS.volsize
     smirror = ARGS.sm
     svault = ARGS.sv
+    typ = "rw"
     
     volume_size = get_size(vol_size)   
     
@@ -526,7 +534,7 @@ if __name__ == "__main__":
     svmd = get_svm()
     svm_uuid = svmd[0]
     svm_lang = svmd[1]
-    
+    lang = svm_lang
     print()    
     task_id = input("Enter a valid and approved Task number:")
     
@@ -552,38 +560,6 @@ if __name__ == "__main__":
     SRSC = 10
     
 
-    if smirror == "y":
-        
-        print()
-        peer_clus = input("Enter a Target Cluster name/IP for SnapMirror Configuration: ")
-        peer_svm = input("Enter a Target SVM Name: ")
-        peer_aggr = input("Enter a Target Aggregate Name: ")
-        print()
-        
-        clus_name = peer_clus
-        vol_name = vol_name+"_mir"
-        exp_name = vol_name
-        
-        #crt_exp(exp_name, headers)
-        
-        aggrname = peer_aggr
-        svmname = peer_svm
-        #snapshot_policy = "default"
-        
-        crt_exp(exp_name, headers)
-        
-        if (ARGS.proto == "nfs" or ARGS.proto == "multi"):
-            SecStyle = "unix"
-        elif ARGS.proto == "cifs":
-            SecStyle = "ntfs"
-        else:
-            print("Invalid protocal, should be nfs, cifs or multi")
-            sys.exit()
-            
-        crt_vol(volume_size, SecStyle, headers)
-        
-        #crt_estab_snpmir()
-        
     if ( ARGS.proto == "nfs" or ARGS.proto == "multi"):
         
         exp_name = vol_name+"_ip"
@@ -649,3 +625,44 @@ if __name__ == "__main__":
         print("Invalid protocal, should be nfs, cifs or multi")
         sys.exit()
         
+
+    if smirror == "y":
+        
+        print()
+        peer_clus = input("Enter a Target Cluster name/IP for SnapMirror Configuration: ")
+        peer_svm = input("Enter a Target SVM Name: ")
+        peer_aggr = input("Enter a Target Aggregate Name: ")
+        print()
+        
+        typ = "dp" 
+        lang = svm_lang
+        snapshot_policy = "none"
+        path = ""
+                
+        clus_name = peer_clus
+        svmname = peer_svm
+        aggrname = peer_aggr
+        
+        vol_name = vol_name+"_mir"
+        
+        psvmd=get_svm()
+        svm_uuid = psvmd[0]
+        #svm_lang = psvmd[1]
+        exp_name = vol_name
+        
+        aggrname = peer_aggr
+        svmname = peer_svm
+        
+        crt_exp(exp_name, headers)
+        
+        if (ARGS.proto == "nfs" or ARGS.proto == "multi"):
+            SecStyle = "unix"
+        elif ARGS.proto == "cifs":
+            SecStyle = "ntfs"
+        else:
+            print("Invalid protocal, should be nfs, cifs or multi")
+            sys.exit()
+            
+        crt_vol(volume_size, SecStyle, headers)
+        
+        #crt_estab_snpmir()
