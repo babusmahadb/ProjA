@@ -934,3 +934,113 @@ Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it 
 (privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-sdb10-dmz -smb1-enabled true" to enable it.
 
 cluster1::>
+
+############################################################################################################################################################################################
+
+
+site01-pfsx-app01::> vservserver create -vserver uslv-vfsx-cf10-dmz -subtype default -rootvolume uslv_vfsx_cf10_dmz_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+
+Error: "vservserver" is not a recognized command
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-cf10-dmz -subtype default -rootvolume uslv_vfsx_cf10_dmz_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+[Job 204] Job succeeded:
+Vserver creation completed.
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-sdb10-dmz -subtype default -rootvolume uslv_vfsx_sdb10_dmz_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+[Job 205] Job succeeded:
+Vserver creation completed.
+
+site01-pfsx-app01::> nfs create -vserver uslv-vfsx-cf10-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled -v4.0-read-delegation disabled -v4.0-write-delegation disabled
+
+site01-pfsx-app01::> nfs create -vserver uslv-vfsx-sdb10-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled -v4.0-read-delegation disabled -v4.0-write-delegation disabled
+
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-cf10-dmz -lif lif_cf -service-policy default-data-files -address 192.168.0.108 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0c -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+site01-pfsx-app01::> dns create -vserver uslv-vfsx-cf10-dmz -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true
+
+site01-pfsx-app01::> cifs create -vserver uslv-vfsx-cf10-dmz -cifs-server uslv-vfsx-cf10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-cf10-dmz -smb1-enabled true" to enable it.
+
+site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-sdb10-dmz
+
+site01-pfsx-app01::> net interface create -vserver uslv-vfsx-sdb10-dmz -lif lif_sdb -service-policy default-data-files -address 192.168.0.109 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0f -status-admin up
+  (network interface create)
+
+site01-pfsx-app01::> cifs create -cifs-server  uslv-vfsx-sdb10 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver  uslv-vfsx-sdb10-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-sdb10-dmz -smb1-enabled true" to enable it.
+
+site01-pfsx-app01::>
+site01-pfsx-app01::>
+site01-pfsx-app01::> vserver show
+                               Admin      Operational Root
+Vserver     Type    Subtype    State      State       Volume     Aggregate
+----------- ------- ---------- ---------- ----------- ---------- ----------
+cluster1-01 node    -          -          -           -          -
+cluster1-02 node    -          -          -           -          -
+site01-pfsx-app01
+            admin   -          -          -           -          -
+uslv-vfsx-cf10-dmz
+            data    default    running    running     uslv_vfsx_ aggr5_
+                                                      cf10_dmz_  cluster1_
+                                                      root       ssd
+uslv-vfsx-sdb10-dmz
+            data    default    running    running     uslv_vfsx_ aggr6_
+                                                      sdb10_dmz_ cluster1_
+                                                      root       sata
+5 entries were displayed.
+
+site01-pfsx-app01::> iscsi show
+This table is currently empty.
+
+site01-pfsx-app01::> iscsi create -vserver uslv-vfsx-
+    uslv-vfsx-cf10-dmz  uslv-vfsx-sdb10-dmz
+site01-pfsx-app01::> iscsi create -vserver uslv-vfsx-cf10-dmz
+
+site01-pfsx-app01::> iscsi create -vserver uslv-vfsx-sdb10-dmz
+
+site01-pfsx-app01::> iscsi show
+           Target                           Target                       Status
+Vserver    Name                             Alias                        Admin
+---------- -------------------------------- ---------------------------- ------
+uslv-vfsx-cf10-dmz
+           iqn.1992-08.com.netapp:sn.c619f90adc2411ecb4e4005056b08ed8:vs.3
+                                            uslv-vfsx-cf10-dmz           up
+uslv-vfsx-sdb10-dmz
+           iqn.1992-08.com.netapp:sn.ceb7db51dc2411ecb4e4005056b08ed8:vs.4
+                                            uslv-vfsx-sdb10-dmz          up
+2 entries were displayed.
+
+site01-pfsx-app01::> vserver show -fields allowed-protocols
+vserver     allowed-protocols
+----------- -----------------
+cluster1-01 -
+cluster1-02 -
+site01-pfsx-app01
+            -
+uslv-vfsx-cf10-dmz
+            nfs,cifs,fcp,iscsi,ndmp
+uslv-vfsx-sdb10-dmz
+            nfs,cifs,fcp,iscsi,ndmp
+5 entries were displayed.
+
+site01-pfsx-app01::>
+

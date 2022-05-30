@@ -83,6 +83,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
         aggr = tmp['records']
 
         for i in aggr:
+            #print("Val of i", i)
             r = r + 1
             aggr_uuid = i['uuid']
             url = "https://{}/api/storage/aggregates/{}".format(cluster,aggr_uuid)
@@ -395,7 +396,7 @@ def get_clus_peer(cluster: str, headers_inc: str):
     print("Peer Cluster for "+str(cluster)+" is "+str(cls_lst)+".")
     print()
     
-    return cls_pr_lt
+    return cls_lst
         
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
@@ -440,13 +441,41 @@ def parse_args() -> argparse.Namespace:
 
     return parsed_args
 
-#def prmt():
-#    
-#    peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration: ")
-#    
-#    return peer_clus
-#                
-                
+def snpchk(clstr: str, headers: str):
+        
+    print()
+    clus_peer = get_clus_peer(clstr, headers)
+    
+    #print("Cluster/SVM Peer", clus_peer, svm_peer)
+    
+    while True:
+        
+        peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration[Can be - uspa-pfsx-cf01, usas-pfsx-nps01]: ")
+        
+        if peer_clus in clus_peer:
+            dsktype = ['sas','ssd','sata']
+            peer_aggr_list = list_aggregate(peer_clus,dsktype,headers)
+            svm_p = svm_peer(clstr, peer_clus, headers)
+            break
+        else:
+            print()
+            print("Entered Cluster is not peered with Source Cluster, Try these Cluster name: ", clus_peer)
+            continue
+    print()
+    print("Source Cluster/SVM "+str(clstr)+"/"+str(aggr_list)+" Peered with "+str(peer_clus)+"/"+str(svm_p)+".")
+    print()
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    
 if __name__ == "__main__":
 
     logging.basicConfig(
@@ -479,6 +508,8 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
+                if smirror == "y":
+                    snpchk(clstr, headers)
                 #svm_list = list_svm(clstr, headers)
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
@@ -489,6 +520,8 @@ if __name__ == "__main__":
         clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_name:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
+                if smirror == "y":
+                    snpchk(clstr, headers)
                 #svm_list = list_svm(clstr, headers)
     else:
         print()
@@ -497,28 +530,7 @@ if __name__ == "__main__":
 
     #clus_peer = get_clus_peer(clstr, headers)
     
-    if smirror == "y":
-        
-        print()
-        clus_peer = get_clus_peer(clstr, headers)
-        #svm_peer = svm_peer(clstr, clus_peer, headers)
-        #print("Cluster/SVM Peer", clus_peer, svm_peer)
-        
-        while True:
-            
-            peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration[Can be - uspa-pfsx-cf01, usas-pfsx-nps01]: ")
-            
-            if peer_clus in clus_peer:
-                dsktype = ['sas','ssd','sata']
-                peer_aggr_list = list_aggregate(peer_clus,dsktype,headers)
-                svm_peer = svm_peer(clstr, peer_clus, headers)
-                break
-            else:
-                print()
-                print("Entered Cluster is not peered with Source Cluster, Try these Cluster name: ", clus_peer)
-                continue
-        print()
-        print("Source Cluster/SVM "+str(clstr)+"/"+str(aggr_list)+" Peered with "+str(clus_peer)+"/"+str(svm_peer)+".")
-        print()
+
+
 
 

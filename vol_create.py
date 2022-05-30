@@ -58,7 +58,7 @@ def check_job_status(job_status: str, headers_inc: str):
 def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     """Module to create a volume"""
         
-    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=4hourly&copies.count=6".format(clus_name,svmname)
+    snap_url = "https://{}/api/storage/snapshot-policies?copies.snapmirror_label=daily&name=*default*&copies.prefix=4hourly&copies.count=6".format(clus_name)
     response = requests.get(snap_url, headers = headers, verify=False)
     snap_res = response.json()
     
@@ -75,14 +75,27 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
             cnt = j['count']
             if (pref == "daily" and cnt == 7):
                 snap_list.append(snap_policy)
-    print()    
-    snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")    
+    
+    if smirror == "y":
+        
+        typ = "dp"
+        lang = svm_lang
+        snapshot_policy = "none"
+        smirror == "n"
+        
+    else:
+        typ = "rw"
+        lang = svm_lang
+        print()    
+        snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")    
     
     vol_url = "https://{}/api/storage/volumes/?return_timeout=30".format(clus_name)
     vol_data = {
         "aggregates.name": [aggrname],
         "svm.name": svmname,
         "name": vol_name,
+        "type": typ,
+        "language": lang,
         "size": volume_size,
         "comment": task_id,
          
@@ -183,6 +196,7 @@ def get_exp_id(exp_name: str, headers_inc: str):
     
     for i in exp_id_rd:
         pid = dict(i)
+        print("pid ",pid)
     
     exp_id = pid['id']
                 
@@ -507,14 +521,7 @@ if __name__ == "__main__":
     
     res = re.sub(r'[0-9]+$', lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}",vid)
     
-    if smirror == "y":
-        
-        print()
-        peer_clus = input("Enter a Valid target Cluster name/IP for SnapMirror Configuration: ")
-        
-        crt_tgt_vol()
-        
-        crt_estab_snpmir()
+    
        
     svmd = get_svm()
     svm_uuid = svmd[0]
@@ -523,6 +530,8 @@ if __name__ == "__main__":
     print()    
     task_id = input("Enter a valid and approved Task number:")
     
+    
+        
     #svm_tag = svmname[-4:]
     svm_tag = svmname.split("-")
     if len(svm_tag) == 0:
@@ -541,6 +550,39 @@ if __name__ == "__main__":
     Ext_Vol_Style = "flexvol"
     #Space Reserved for Snapshot Copies
     SRSC = 10
+    
+
+    if smirror == "y":
+        
+        print()
+        peer_clus = input("Enter a Target Cluster name/IP for SnapMirror Configuration: ")
+        peer_svm = input("Enter a Target SVM Name: ")
+        peer_aggr = input("Enter a Target Aggregate Name: ")
+        print()
+        
+        clus_name = peer_clus
+        vol_name = vol_name+"_mir"
+        exp_name = vol_name
+        
+        #crt_exp(exp_name, headers)
+        
+        aggrname = peer_aggr
+        svmname = peer_svm
+        #snapshot_policy = "default"
+        
+        crt_exp(exp_name, headers)
+        
+        if (ARGS.proto == "nfs" or ARGS.proto == "multi"):
+            SecStyle = "unix"
+        elif ARGS.proto == "cifs":
+            SecStyle = "ntfs"
+        else:
+            print("Invalid protocal, should be nfs, cifs or multi")
+            sys.exit()
+            
+        crt_vol(volume_size, SecStyle, headers)
+        
+        #crt_estab_snpmir()
         
     if ( ARGS.proto == "nfs" or ARGS.proto == "multi"):
         
