@@ -438,7 +438,7 @@ def crt_share(svm_uuid: str, headers_inc: str):
         print(err)
         sys.exit(1)
     print()
-    print("CIFS share '"+share_name+"' create with path "+path+".")
+    print("CIFS share '"+share_name+"' created with path "+path+".")
         
 
 
@@ -465,6 +465,20 @@ def get_svm():
         
     return svm_uuid,svm_lang    
  
+def mnt_vol(vol_name: str, headers: str):
+
+    mnt_obj = {
+        "nas": {
+            "path": path
+            }
+        }
+
+    mnt_url = "https://{}/api/storage/volumes?name={}".format(clus_name,vol_name)
+    response = requests.patch(mnt_url, headers=headers, json=mnt_obj, verify=False)
+    mnt_json = response.json()
+    
+    #print(mnt_json)
+
     
 if __name__ == "__main__":
     
@@ -576,7 +590,8 @@ if __name__ == "__main__":
     
         #Export Policy: cifs-default or default
         cifs_exp_name = []
-        cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs&svm.name={}".format(clus_name,svmname)
+        #cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs&svm.name={}".format(clus_name,svmname)
+        cifs_exp_url = "https://{}/api/protocols/nfs/export-policies?name=*default*&rules.protocols=cifs".format(clus_name)
         try:
             response = requests.get(cifs_exp_url, headers=headers, verify=False)
             cifs_exp_res = response.json()
@@ -657,12 +672,21 @@ if __name__ == "__main__":
         
         if (ARGS.proto == "nfs" or ARGS.proto == "multi"):
             SecStyle = "unix"
+            crt_vol(volume_size, SecStyle, headers)
+            #crt_estab_snpmir()
+            path = "/"+vol_name
+            mnt_vol(vol_name, headers)
         elif ARGS.proto == "cifs":
             SecStyle = "ntfs"
+            crt_vol(volume_size, SecStyle, headers)
+            #crt_estab_snpmir()
+            path = "/"+vol_name
+            mnt_vol(vol_name, headers)
+            crt_share(svm_uuid, headers)
         else:
             print("Invalid protocal, should be nfs, cifs or multi")
             sys.exit()
             
-        crt_vol(volume_size, SecStyle, headers)
+        
         
         #crt_estab_snpmir()
