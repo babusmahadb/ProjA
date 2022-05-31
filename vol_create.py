@@ -76,20 +76,6 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
             if (pref == "daily" and cnt == 7):
                 snap_list.append(snap_policy)
     
-    #if smirror == "y":
-    #    
-    #    typ = "dp"
-    #    lang = svm_lang
-    #    snapshot_policy = "none"
-    #    path = ""
-    #    smirror == "n"
-    #    clus_name = ARGS.cluster
-    #    svmname = ARGS.svm_name
-    #    aggrname = ARGS.aggr
-    #    
-    #else:
-    #typ = "rw"
-    #    lang = svm_lang
     print()    
     snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")    
     
@@ -477,8 +463,63 @@ def mnt_vol(vol_name: str, headers: str):
     response = requests.patch(mnt_url, headers=headers, json=mnt_obj, verify=False)
     mnt_json = response.json()
     
-    #print(mnt_json)
+    print(mnt_json)
 
+def crt_estab_snpmir(tgt_clus: str, headers: str):
+    
+    dataobj = {}
+    src = src_svm+":"+src_vol
+    dst = tgt_svm+":"+tgt_vol
+    dataobj['source'] = {"path": src}
+    dataobj['destination'] = {"path": dst}
+       
+    #print(dataobj)
+
+    smc_url = "https://{}/api/snapmirror/relationships/".format(tgt_clus)
+    try:
+        response = requests.post(smc_url,headers=headers,json=dataobj, verify=False)
+    except requests.exceptions.HTTPError as err:
+        print(str(err))
+        sys.exit(1)
+    except requests.exceptions.RequestException as err:
+        print(str(err))
+        sys.exit(1)
+    smc_res = response.json()
+    #print(smc_res)
+    if 'error' in smc_res:
+        print(smc_res)
+        sys.exit(1)
+
+    
+    sm_url = "https://{}/api/snapmirror/relationships?source.path={}".format(tgt_clus, src)
+    response = requests.get(sm_url,headers=headers, verify=False)
+    sm_res = response.json()
+    
+    sm_dt = dict(sm_res)
+    sm_rd = sm_dt['records']
+    
+    for id in sm_rd:
+        smuuid = id['uuid']
+    
+    dataobj['state'] = "snapmirrored"
+    
+    smi_url = "https://{}/api/snapmirror/relationships/{}".format(tgt_clus,smuuid)
+    try:
+        response = requests.patch(smi_url,headers=headers,json=dataobj, verify=False)
+    except requests.exceptions.HTTPError as err:
+        print(str(err))
+        sys.exit(1)
+    except requests.exceptions.RequestException as err:
+        print(str(err))
+        sys.exit(1)
+    smi_res = response.json()
+    #print(smi_res)
+    if 'error' in smi_res:
+        print(smi_res)
+        sys.exit(1)
+    time.sleep(30)    
+
+    
     
 if __name__ == "__main__":
     
@@ -653,12 +694,19 @@ if __name__ == "__main__":
         lang = svm_lang
         snapshot_policy = "none"
         path = ""
+        
+        src_clus = clus_name
+        src_svm = svmname
+        src_vol = vol_name
                 
         clus_name = peer_clus
         svmname = peer_svm
         aggrname = peer_aggr
         
         vol_name = vol_name+"_mir"
+        tgt_clus = clus_name
+        tgt_svm = svmname
+        tgt_vol = vol_name
         
         psvmd=get_svm()
         svm_uuid = psvmd[0]
@@ -673,16 +721,17 @@ if __name__ == "__main__":
         if (ARGS.proto == "nfs" or ARGS.proto == "multi"):
             SecStyle = "unix"
             crt_vol(volume_size, SecStyle, headers)
-            #crt_estab_snpmir()
+            crt_estab_snpmir(tgt_clus, headers)
             path = "/"+vol_name
-            #mnt_vol(vol_name, headers)
+            mnt_vol(vol_name, headers)
         elif ARGS.proto == "cifs":
             SecStyle = "ntfs"
             crt_vol(volume_size, SecStyle, headers)
-            #crt_estab_snpmir()
-            path = "/"+vol_name
-            #mnt_vol(vol_name, headers)
             crt_share(svm_uuid, headers)
+            crt_estab_snpmir(tgt_clus, headers)
+            path = "/"+vol_name
+            mnt_vol(vol_name, headers)
+            
         else:
             print("Invalid protocal, should be nfs, cifs or multi")
             sys.exit()
