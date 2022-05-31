@@ -675,13 +675,13 @@ if __name__ == "__main__":
             crt_vol(volume_size, SecStyle, headers)
             #crt_estab_snpmir()
             path = "/"+vol_name
-            mnt_vol(vol_name, headers)
+            #mnt_vol(vol_name, headers)
         elif ARGS.proto == "cifs":
             SecStyle = "ntfs"
             crt_vol(volume_size, SecStyle, headers)
             #crt_estab_snpmir()
             path = "/"+vol_name
-            mnt_vol(vol_name, headers)
+            #mnt_vol(vol_name, headers)
             crt_share(svm_uuid, headers)
         else:
             print("Invalid protocal, should be nfs, cifs or multi")
