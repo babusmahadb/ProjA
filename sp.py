@@ -49,14 +49,13 @@ def find_clstr(site: str, envir: str, domain: str):
                     elif domain in val:
                         op = ''.join(val)
                         output.append(op)
-    #print(output)
+    print(output)
     return output
     
 def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
     """Lists the Aggregate"""
     print()
-    #print("List of Aggregates on ",cluster)
-    #print("==========================================")
+    
     r=0
     tab = tt.Texttable()
     header = ['Cluster Name','VServer Name','Aggr name','Size(GB)','Available(GB)','Used %']
@@ -83,7 +82,6 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
         aggr = tmp['records']
 
         for i in aggr:
-            #print("Val of i", i)
             r = r + 1
             aggr_uuid = i['uuid']
             url = "https://{}/api/storage/aggregates/{}".format(cluster,aggr_uuid)
@@ -102,14 +100,11 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             size = (((int(tmp3['size'])/1024)/1024)/1024)
             used = (((int(tmp3['used'])/1024)/1024)/1024)
             uip = (used * 100)/size
-            #uip = int(uip)
             aggr_name = i['name']
             svm_name = list_svm(cluster, headers)
-            #print("svm_name is ", svm_name)
             tab.add_row([cluster,svm_name,aggr_name,size,avail,uip])
             tab.set_cols_width([20,25,35,15,15,10])
             tab.set_cols_align(['c','c','c','c','c','c'])
-        #print("Number of Storage VMs on this NetApp cluster :{}".format(ctr))
     setdisplay = tab.draw()
     print(setdisplay)
     
@@ -126,7 +121,6 @@ def sort_svm(cluster: str, headers_inc: str):
     vservers = tmp['records']
     
     for i in vservers:
-        #print(i)
         ctr = ctr + 1
         if i is False:
             print("Vserver can't be sorted for app "+apps+", select one of different app value", app_list)
@@ -134,11 +128,9 @@ def sort_svm(cluster: str, headers_inc: str):
         if services == 'nfs':
             sort_name = i['name']
             tmp_n.append(sort_name)
-            #print("fn sort_svm sort_name", sort_name)
             if apps in app_list:
                 if apps in sort_name:
                     sort_row.append(sort_name)
-                    #print("fn sort_svm - sort_row", sort_row) 
             else:
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
@@ -156,7 +148,6 @@ def sort_svm(cluster: str, headers_inc: str):
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
         else:
-            
             tmp=dict(i)
             tmp1 = tmp['svm']
             tmp3 = dict(tmp1)
@@ -168,16 +159,11 @@ def sort_svm(cluster: str, headers_inc: str):
             else:
                 print("provide valid -app value, it must be one of ",app_list)
                 sys.exit(1)
-            #sort_name = i['name']
+    
     tmp_n = set(tmp_n)
     tmp_n = list(tmp_n)
-    #print("tmp_n",tmp_n)
     sort_row = tmp_n
     
-    #print("tmp list", tmp_n)
-    #print("sort row value",sort_row)
-        
-            
     return sort_row 
 
     
@@ -191,11 +177,9 @@ def list_svm(cluster: str, headers_inc: str):
         host_subnet = '.'.join(host_ip_add[0:3])
     except socket.gaierror as err:
         host_subnet = "127.0.0"
-        
-                
+    
     ctr = 0
     tmp = dict(get_vservers(cluster, headers_inc))
-    #print(" tmp of list_svm ", tmp, ctr)
     vservers = tmp['records']
     srt = clus = []
     row = []
@@ -203,7 +187,6 @@ def list_svm(cluster: str, headers_inc: str):
         ctr = ctr + 1
         if services == 'nfs':
             clus = i['name']
-            #print("fn list_svm - clus",clus)
             try:
                 svm_ip_add = socket.gethostbyname(clus).split('.')
                 svm_subnet = '.'.join(svm_ip_add[0:3])
@@ -214,20 +197,13 @@ def list_svm(cluster: str, headers_inc: str):
                 row = [clus+"*"]
                 return row
             srt = sort_svm(cluster, headers_inc)
-            #print("srt output",srt)
-            #clus = list(set(clus) | set(srt))
-            #row = clus
             row = srt
         elif services == 'cifs':
             rcd_dt = dict(i)
             svm_rd = rcd_dt['svm']
             svm_dt = dict(svm_rd)
             clus = svm_dt['name']
-            #clus = list(clus)
             srt = sort_svm(cluster, headers_inc)
-            #print(srt)
-            #print(clus)
-            #clus = list(set(clus) | set(srt))
             row=srt
         elif services == 'iscsi':
             tmp=dict(i)
@@ -235,7 +211,6 @@ def list_svm(cluster: str, headers_inc: str):
             tmp3 = dict(tmp1)
             clus = tmp3['name']
             srt = sort_svm(cluster, headers_inc)
-            #clus = list(set(clus) | set(srt))
             row=srt
         else:
             print("Enter valid protocol")
@@ -256,8 +231,6 @@ def list_svm(cluster: str, headers_inc: str):
 
     for chk in upd_vs:
         adc = auth_dp_chk(cluster,chk,headers_inc)
-        #print(adc)
-
         row_dt = dict(adc)
         chk_ind = row_dt['num_records']
 
@@ -276,13 +249,6 @@ def list_svm(cluster: str, headers_inc: str):
         elif "cf" in k:
             row.append(k)
     
-    #if ARGS.sm == 'y':
-    #    
-    #    row = []
-    #    row = svm_peer
-    #    print("snapm row", row)
-    
-    
     return row
 
 def svm_peer(cluster: str, peer_cluster: str, headers_inc: str):
@@ -295,12 +261,10 @@ def svm_peer(cluster: str, peer_cluster: str, headers_inc: str):
     svm_pr_rd = svm_pr_dt['records']
     
     svm_lst = []
-    
     for r in svm_pr_rd:
         svm_pr_lt = r['name']
-        svm_lst.append(svm_pr_lt)
-        
-    #print("peer svm", svm_lst)
+        if svm_pr_lt not in svm_lst:
+            svm_lst.append(svm_pr_lt)
     
     return svm_lst
 
@@ -310,7 +274,6 @@ def auth_dp_chk(cluster: str, fsvm: str, headers_inc: str):
     url = "https://{}/api/svm/svms?subtype=!dp_destination&name={}&return_timeout=15".format(cluster,fsvm)
     try:
         response = requests.get(url, headers=headers_inc, verify=False)
-        #print(response.json())
     except requests.exceptions.HTTPError as err:
         print(err)
         sys.exit(1)
@@ -328,7 +291,6 @@ def get_vservers(cluster: str, headers_inc: str):
         url = "https://{}/api/svm/svms?{}.enabled=true".format(cluster,services)
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
-            #print(response.json())
         except requests.exceptions.HTTPError as err:
             print(err)
             sys.exit(1)
@@ -337,10 +299,8 @@ def get_vservers(cluster: str, headers_inc: str):
             sys.exit(1)
     elif services == 'cifs':
         url = "https://{}/api/protocols/{}/services?enabled=true".format(cluster,services)
-        
         try:
             response = requests.get(url, headers=headers_inc, verify=False)
-               
         except requests.exceptions.HTTPError as err:
             print(err)
             sys.exit(1)
@@ -361,8 +321,7 @@ def get_vservers(cluster: str, headers_inc: str):
         print()
         print(" Enter Valid protocol, should be nfs, cifs or iscsi")
         sys.exit(1)
-        
-        
+    
     out_response = response.json() 
     
     return out_response
@@ -374,7 +333,6 @@ def get_clus_peer(cluster: str, headers_inc: str):
     cls_pr_url = "https://{}/api/cluster/peers?return_records=true&return_timeout=15".format(cluster)
     try:
         response = requests.get(cls_pr_url, headers=headers_inc, verify=False)
-        #print(response.json())
     except requests.exceptions.HTTPError as err:
         print(err)
         sys.exit(1)
@@ -383,21 +341,44 @@ def get_clus_peer(cluster: str, headers_inc: str):
         sys.exit(1)
     
     cls_pr_json = response.json()
-    
     cls_pr_dt = dict(cls_pr_json)
     cls_pr_rd = cls_pr_dt['records']
     
     cls_lst = []
-    
     for r in cls_pr_rd:
         cls_pr_lt = r['name']
         cls_lst.append(cls_pr_lt)
         
-    print("Peer Cluster for "+str(cluster)+" is "+str(cls_lst)+".")
-    print()
-    
     return cls_lst
-        
+
+
+def get_svm_peer(cluster: str, headers_inc: str):
+    """ get cluster peer details """
+
+    svm_pr_url = "https://{}/api/svm/peers?svm.name=*".format(cluster)
+    try:
+        response = requests.get(svm_pr_url, headers=headers_inc, verify=False)
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        sys.exit(1)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        sys.exit(1)
+    
+    svm_pr_json = response.json()
+    svm_pr_dt = dict(svm_pr_json)
+    svm_pr_rd = svm_pr_dt['records']
+    
+    svm_lst = []
+    for r in svm_pr_rd:
+        b = dict(r)
+        p = b['svm']
+        svm_pr_lt = p['name']
+        if svm_pr_lt not in svm_lst:
+            svm_lst.append(svm_pr_lt)
+    
+    return svm_lst
+    
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
 
@@ -444,10 +425,21 @@ def parse_args() -> argparse.Namespace:
 def snpchk(clstr: str, headers: str):
         
     print()
+        
+    while True:
+        
+        sclus = input("Pick Source Cluster name/IP for SnapMirror Configuration: ")
+        
+        if sclus in clstr_names:
+            clstr = sclus
+            sp = get_svm_peer(clstr, headers)
+            break
+        else:
+            print()
+            print("Entered Cluster is not Source Cluster listed above, Try these Cluster name: ", clstr_names)
+            continue
+            
     clus_peer = get_clus_peer(clstr, headers)
-    
-    #print("Cluster/SVM Peer", clus_peer, svm_peer)
-    
     while True:
         
         peer_clus = input("Enter a Peer Cluster name/IP for SnapMirror Configuration[Can be - uspa-pfsx-cf01, usas-pfsx-nps01]: ")
@@ -462,7 +454,7 @@ def snpchk(clstr: str, headers: str):
             print("Entered Cluster is not peered with Source Cluster, Try these Cluster name: ", clus_peer)
             continue
     print()
-    print("Source Cluster/SVM "+str(clstr)+"/"+str(aggr_list)+" Peered with "+str(peer_clus)+"/"+str(svm_p)+".")
+    print("Source Cluster/SVM "+str(clstr)+"/"+str(sp)+" Peered with "+str(peer_clus)+"/"+str(svm_p)+".")
     print()
 
 class bcolors:
@@ -505,11 +497,17 @@ if __name__ == "__main__":
             else:
                 ARGS.env = 'pfsx'
         
-        clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
-        for clstr in clstr_name:
+        clstr_names = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
+        for clstr in clstr_names:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
                 if smirror == "y":
-                    snpchk(clstr, headers)
+                    cp = get_clus_peer(clstr, headers)
+                    sp = get_svm_peer(clstr, headers)
+                    print()
+                    print("Source Cluster/SVM "+clstr+"/"+str(sp)+" peered with "+str(cp)+".")
+                    print()
+        if smirror == "y":
+            snpchk(clstr, headers)
                 #svm_list = list_svm(clstr, headers)
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
@@ -517,20 +515,23 @@ if __name__ == "__main__":
         else:
             dsktype = ['sata']
         ARGS.env = 'sfsx'
-        clstr_name = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
-        for clstr in clstr_name:
+        clstr_names = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
+        for clstr in clstr_names:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
                 if smirror == "y":
-                    snpchk(clstr, headers)
-                #svm_list = list_svm(clstr, headers)
+                    cp = get_clus_peer(clstr, headers)
+                    sp = get_svm_peer(clstr, headers)
+                    print()
+                    print("Source Cluster/SVM "+clstr+"/"+str(sp)+" peered with "+str(cp)+".")
+                    print()
+        if smirror == "y":
+            snpchk(clstr, headers)
+            
     else:
         print()
         print("-env value invalid, it should be prod or nprod")
         sys.exit(1)
 
-    #clus_peer = get_clus_peer(clstr, headers)
     
-
-
 
 
