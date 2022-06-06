@@ -3,7 +3,7 @@ ONTAP REST API Scripts
 
 Purpose: Validation Script to list Cluster/VServer/Aggrerate details using ONTAP REST API.
 
-Usage: sp.py [-h] -s SITE_NAME -env ENV -host HOST -app APP -proto PROTO -domain DOMAIN [-dskt DSKT] [-u API_USER] [-p API_PASS]
+Usage: clstr_show.py [-h] -s SITE_NAME -env ENV -host HOST -app APP -proto PROTO -domain DOMAIN [-dskt DSKT] [-u API_USER] [-p API_PASS]
 """
 
 import pandas as pd
