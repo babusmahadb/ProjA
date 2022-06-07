@@ -3,7 +3,7 @@ ONTAP REST API Scripts
 
 Purpose: Validation Script to list Cluster/VServer/Aggrerate details using ONTAP REST API.
 
-Usage: sp.py [-h] -s SITE_NAME -env ENV -host HOST -app APP -proto PROTO -domain DOMAIN [-dskt DSKT] [-u API_USER] [-p API_PASS]
+Usage: clstr_show.py [-h] -s SITE_NAME -env ENV -host HOST -app APP -proto PROTO -domain DOMAIN [-dskt DSKT] [-u API_USER] [-p API_PASS]
 """
 
 import pandas as pd
@@ -49,7 +49,7 @@ def find_clstr(site: str, envir: str, domain: str):
                     elif domain in val:
                         op = ''.join(val)
                         output.append(op)
-    print(output)
+    print(bcolors.OKBLUE,"Resulting Cluster(s) are: ", output,bcolors.ENDC)
     return output
     
 def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
@@ -69,7 +69,7 @@ def list_aggregate(cluster: str, dsktype: str, headers_inc: str) -> None:
             response = requests.get(url, headers=headers_inc, verify=False)
             tmp = dict(response.json())
             if "error" in tmp:
-                print("Invalid Username/Password")
+                print(""+bcolors.FAIL +"Invalid Username/Password"+bcolors.ENDC +".")
                 print(tmp)
                 sys.exit(1)
         except requests.exceptions.HTTPError as err:
@@ -123,7 +123,7 @@ def sort_svm(cluster: str, headers_inc: str):
     for i in vservers:
         ctr = ctr + 1
         if i is False:
-            print("Vserver can't be sorted for app "+apps+", select one of different app value", app_list)
+            print(bcolors.WARNING,"Vserver can't be sorted for app "+apps+", select one of different app value", app_list,bcolors.ENDC)
             sys.exit(1)
         if services == 'nfs':
             sort_name = i['name']
@@ -132,7 +132,7 @@ def sort_svm(cluster: str, headers_inc: str):
                 if apps in sort_name:
                     sort_row.append(sort_name)
             else:
-                print("provide valid -app value, it must be one of ",app_list)
+                print(bcolors.WARNING,"provide valid -app value, it must be one of ",app_list,bcolors.ENDC)
                 sys.exit(1)
             
         elif services == 'cifs':
@@ -145,7 +145,7 @@ def sort_svm(cluster: str, headers_inc: str):
                 if apps in sort_name:
                     sort_row.append(sort_name)
             else:
-                print("provide valid -app value, it must be one of ",app_list)
+                print(bcolors.WARNING,"provide valid -app value, it must be one of ",app_list,bcolors.ENDC)
                 sys.exit(1)
         else:
             tmp=dict(i)
@@ -157,7 +157,7 @@ def sort_svm(cluster: str, headers_inc: str):
                 if apps in sort_name:
                     sort_row.append(sort_name)
             else:
-                print("provide valid -app value, it must be one of ",app_list)
+                print(bcolors.WARNING,"provide valid -app value, it must be one of ",app_list,bcolors.ENDC)
                 sys.exit(1)
     
     tmp_n = set(tmp_n)
@@ -213,7 +213,7 @@ def list_svm(cluster: str, headers_inc: str):
             srt = sort_svm(cluster, headers_inc)
             row=srt
         else:
-            print("Enter valid protocol")
+            print(bcolors.WARNING,"Enter valid protocol",bcolors.ENDC)
             sys.exit(1)
     
     flt_vs = set(row)
@@ -319,7 +319,7 @@ def get_vservers(cluster: str, headers_inc: str):
             sys.exit(1)
     else:
         print()
-        print(" Enter Valid protocol, should be nfs, cifs or iscsi")
+        print(bcolors.WARNING,"Enter Valid protocol, should be nfs, cifs or iscsi",bcolors.ENDC)
         sys.exit(1)
     
     out_response = response.json() 
@@ -436,7 +436,7 @@ def snpchk(clstr: str, headers: str):
             break
         else:
             print()
-            print("Entered Cluster is not Source Cluster listed above, Try these Cluster name: ", clstr_names)
+            print("Entered Cluster is not Source Cluster listed above, Try these Cluster name: ", bcolors.OKBLUE,clstr_names,bcolors.ENDC)
             continue
             
     clus_peer = get_clus_peer(clstr, headers)
@@ -451,10 +451,10 @@ def snpchk(clstr: str, headers: str):
             break
         else:
             print()
-            print("Entered Cluster is not peered with Source Cluster, Try these Cluster name: ", clus_peer)
+            print("Entered Cluster is not peered with Source Cluster, Try these Cluster name: ", bcolors.OKBLUE,clus_peer,bcolors.ENDC)
             continue
     print()
-    print("Source Cluster/SVM "+str(clstr)+"/"+str(sp)+" Peered with "+str(peer_clus)+"/"+str(svm_p)+".")
+    print("Source Cluster/SVM "+bcolors.OKGREEN+""+str(clstr)+"/"+str(sp)+""+bcolors.ENDC+" Peered with "+bcolors.OKCYAN+""+str(peer_clus)+"/"+str(svm_p)+bcolors.ENDC+".")
     print()
 
 class bcolors:
