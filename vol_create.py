@@ -46,12 +46,12 @@ def check_job(job_status: str, headers_inc: str):
     print()
 
     if job_status['state'] == "failure":
-        print("Volume creation failed due to :{}".format(job_status['message']))
+        print(bcolors.WARNING,"Volume creation failed due to :"+bcolors.ENDC+"{}".format(job_status['message']))
     elif job_status['state'] == "success":
         if path == "":
-            print("Volume "+vol_name+" of "+vol_size.upper()+" created successfully.")
+            print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully.")
         else:    
-            print("Volume "+vol_name+" of "+vol_size.upper()+" created successfully. Junction path is "+path+" .")
+            print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully. Junction path is "+bcolors.HEADER,path,bcolors.ENDC+" .")
     else:
         job_status_url = "https://{}/api/cluster/jobs/{}".format(clus_name, job_status['uuid'])
         job_response = requests.get(job_status_url, headers=headers_inc, verify=False)
@@ -78,9 +78,15 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
             cnt = j['count']
             if (pref == "daily" and cnt == 7):
                 snap_list.append(snap_policy)
-
-    print()
-    snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" ,"+str(snap_list)+": ")
+    dpv = "_mir"
+    if dpv in vol_name:
+       snapshot_policy = "none"
+    else:
+        if not snap_list:
+            snapshot_policy = "default"
+        else:
+            print()
+            snapshot_policy = input("Pick the snapshot policy for volume "+vol_name+" :"+str(snap_list)+": ")
 
     vol_url = "https://{}/api/storage/volumes/?return_timeout=30".format(clus_name)
     vol_data = {
@@ -131,6 +137,18 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
         sys.exit(1)
     
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    
+    
 def parse_args() -> argparse.Namespace:
     """Parse the command line arguments from the user"""
 
@@ -229,7 +247,7 @@ def crt_add_rule(rest_client: str, exp_id: str, headers_inc: str):
             print(err)
             sys.exit(1)
 
-        print("Rule for export Policy '"+exp_name+"' updated with protocol nfs3 for volume '"+vol_name+"' having access ro/rw/su of sys for client '"+host+"'.")
+        print("Rule for export Policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' updated with protocol nfs3 for volume '"+bcolors.HEADER,vol_name,bcolors.ENDC+"' having access ro/rw/su of sys for client '"+bcolors.OKCYAN,host,bcolors.ENDC+"'.")
 
 
 def crt_pol_rule(client: str, headers_inc: str):
@@ -272,7 +290,7 @@ def crt_pol_rule(client: str, headers_inc: str):
         sys.exit(1)
     #print("exp_res",exp_res)
     print()
-    print("Export policy '"+exp_name+"' created for volume '"+vol_name+"' with rule ro/rw/su of sys for clients '"+client+"'.")
+    print("Export policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' created for volume '"+bcolors.HEADER,vol_name,bcolors.ENDC+"' with rule ro/rw/su of sys for clients '"+bcolors.OKCYAN,client,bcolors.ENDC+"'.")
     print()
 
 
@@ -316,7 +334,7 @@ def crt_cifs_exp(exp_name: str, headers_inc: str):
 
         print(err)
         sys.exit(1)
-    print("Policy '"+exp_name+"' created with cifs protocol clientmatch of 0.0.0.0/0")
+    print("Policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' created with cifs protocol clientmatch of 0.0.0.0/0")
 
 
 def crt_exp(exp_name: str, headers_inc: str):
@@ -390,7 +408,7 @@ def crt_exp(exp_name: str, headers_inc: str):
                 print(err)
                 sys.exit(1)
 
-            print("Rule for export Policy '"+exp_name+"' updated with protocol nfs3 for volume '"+vol_name+"' having access ro/rw/su of sys for client '"+clientlist+"'.")
+            print("Rule for export Policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' updated with protocol nfs3 for volume '"+bcolors.HEADER,vol_name,bcolors.ENDC+"' having access ro/rw/su of sys for client '"+bcolors.OKCYAN,clientlist,bcolors.ENDC+"'.")
 
     else:
         print()
@@ -429,7 +447,7 @@ def crt_share(svm_uuid: str, headers_inc: str):
         print(err)
         sys.exit(1)
     print()
-    print("CIFS share '"+share_name+"' created with path "+path+".")
+    print("CIFS share '"+bcolors.OKBLUE,share_name,bcolors.ENDC+"' created with path "+bcolors.OKGREEN,path,bcolors.ENDC+".")
 
 
 
@@ -482,9 +500,9 @@ def mnt_vol(vol_name: str, headers: str):
     
     mnt_state = mnt_chk['state']
     if mnt_state == "success":
-        print("DP volume "+vol_name+" mounted, and Junction path is: ", path)
+        print("DP volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" mounted, and Junction path is: ", bcolors.OKGREEN,path,bcolors.ENDC)
     else:
-        print("Volume mount failed", mnt_chk)
+        print("Volume mount failed", bcolors.FAIL,mnt_chk,bcolors.ENDC)
     print()
     
 def check_job_status(cluster: str, job_status: str, failed: str, created: str, creating: str, headers_inc: str):
@@ -492,7 +510,7 @@ def check_job_status(cluster: str, job_status: str, failed: str, created: str, c
     #print("inside function", failed,created,creating)
     
     if job_status['state'] == "failure":
-        print("{}{}".format(failed,job_status['message']))
+        print("{}{}".format(failed,bcolors.FAIL,job_status['message'],bcolors.ENDC))
     elif job_status['state'] == "success":
         print(created)
     else:
@@ -542,8 +560,8 @@ def crt_estab_snpmir(tgt_clus: str, headers: str):
     sm_dt = dict(sm_res)
     sm_rd = sm_dt['records']
 
-    if sm_rd is False:
-        print("Creation of Snapmirror for "+src+" failed, refer JOB ID: ", smc_res)
+    if not sm_rd:
+        print("Creation of Snapmirror for "+bcolors.FAIL,src,bcolors.ENDC+" failed, refer JOB ID: ", smc_res)
         sys.exit(1)
     for id in sm_rd:
         smuuid = id['uuid']
@@ -613,7 +631,7 @@ if __name__ == "__main__":
         sys.exit(1)
     if "error" in find_res:
         print()
-        print("Invalid username/password")
+        print(bcolors.FAIL,"Invalid username/password",bcolors.ENDC)
         print(find_res)
         sys.exit(1)
 
@@ -701,7 +719,7 @@ if __name__ == "__main__":
             print(err)
             sys.exit(1)
 
-        if cifs_exp_name is False:
+        if not cifs_exp_name:
             print("No export policy created for cifs protocol with name tag of 'default'")
             crt = input("Would you like to create default export policy with cifs protocol rule?(y/n):")
             if crt == 'y':

@@ -71,21 +71,16 @@ def mnt_vol(vol_name: str, headers: str):
     
     #{'uuid': '18b54986-e945-11ec-9591-005056b09de7', '_links': {'self': {'href': '/api/cluster/jobs/18b54986-e945-11ec-9591-005056b09de7'}}}
     m = dict(mnt_json)
-    print(m)
     n = m['jobs']
-    print(type(n))
-    
     for t in n:
-        print(t)
         u = t['uuid']
-        print(u)
     
     href = "api/cluster/jobs/"+u+""    
-    print(href)
+    
     mnt_chk = "https://{}/{}".format(clus_name,href)
     response = requests.get(mnt_chk, headers=headers, verify=False)
     mnt_chk = response.json()
-    print(mnt_chk)
+    
     mnt_state = mnt_chk['state']
     if mnt_state == "success":
         print("Volume "+vol_name+" mounted successfully.")
