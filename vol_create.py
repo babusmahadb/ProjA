@@ -58,6 +58,7 @@ def check_job(job_status: str, headers_inc: str):
         job_status = job_response.json()
         check_job( job_status, headers_inc)
 
+
 def crt_vol(volume_size, SecStyle: str, headers_inc: str):
     """Module to create a volume"""
 
@@ -117,7 +118,6 @@ def crt_vol(volume_size, SecStyle: str, headers_inc: str):
             }
            }
         }
-
 
     response = requests.post(vol_url,headers=headers_inc,json=vol_data,verify=False)
     time.sleep(20)
@@ -195,8 +195,6 @@ def parse_args() -> argparse.Namespace:
 
     return parsed_args
 
-
-
 def get_exp_id(exp_name: str, headers_inc: str):
     """ Get's Export Policy ID using policy name """
 
@@ -216,7 +214,6 @@ def get_exp_id(exp_name: str, headers_inc: str):
     expt_id = pid['id']
 
     return  expt_id
-
 
 def crt_add_rule(rest_client: str, exp_id: str, headers_inc: str):
     """ add's additional rule existing expolicy """
@@ -292,7 +289,6 @@ def crt_pol_rule(client: str, headers_inc: str):
     print()
     print("Export policy"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"created for volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"with rule ro/rw/su of sys for clients"+bcolors.OKCYAN,client,bcolors.ENDC+"")
     print()
-
 
 
 def crt_cifs_exp(exp_name: str, headers_inc: str):
@@ -415,8 +411,6 @@ def crt_exp(exp_name: str, headers_inc: str):
         print("Existing script")
         sys.exit(1)
 
-
-
 def crt_share(svm_uuid: str, headers_inc: str):
     """ create new cifs share for volume """
 
@@ -449,8 +443,6 @@ def crt_share(svm_uuid: str, headers_inc: str):
     print()
     print("CIFS share"+bcolors.OKBLUE,share_name,bcolors.ENDC+"created with path :"+bcolors.OKGREEN,path,bcolors.ENDC+"")
 
-
-
 def get_svm():
     """ Get SVM nane and UUID """
 
@@ -473,6 +465,7 @@ def get_svm():
         sys.exit(1)
 
     return svm_uuid,svm_lang
+
 
 def mnt_vol(vol_name: str, headers: str):
 
@@ -505,6 +498,7 @@ def mnt_vol(vol_name: str, headers: str):
         print("Volume mount failed",bcolors.FAIL,mnt_chk,bcolors.ENDC)
     print()
     
+    
 def check_job_status(cluster: str, job_status: str, failed: str, created: str, creating: str, headers_inc: str):
     """Check Job Status"""
     #print("inside function", failed,created,creating)
@@ -530,9 +524,7 @@ def crt_estab_snpmir(tgt_clus: str, headers: str):
     dst = tgt_svm+":"+tgt_vol
     dataobj['source'] = {"path": src}
     dataobj['destination'] = {"path": dst}
-
-    #print(dataobj)
-
+ 
     smc_url = "https://{}/api/snapmirror/relationships/".format(tgt_clus)
     try:
         response = requests.post(smc_url,headers=headers,json=dataobj, verify=False)
@@ -654,16 +646,12 @@ if __name__ == "__main__":
 
     res = re.sub(r'[0-9]+$', lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}",vid)
 
-
-
     svmd = get_svm()
     svm_uuid = svmd[0]
     svm_lang = svmd[1]
     lang = svm_lang
     print()
     task_id = input("Enter a valid and approved Task number:")
-
-
 
     #svm_tag = svmname[-4:]
     svm_tag = svmname.split("-")
@@ -751,7 +739,6 @@ if __name__ == "__main__":
         print("Invalid protocal, should be nfs, cifs or multi")
         sys.exit()
 
-
     if smirror == "y":
 
         print()
@@ -773,19 +760,14 @@ if __name__ == "__main__":
         svmname = peer_svm
         aggrname = peer_aggr
 
-        #vol_name = vol_name+"_mir"
         tgt_clus = clus_name
         tgt_svm = svmname
-        #tgt_vol = vol_name
-
+        
         psvmd=get_svm()
         svm_uuid = psvmd[0]
-        #svm_lang = psvmd[1]
-        #exp_name = vol_name
-
+        
         aggrname = peer_aggr
         svmname = peer_svm
-        #print("tgt_svm, svmname",tgt_svm, svmname)
         svm_tag = svmname.split("-")
 
         if len(svm_tag) == 0:
@@ -794,16 +776,11 @@ if __name__ == "__main__":
         else:
            svm_tag = svm_tag[2]
 
-
-        #if ARGS.volname:
-        #   vol_name = ARGS.volname
-        #else:
         vol_name = "v_"+svm_tag+"_"+shrproto+"_"+funcgrp.upper()+res
 
         vol_name = vol_name+"_mir"
         exp_name = vol_name
         tgt_vol = vol_name
-
 
         crt_exp(exp_name, headers)
 
@@ -820,7 +797,6 @@ if __name__ == "__main__":
             crt_estab_snpmir(tgt_clus, headers)
             path = "/"+vol_name
             mnt_vol(vol_name, headers)
-
         else:
             print("Invalid protocal, should be nfs, cifs or multi")
             sys.exit()
