@@ -51,7 +51,7 @@ def check_job(job_status: str, headers_inc: str):
         if path == "":
             print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully.")
         else:    
-            print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully. Junction path is "+bcolors.HEADER,path,bcolors.ENDC+" .")
+            print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully. Junction path is "+bcolors.OKGREEN,path,bcolors.ENDC+" .")
     else:
         job_status_url = "https://{}/api/cluster/jobs/{}".format(clus_name, job_status['uuid'])
         job_response = requests.get(job_status_url, headers=headers_inc, verify=False)
@@ -247,7 +247,7 @@ def crt_add_rule(rest_client: str, exp_id: str, headers_inc: str):
             print(err)
             sys.exit(1)
 
-        print("Rule for export Policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' updated with protocol nfs3 for volume '"+bcolors.HEADER,vol_name,bcolors.ENDC+"' having access ro/rw/su of sys for client '"+bcolors.OKCYAN,host,bcolors.ENDC+"'.")
+        print("Rule for export Policy"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"updated with protocol nfs3 for volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"having access ro/rw/su of sys for client"+bcolors.OKCYAN,host,bcolors.ENDC+".")
 
 
 def crt_pol_rule(client: str, headers_inc: str):
@@ -290,7 +290,7 @@ def crt_pol_rule(client: str, headers_inc: str):
         sys.exit(1)
     #print("exp_res",exp_res)
     print()
-    print("Export policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' created for volume '"+bcolors.HEADER,vol_name,bcolors.ENDC+"' with rule ro/rw/su of sys for clients '"+bcolors.OKCYAN,client,bcolors.ENDC+"'.")
+    print("Export policy"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"created for volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"with rule ro/rw/su of sys for clients"+bcolors.OKCYAN,client,bcolors.ENDC+".")
     print()
 
 
@@ -334,7 +334,7 @@ def crt_cifs_exp(exp_name: str, headers_inc: str):
 
         print(err)
         sys.exit(1)
-    print("Policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' created with cifs protocol clientmatch of 0.0.0.0/0")
+    print("Policy"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"created with cifs protocol clientmatch of 0.0.0.0/0")
 
 
 def crt_exp(exp_name: str, headers_inc: str):
@@ -408,7 +408,7 @@ def crt_exp(exp_name: str, headers_inc: str):
                 print(err)
                 sys.exit(1)
 
-            print("Rule for export Policy '"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"' updated with protocol nfs3 for volume '"+bcolors.HEADER,vol_name,bcolors.ENDC+"' having access ro/rw/su of sys for client '"+bcolors.OKCYAN,clientlist,bcolors.ENDC+"'.")
+            print("Rule for export Policy"+bcolors.OKBLUE,exp_name,bcolors.ENDC+"updated with protocol nfs3 for volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"having access ro/rw/su of sys for client"+bcolors.OKCYAN,clientlist,bcolors.ENDC+".")
 
     else:
         print()
@@ -447,7 +447,7 @@ def crt_share(svm_uuid: str, headers_inc: str):
         print(err)
         sys.exit(1)
     print()
-    print("CIFS share '"+bcolors.OKBLUE,share_name,bcolors.ENDC+"' created with path "+bcolors.OKGREEN,path,bcolors.ENDC+".")
+    print("CIFS share"+bcolors.OKBLUE,share_name,bcolors.ENDC+"created with path :"+bcolors.OKGREEN,path,bcolors.ENDC+".")
 
 
 
@@ -500,9 +500,9 @@ def mnt_vol(vol_name: str, headers: str):
     
     mnt_state = mnt_chk['state']
     if mnt_state == "success":
-        print("DP volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" mounted, and Junction path is: ", bcolors.OKGREEN,path,bcolors.ENDC)
+        print("DP volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"mounted, and Junction path is:",bcolors.OKGREEN,path,bcolors.ENDC)
     else:
-        print("Volume mount failed", bcolors.FAIL,mnt_chk,bcolors.ENDC)
+        print("Volume mount failed",bcolors.FAIL,mnt_chk,bcolors.ENDC)
     print()
     
 def check_job_status(cluster: str, job_status: str, failed: str, created: str, creating: str, headers_inc: str):
@@ -549,7 +549,7 @@ def crt_estab_snpmir(tgt_clus: str, headers: str):
     job_response = requests.get(job_status, headers=headers, verify=False)
     job_status = job_response.json()
     failed = "SnapMirror creation failed due to :"  
-    created = "SnapMirror created successfully between "+src+" and "+dst+"."
+    created = "SnapMirror created successfully between"+bcolors.OKBLUE,src,bcolors.ENDC+" and "+bcolors.OKGREEN,dst,bcolors.ENDC+"."
     creating = "SnapMirror creation in process...."
     check_job_status(tgt_clus, job_status, failed, created, creating, headers)
     
@@ -561,7 +561,7 @@ def crt_estab_snpmir(tgt_clus: str, headers: str):
     sm_rd = sm_dt['records']
 
     if not sm_rd:
-        print("Creation of Snapmirror for "+bcolors.FAIL,src,bcolors.ENDC+" failed, refer JOB ID: ", smc_res)
+        print("Creation of Snapmirror for"+bcolors.FAIL,src,bcolors.ENDC+"failed, refer JOB ID: ", smc_res)
         sys.exit(1)
     for id in sm_rd:
         smuuid = id['uuid']
@@ -584,7 +584,7 @@ def crt_estab_snpmir(tgt_clus: str, headers: str):
     job_response = requests.get(job_status, headers=headers, verify=False)
     job_status = job_response.json()
     failed = "SnapMirror initialize failed due to :"  
-    created = "SnapMirror initialized successfully between "+src+" and "+dst+"."
+    created = "SnapMirror initialized successfully between"+bcolors.OKBLUE,src,bcolors.ENDC+" and "+bcolors.OKGREEN,dst,bcolors.ENDC+"."
     creating = "SnapMirror initializion in process...."
     check_job_status(tgt_clus, job_status, failed, created, creating, headers)
     
