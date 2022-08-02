@@ -49,6 +49,7 @@ def find_clstr(site: str, envir: str, domain: str):
                     elif domain in val:
                         op = ''.join(val)
                         output.append(op)
+    print()
     print(bcolors.OKBLUE,"Resulting Cluster(s) are: ", output,bcolors.ENDC)
     return output
     
@@ -490,13 +491,14 @@ if __name__ == "__main__":
     if (ARGS.env == 'prod' or ARGS.domain == 'dmz'):
         if ARGS.dskt == 'sata':
             dsktype = ['sas','ssd','sata']
+            ARGS.env = 'pfsx'
         else:
             dsktype = ['sas','ssd']
             if ARGS.env == 'nprod':
                 ARGS.env = 'sfsx'
             else:
                 ARGS.env = 'pfsx'
-        
+        print(dsktype)
         clstr_names = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_names:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
