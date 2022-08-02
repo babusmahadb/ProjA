@@ -1044,3 +1044,353 @@ uslv-vfsx-sdb10-dmz
 
 site01-pfsx-app01::>
 
+
+
+
+#####################################################################################################################################################
+
+Add Alias in DNS for cluster names of site01-pfsx-app01(Cluster1), site02-pfsx-app01(Cluster2) and site01-sfsx-app02(Cluster3)
+
+site01-pfsx-app01::> cluster identity modify -name site01-pfsx-app01
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-afsx-dmz -subtype default -rootvolume uslv_vfsx_afsx_dmz_root -aggregate cluster1_01_ssd_1 -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-nfs,data-cifs,data-flexcache,data-iscsi -comment ""
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-cf10-dmz -subtype default -rootvolume uslv_vfsx_cf10_dmz_root -aggregate cluster1_01_ssd_1 -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-nfs,data-cifs,data-flexcache,data-iscsi -comment ""
+
+site01-pfsx-app01::> vserver create -vserver uslv-vfsx-sdb10-dmz -subtype default -rootvolume uslv_vfsx_sdb10_dmz_root -aggregate cluster1_01_ssd_1 -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-nfs,data-cifs,data-flexcache,data-iscsi -comment ""
+
+site01-pfsx-app01::> nfs create -vserver uslv-vfsx-cf10-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled
+
+site01-pfsx-app01::> nfs create -vserver uslv-vfsx-sdb10-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled
+
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-cf10-dmz -lif list_cf -service-policy default-data-files -address 192.168.0.115 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+site01-pfsx-app01::> net int create -vserver uslv-vfsx-sdb10-dmz -lif list_sdb -service-policy default-data-files -address 192.168.0.116 -netmask 255.255.255.0 -home-node cluster1-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true
+  (network interface create)
+
+site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-cf11-dmz
+
+site01-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-sdb11-dmz
+
+site01-pfsx-app01::> cifs create -cifs-server uslv-cf -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-cf10-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-cf10-dmz -smb1-enabled true" to enable it.
+
+site01-pfsx-app01::> cifs create -cifs-server uslv-sdb -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb10-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-sdb10-dmz -smb1-enabled true" to enable it.
+
+site01-pfsx-app01::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+uslv-vfsx-cf10-dmz
+            USLV-CF10       up        DEMO             domain
+uslv-vfsx-sdb10-dmz
+            USLV-SDB        up        DEMO             domain
+2 entries were displayed.
+
+site01-pfsx-app01::> iscsi create -vserver uslv-vfsx-cf10-dmz -target-alias uslv-vfsx-cf10-dmz -status-admin up
+
+site01-pfsx-app01::> iscsi create -vserver uslv-vfsx-sdb10-dmz -target-alias uslv-vfsx-sdb10-dmz -status-admin up
+
+site01-pfsx-app01::> iscsi show
+           Target                           Target                       Status
+Vserver    Name                             Alias                        Admin
+---------- -------------------------------- ---------------------------- ------
+uslv-vfsx-cf10-dmz
+           iqn.1992-08.com.netapp:sn.a151dcb4117d11ed8d31005056b70e44:vs.3
+                                            uslv-vfsx-cf10-dmz           up
+uslv-vfsx-sdb10-dmz
+           iqn.1992-08.com.netapp:sn.ba414c40117d11ed8d31005056b70e44:vs.4
+                                            uslv-vfsx-sdb10-dmz          up
+2 entries were displayed.
+
+site01-pfsx-app01::> nfs show
+
+Vserver: uslv-vfsx-cf10-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-sdb10-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+2 entries were displayed.
+
+site01-pfsx-app01::>
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+site02-pfsx-app01::> cluster identity modify -name site02-pfsx-app01
+
+site02-pfsx-app01::> vserver create -vserver uslv-vfsx-cf11-dmz -subtype default -rootvolume uslv_vfsx_cf11_dmz_root -aggregate cluster2_01_sas_1 -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-nfs,data-cifs,data-flexcache,data-iscsi -comment ""
+
+site02-pfsx-app01::> vserver create -vserver uslv-vfsx-sdb11-dmz -subtype default -rootvolume uslv_vfsx_sdb11_dmz_root -aggregate cluster2_01_sas_1 -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-nfs,data-cifs,data-flexcache,data-iscsi -comment ""
+
+site02-pfsx-app01::> nfs create -vserver uslv-vfsx-cf11-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled
+
+site02-pfsx-app01::> nfs create -vserver uslv-vfsx-sdb11-dmz -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled
+
+site02-pfsx-app01::> net int modify -lif svm21_cifs_nfs_lif1 -vserver svm21 -status-admin down
+  (network interface modify)
+
+site02-pfsx-app01::> net int delete -lif svm21_cifs_nfs_lif1 -vserver svm21
+  (network interface delete)
+
+site02-pfsx-app01::> net int modify -lif cluster2-01_iscsi_lif_1 -vserver svm21 -status-admin down
+  (network interface modify)
+
+site02-pfsx-app01::> net int delete  -lif cluster2-01_iscsi_lif_1 -vserver svm21
+  (network interface delete)
+
+site02-pfsx-app01::> net int create -vserver uslv-vfsx-cf11-dmz -lif list_cf -service-policy default-data-files -address 192.168.0.141 -netmask 255.255.255.0 -home-node cluster2-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -force-subnet-association true
+  (network interface create)
+
+site02-pfsx-app01::> net int create -vserver uslv-vfsx-sdb11-dmz -lif list_sdb  -service-policy default-data-files -address 192.168.0.142 -netmask 255.255.255.0 -home-node cluster2-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -force-subnet-association true
+  (network interface create)
+
+site02-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-cf11-dmz
+
+site02-pfsx-app01::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-sdb11-dmz
+
+site02-pfsx-app01::> cifs create -cifs-server uslv-cf11 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-cf11-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-cf11-dmz -smb1-enabled true" to enable it.
+
+site02-pfsx-app01::> cifs create -cifs-server uslv-sdb11 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb11-dmz
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-sdb11-dmz -smb1-enabled true" to enable it.
+
+site02-pfsx-app01::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+svm21       SVM21           up        DEMO             domain
+uslv-vfsx-cf11-dmz
+            USLV-CF11       up        DEMO             domain
+uslv-vfsx-sdb11-dmz
+            USLV-SDB11      up        DEMO             domain
+3 entries were displayed.
+
+
+site02-pfsx-app01::> iscsi create -vserver uslv-vfsx-cf11-dmz -target-alias uslv-vfsx-cf11-dmz -status-admin up
+
+site02-pfsx-app01::> iscsi create -vserver uslv-vfsx-sdb11-dmz -target-alias uslv-vfsx-sdb11-dmz -status-admin up
+
+site02-pfsx-app01::> iscsi show
+           Target                           Target                       Status
+Vserver    Name                             Alias                        Admin
+---------- -------------------------------- ---------------------------- ------
+uslv-vfsx-cf11-dmz
+           iqn.1992-08.com.netapp:sn.cb76ef95117e11edb43c005056b74106:vs.3
+                                            uslv-vfsx-cf11-dmz           up
+uslv-vfsx-sdb11-dmz
+           iqn.1992-08.com.netapp:sn.db6aec48117e11edb43c005056b74106:vs.4
+                                            uslv-vfsx-sdb11-dmz          up
+2 entries were displayed.
+
+site02-pfsx-app01::> nfs show
+
+Vserver: svm21
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-cf11-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-sdb11-dmz
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+3 entries were displayed.
+
+site02-pfsx-app01::>
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+site01-sfsx-app02::> vserver create -vserver uslv-vfsx-cf12 -subtype default -rootvolume uslv_vfsx_cf12_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+[Job 121] Job succeeded:
+Vserver creation completed.
+
+site01-sfsx-app02::> vserver create -vserver uslv-vfsx-sdb12 -subtype default -rootvolume uslv_vfsx_sdb12_root -rootvolume-security-style unix -language C.UTF-8 -snapshot-policy default -data-services data-iscsi,data-nfs,data-cifs,data-flexcache,data-fpolicy-client -foreground true
+[Job 122] Job succeeded:
+Vserver creation completed.
+
+site01-sfsx-app02::> nfs create -vserver uslv-vfsx-cf12 -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled
+
+site01-sfsx-app02::>  nfs create -vserver uslv-vfsx-sdb12 -access true -v3 enabled -v4.0 disabled -tcp enabled -v4.0-acl disabled
+
+site01-sfsx-app02::> net int create -vserver uslv-vfsx-cf12 -lif list_cf -service-policy default-data-files -address 192.168.0.154 netmask 255.255.255.0 -home-node cluster3-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -force-subnet-association true
+  (network interface create)
+
+Error: "netmask" is an invalid value for field "-netmask <IP Address>"
+
+site01-sfsx-app02::> net int create -vserver uslv-vfsx-cf12 -lif list_cf -service-policy default-data-files -address 192.168.0.154 -netmask 255.255.255.0 -home-node cluster3-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -force-subnet-association true
+  (network interface create)
+
+site01-sfsx-app02::> net int create -vserver uslv-vfsx-sdb12 -lif list_sdb -service-policy default-data-files -address 192.168.0.155 -netmask 255.255.255.0 -home-node cluster3-01 -home-port e0e -status-admin up -failover-policy system-defined -firewall-policy data -auto-revert false -failover-group Default -is-dns-update-enabled true -force-subnet-association true
+  (network interface create)
+
+site01-sfsx-app02::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-cf12
+
+site01-sfsx-app02::> dns create -domains demo.netapp.com -name-servers 192.168.0.253 -timeout 2 -attempts 1 -skip-config-validation true -vserver uslv-vfsx-sdb12
+
+site01-sfsx-app02::> cifs create -cifs-server uslv-cf12 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-cf12
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-cf12 -smb1-enabled true" to enable it.
+
+site01-sfsx-app02::> cifs create -cifs-server uslv-sdb12 -domain demo.netapp.com -ou CN=Computers -default-site "" -status-admin up -comment "" -vserver uslv-vfsx-sdb12
+
+In order to create an Active Directory machine account for the CIFS server, you must supply the name and password of a Windows account with sufficient privileges to add computers to the "CN=Computers" container
+within the "DEMO.NETAPP.COM" domain.
+
+Enter the user name: Administrator
+
+Enter the password:
+
+Notice: SMB1 protocol version is obsolete and considered insecure. Therefore it is deprecated and disabled on this CIFS server. Support for SMB1 might be removed in a future release. If required, use the
+(privilege: advanced) "vserver cifs options modify -vserver uslv-vfsx-sdb12 -smb1-enabled true" to enable it.
+
+site01-sfsx-app02::> cifs show
+            Server          Status    Domain/Workgroup Authentication
+Vserver     Name            Admin     Name             Style
+----------- --------------- --------- ---------------- --------------
+svm21-dst   SVM21-DST       up        DEMO             domain
+uslv-vfsx-cf12
+            USLV-CF12       up        DEMO             domain
+uslv-vfsx-sdb12
+            USLV-SDB12      up        DEMO             domain
+3 entries were displayed.
+
+site01-sfsx-app02::> iscsi create -vserver uslv-vfsx-cf12 -target-alias uslv-vfsx-cf12 -status-admin up
+
+site01-sfsx-app02::> iscsi create -vserver uslv-vfsx-sdb12 -target-alias uslv-vfsx-sdb12 -status-admin up
+
+site01-sfsx-app02::> iscsi show
+           Target                           Target                       Status
+Vserver    Name                             Alias                        Admin
+---------- -------------------------------- ---------------------------- ------
+uslv-vfsx-cf12
+           iqn.1992-08.com.netapp:sn.b44b75d2124111edbf1f005056b784f0:vs.3
+                                            uslv-vfsx-cf12               up
+uslv-vfsx-sdb12
+           iqn.1992-08.com.netapp:sn.c34552b8124111edbf1f005056b784f0:vs.4
+                                            uslv-vfsx-sdb12              up
+2 entries were displayed.
+
+site01-sfsx-app02::> nfs show
+
+Vserver: svm21-dst
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-cf12
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+
+Vserver: uslv-vfsx-sdb12
+
+        General Access:  true
+                    v3:  enabled
+                  v4.0:  disabled
+                   4.1:  disabled
+                   UDP:  enabled
+                   TCP:  enabled
+  Default Windows User:  -
+ Default Windows Group:  -
+3 entries were displayed.
+
+site01-sfsx-app02::>
+
+#####################################################################################################################################################
