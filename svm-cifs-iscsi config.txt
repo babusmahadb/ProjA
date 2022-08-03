@@ -1394,3 +1394,119 @@ Vserver: uslv-vfsx-sdb12
 site01-sfsx-app02::>
 
 #####################################################################################################################################################
+
+Need to create 2 lifs intercls1(cluster1-01) 192.168.0.105 & intercls2(cluster1-02) 192.168.0.106
+
+site01-pfsx-app01::> cluster peer create -generate-passphrase -offer-expiration 2days
+
+Notice:
+        Passphrase: 9u5fWs0Fb4wvLBmQZPRQGo36
+        Expiration Time: 8/4/2022 17:00:10 +00:00
+        Initial Allowed Vserver Peers: -
+        Intercluster LIF IP: 192.168.0.105
+        Peer Cluster Name: Clus_Go36 (temporary generated)
+
+        Warning: make a note of the passphrase - it cannot be displayed again.
+
+
+site02-pfsx-app01::> cluster peer create -peer-addrs 192.168.0.105
+
+Notice: Use a generated passphrase or choose a passphrase of 8 or more characters. To ensure the authenticity of the peering relationship, use a phrase or sequence of characters that would be hard to guess.
+
+Enter the passphrase:
+Confirm the passphrase:
+
+Notice: Clusters "site02-pfsx-app01" and "site01-pfsx-app01" are peered.
+
+site02-pfsx-app01::> cluster peer show
+Peer Cluster Name         Cluster Serial Number Availability   Authentication
+------------------------- --------------------- -------------- --------------
+Clus_rN1u                 -                     Unidentified   pending
+cluster3                  1-80-000011           Available      ok
+site01-pfsx-app01         1-80-000011           Available      ok
+3 entries were displayed.
+
+
+site01-pfsx-app01::> vserver peer create -vserver uslv-vfsx-cf10-dmz -peer-vserver uslv-vfsx-cf11-dmz -applications snapmirror -peer-cluster site02-pfsx-app01
+
+Info: [Job 289] 'vserver peer create' job queued
+
+site02-pfsx-app01::*> vserver peer accept -vserver uslv-vfsx-cf11-dmz -peer-vserver uslv-vfsx-cf10-dmz
+
+Info: [Job 150] 'vserver peer accept' job queued
+
+site02-pfsx-app01::*> vserver peer show
+            Peer        Peer                           Peering        Remote
+Vserver     Vserver     State        Peer Cluster      Applications   Vserver
+----------- ----------- ------------ ----------------- -------------- ---------
+svm21       svm21-dst   peered       cluster3          snapmirror     svm21-dst
+uslv-vfsx-cf11-dmz
+            uslv-vfsx-cf10-dmz
+                        pending      site01-pfsx-app01 snapmirror     uslv-vfsx-cf10-dmz
+2 entries were displayed.
+
+site02-pfsx-app01::*> vserver peer show
+            Peer        Peer                           Peering        Remote
+Vserver     Vserver     State        Peer Cluster      Applications   Vserver
+----------- ----------- ------------ ----------------- -------------- ---------
+svm21       svm21-dst   peered       cluster3          snapmirror     svm21-dst
+uslv-vfsx-cf11-dmz
+            uslv-vfsx-cf10-dmz
+                        peered       site01-pfsx-app01 snapmirror     uslv-vfsx-cf10-dmz
+2 entries were displayed.
+
+site01-pfsx-app01::> vserver peer create -vserver uslv-vfsx-sdb10-dmz -peer-vserver uslv-vfsx-sdb11-dmz -applications snapmirror -peer-cluster site02-pfsx-app01
+
+Info: [Job 290] 'vserver peer create' job queued
+
+site02-pfsx-app01::*> vserver peer accept -vserver uslv-vfsx-sdb11-dmz -peer-vserver uslv-vfsx-sdb10-dmz
+
+Info: [Job 151] 'vserver peer accept' job queued
+
+site02-pfsx-app01::*> vserver peer show
+            Peer        Peer                           Peering        Remote
+Vserver     Vserver     State        Peer Cluster      Applications   Vserver
+----------- ----------- ------------ ----------------- -------------- ---------
+svm21       svm21-dst   peered       cluster3          snapmirror     svm21-dst
+uslv-vfsx-cf11-dmz
+            uslv-vfsx-cf10-dmz
+                        peered       site01-pfsx-app01 snapmirror     uslv-vfsx-cf10-dmz
+uslv-vfsx-sdb11-dmz
+            uslv-vfsx-sdb10-dmz
+                        pending      site01-pfsx-app01 snapmirror     uslv-vfsx-sdb10-dmz
+3 entries were displayed.
+
+site02-pfsx-app01::*> vserver peer show
+            Peer        Peer                           Peering        Remote
+Vserver     Vserver     State        Peer Cluster      Applications   Vserver
+----------- ----------- ------------ ----------------- -------------- ---------
+svm21       svm21-dst   peered       cluster3          snapmirror     svm21-dst
+uslv-vfsx-cf11-dmz
+            uslv-vfsx-cf10-dmz
+                        peered       site01-pfsx-app01 snapmirror     uslv-vfsx-cf10-dmz
+uslv-vfsx-sdb11-dmz
+            uslv-vfsx-sdb10-dmz
+                        pending      site01-pfsx-app01 snapmirror     uslv-vfsx-sdb10-dmz
+3 entries were displayed.
+
+site02-pfsx-app01::*> vserver peer show
+            Peer        Peer                           Peering        Remote
+Vserver     Vserver     State        Peer Cluster      Applications   Vserver
+----------- ----------- ------------ ----------------- -------------- ---------
+svm21       svm21-dst   peered       cluster3          snapmirror     svm21-dst
+uslv-vfsx-cf11-dmz
+            uslv-vfsx-cf10-dmz
+                        peered       site01-pfsx-app01 snapmirror     uslv-vfsx-cf10-dmz
+uslv-vfsx-sdb11-dmz
+            uslv-vfsx-sdb10-dmz
+                        peered       site01-pfsx-app01 snapmirror     uslv-vfsx-sdb10-dmz
+3 entries were displayed.
+
+site01-pfsx-app01::> vserver peer show
+            Peer        Peer                           Peering        Remote
+Vserver     Vserver     State        Peer Cluster      Applications   Vserver
+----------- ----------- ------------ ----------------- -------------- ---------
+uslv-vfsx-cf10-dmz
+            uslv-vfsx-cf11-dmz
+                        peered       site02-pfsx-app01 snapmirror     uslv-vfsx-cf11-dmz
+#####################################################################################################################################################

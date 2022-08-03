@@ -498,7 +498,6 @@ if __name__ == "__main__":
                 ARGS.env = 'sfsx'
             else:
                 ARGS.env = 'pfsx'
-        print(dsktype)
         clstr_names = find_clstr(ARGS.s, ARGS.env, ARGS.domain)
         for clstr in clstr_names:
                 aggr_list = list_aggregate(clstr,dsktype,headers)
@@ -508,8 +507,8 @@ if __name__ == "__main__":
                     print()
                     print("Source Cluster/SVM "+clstr+"/"+str(sp)+" peered with "+str(cp)+".")
                     print()
-        if smirror == "y":
-            snpchk(clstr, headers)
+        #if smirror == "y":
+                    snpchk(clstr, headers)
                 #svm_list = list_svm(clstr, headers)
     elif ARGS.env == 'nprod':
         if (ARGS.dskt == 'sas' or ARGS.dskt == 'ssd'):
@@ -526,8 +525,8 @@ if __name__ == "__main__":
                     print()
                     print("Source Cluster/SVM "+clstr+"/"+str(sp)+" peered with "+str(cp)+".")
                     print()
-        if smirror == "y":
-            snpchk(clstr, headers)
+        #if smirror == "y":
+                    snpchk(clstr, headers)
             
     else:
         print()
