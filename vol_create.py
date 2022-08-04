@@ -51,7 +51,7 @@ def check_job(job_status: str, headers_inc: str):
         if path == "":
             print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully.")
         else:    
-            print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully. Junction path is "+bcolors.OKGREEN,path,bcolors.ENDC+" .")
+            print("Volume "+bcolors.HEADER,vol_name,bcolors.ENDC+" of "+bcolors.HEADER,vol_size.upper(),bcolors.ENDC+" created successfully. Junction path is "+bcolors.OKGREEN,path,bcolors.ENDC+".")
     else:
         job_status_url = "https://{}/api/cluster/jobs/{}".format(clus_name, job_status['uuid'])
         job_response = requests.get(job_status_url, headers=headers_inc, verify=False)
@@ -493,7 +493,7 @@ def mnt_vol(vol_name: str, headers: str):
     
     mnt_state = mnt_chk['state']
     if mnt_state == "success":
-        print("DP volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"mounted, and Junction path is:",bcolors.OKGREEN,path,bcolors.ENDC)
+        print("DP volume"+bcolors.HEADER,vol_name,bcolors.ENDC+"mounted, and Junction path is:"+bcolors.OKGREEN,path,bcolors.ENDC+".")
     else:
         print("Volume mount failed",bcolors.FAIL,mnt_chk,bcolors.ENDC)
     print()
