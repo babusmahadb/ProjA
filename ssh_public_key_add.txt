@@ -1,0 +1,53 @@
+
+import paramiko
+import logging
+from getpass import getpass
+from datetime import datetime
+
+# Generate a timestamp for the log file name
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+log_file = f"ssh_script_{timestamp}.log"
+
+# Set up logging
+logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Read the hostnames from file1.txt into a list
+with open('file1.txt', 'r') as file:
+    hostnames = file.read().splitlines()
+
+# SSH username and password
+username = 'your_username'
+password = getpass('Enter your password: ')
+
+# Loop through each hostname and run the command via SSH
+for hostname in hostnames:
+    logging.info(f"Running command on {hostname}")
+    
+    # Create an SSH client
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    try:
+        # Connect to the remote host
+        client.connect(hostname, username=username, password=password)
+
+        # Run the command
+        stdin, stdout, stderr = client.exec_command('your_command_here')
+
+        # Print the command output
+        output = stdout.read().decode()
+        logging.info(f"Command output on {hostname}:\n{output}")
+        print(output)
+    except paramiko.AuthenticationException:
+        logging.error(f"Authentication failed for {hostname}")
+        print(f"Authentication failed for {hostname}")
+    except paramiko.SSHException as e:
+        logging.error(f"SSH error occurred on {hostname}: {str(e)}")
+        print(f"SSH error occurred on {hostname}: {str(e)}")
+    except Exception as e:
+        logging.error(f"An error occurred on {hostname}: {str(e)}")
+        print(f"An error occurred on {hostname}: {str(e)}")
+    finally:
+        # Close the SSH connection
+        client.close()
+
