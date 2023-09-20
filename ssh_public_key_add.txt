@@ -1,12 +1,11 @@
-
-import paramiko
+import requests
 import logging
 from getpass import getpass
 from datetime import datetime
 
 # Generate a timestamp for the log file name
 timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-log_file = f"ssh_script_{timestamp}.log"
+log_file = "rest_script_" + timestamp + ".log"
 
 # Set up logging
 logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -15,37 +14,53 @@ logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s -
 with open('file1.txt', 'r') as file:
     hostnames = file.read().splitlines()
 
-# SSH username and password
-username = 'your_username'
+
+
+# REST API credentials
+username = 'admin'
 password = getpass('Enter your password: ')
 
-# Loop through each hostname and run the command via SSH
+# Public key
+public_key = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDaM4om88X1Ntxuw6Ydi+EUPQecS628BRelOgJ20ojWWyFDTOIEy0w/9naxjBdgJlKKaoop52XEtpxaXBS8/BnpPP/2wvModSCzL4n1BUTzOnjtOVeHd3KH6xx3b+Y0skDm/sKCtf5MBycd0pI/UKliKFpJ5Tgx7Z6V6sWmvp/F13LUipxaw95lx4uJ/VNMgoN1ICX4l7g4HTD9Ngc9Cw7NCYhegvtLZzmexGpDdZwgOfummqmcgsAHh8qABJRH8javKuiv2rQrxRvDzluqkE2hm5+Zw4kW2UPSMwMM3p8rc0+TFymKIrm1UNp9BCorzvPXTfVw3bD7XPmkmOOxS9+1 ansible@ansible.demo.netapp.com'
+
+# Loop through each hostname and make a REST API request
 for hostname in hostnames:
-    logging.info(f"Running command on {hostname}")
+    # REST API endpoint
+    api_url = 'https://{}.demo.netapp.com/api/security/authentication/publickeys'.format(hostname)
+    print(api_url)
+    logging.info("Making API request for " + hostname)
     
-    # Create an SSH client
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
     try:
-        # Connect to the remote host
-        client.connect(hostname, username=username, password=password)
+        # Create a session and set the authentication credentials
+        session = requests.Session()
+        session.auth = (username, password)
 
-        # Run the command
-        stdin, stdout, stderr = client.exec_command('your_command_here')
+        # Make the API request with the public key in the JSON payload
+        payload = {
+                    "account": {
+                        "name": "babu-adm"
+                    },
+                    "comment": "CTASK",
+                    "index": 0,
+                    "owner": {
+                        "name": hostname
+                        
+                    },
+                    "public_key": public_key
+                  }
+        response = session.post(api_url, json=payload, verify=False)
 
-        # Print the command output
-        output = stdout.read().decode()
-        logging.info(f"Command output on {hostname}:\n{output}")
-        print(output)
-    except paramiko.AuthenticationException:
-        logging.error(f"Authentication failed for {hostname}")
-        print(f"Authentication failed for {hostname}")
-    except paramiko.SSHException as e:
-        logging.error(f"SSH error occurred on {hostname}: {str(e)}")
-        print(f"SSH error occurred on {hostname}: {str(e)}")
-    except Exception as e:
-        logging.error(f"An error occurred on {hostname}: {str(e)}")
+        # Check the response status code
+        if response.status_code == 200 or response.status_code == 201:
+            logging.info("API request successful for " + hostname+ " with status code " + str(response.status_code)+ "")
+            print("API request successful for "+hostname+ " with status code " + str(response.status_code)+ "")
+        else:
+            logging.error("API request failed for " + hostname + " with status code " + str(response.status_code)+ "")
+            print("API request failed for " + hostname+ " with status code " +str(response.status_code)+ "")
+    except requests.exceptions.RequestException as e:
+        logging.error("An error occurred for " + hostname+ ": "+str(e)+ "")
+        print("An error occurred for " + hostname+ ": "+str(e)+ "")
+
         print(f"An error occurred on {hostname}: {str(e)}")
     finally:
         # Close the SSH connection
